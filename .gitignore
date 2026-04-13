@@ -1,0 +1,8 @@
+config.php
+db/*.sqlite
+db/*.sqlite-wal
+db/*.sqlite-shm
+.agents/
+.claude/
+node_modules/
+*.zip

@@ -1,0 +1,41 @@
+User-agent: *
+Allow: /
+Disallow: /send.php
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+# Yandex
+User-agent: YandexBot
+Allow: /
+
+# Bing / ChatGPT
+User-agent: Bingbot
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# OpenAI / ChatGPT crawler
+User-agent: GPTBot
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+# Google Gemini
+User-agent: Google-Extended
+Allow: /
+
+# Common Crawl (используется многими LLM)
+User-agent: CCBot
+Allow: /
+
+# Apple AI
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://splithub.ru/sitemap.xml

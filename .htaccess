@@ -1,0 +1,4 @@
+# Запретить прямой доступ к config.php
+<Files "config.php">
+    Require all denied
+</Files>
