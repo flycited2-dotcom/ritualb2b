@@ -3,16 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>СплитХаб — Оптовые кондиционеры для монтажников Симферополь</title>
-<meta name="description" content="Мультибрендовый оптовый прайс кондиционеров для монтажников Симферополь. ULTIMA COMFORT, XIGMA, Eurohoff, DAICHI — инверторные и On/Off, медная труба. Цены без наценки.">
+<title>СплитХаб — Оптовые кондиционеры для монтажников и B2B и B2B Симферополь</title>
+<meta name="description" content="Мультибрендовый оптовый прайс кондиционеров для монтажников и B2B Симферополь. ULTIMA COMFORT, XIGMA, Eurohoff, DAICHI — инверторные и On/Off, медная труба. Цены без наценки.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://splithub.ru/">
 <meta name="yandex-verification" content="91dea475fefafcd8">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://splithub.ru/">
-<meta property="og:title" content="СплитХаб — Оптовые кондиционеры для монтажников">
+<meta property="og:title" content="СплитХаб — Оптовые кондиционеры для монтажников и B2B">
 <meta property="og:description" content="Мультибренд — ULTIMA COMFORT, XIGMA, Eurohoff, DAICHI. Инвертор, On/Off, медная труба. Оптовые цены, быстрая доставка.">
-<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -89,6 +92,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .brand-photo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--blo);}
 .brand-info{flex:1;}
 .brand-name{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
+.brand-factory{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;color:var(--amber-d);white-space:nowrap;vertical-align:middle;}
 .brand-line{height:1px;background:var(--blo);margin-top:5px;}
 .series-badge{
   display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;
@@ -447,7 +451,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   position: fixed;
   left: 0; right: 0; bottom: 0; top: auto;
   width: 100%;
-  height: 82vh;
+  height: 90vh;
   border-radius: 20px 20px 0 0;
   transform: translateY(100%);
   transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
@@ -527,8 +531,8 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   .dr {
     left: 50%; top: 50%;
     bottom: auto; right: auto;
-    width: min(560px, 92vw);
-    height: min(680px, 85vh);
+    width: min(580px, 94vw);
+    height: min(800px, 92vh);
     border-radius: 20px;
     transform: translate(-50%, -50%) scale(0.95);
     opacity: 0;
@@ -542,7 +546,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
     pointer-events: auto;
   }
   .dr .dl { flex: 1; overflow-y: auto; min-height: 0; }
-  .dr .df { flex-shrink: 0; max-height: 55%; overflow-y: auto; }
+  .dr .df { flex-shrink: 0; overflow-y: auto; }
 }
 
 /* ══ МОБИЛЬ max-width:639px ══ */
@@ -771,6 +775,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd-ov{position:fixed;inset:0;z-index:300;background:rgba(15,18,28,.45);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .28s}
 .pd-ov.on{opacity:1;pointer-events:auto}
 .pd{position:fixed;left:0;right:0;bottom:0;z-index:301;background:rgba(245,247,250,.97);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border-radius:24px 24px 0 0;border-top:1px solid var(--bhi);box-shadow:0 -12px 60px rgba(0,0,0,.2);max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);overflow:hidden}
+#pd-inner{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .pd.on{transform:translateY(0)}
 .pd-handle{width:100%;padding:12px 0 4px;display:flex;justify-content:center;flex-shrink:0;cursor:pointer}
 .pd-handle-bar{width:40px;height:4px;border-radius:2px;background:rgba(0,0,0,.12)}
@@ -811,8 +816,8 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd-qb.pls:hover{background:var(--amber-d)}
 .pd-qv{font-family:'Unbounded',sans-serif;font-size:.88rem;font-weight:700;min-width:22px;text-align:center;color:var(--text)}
 @media(min-width:640px){
-  .pd{max-width:540px;left:50%;border-radius:20px 20px 0 0;transform:translateX(-50%) translateY(100%)}
-  .pd.on{transform:translateX(-50%) translateY(0)}
+  .pd{max-width:560px;width:92vw;left:50%;top:50%;bottom:auto;border-radius:20px;transform:translate(-50%,-50%) scale(0.95);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .3s ease;max-height:88vh;}
+  .pd.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;}
 }
 
 /* SCROLL-TOP & SHARE */
@@ -848,6 +853,8 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* NAV AUTH BTN */
 .nav-auth-btn{border:none;background:rgba(245,158,11,.12);color:var(--amber-d);border-radius:8px;padding:6px 12px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
 .nav-auth-btn:hover{background:rgba(245,158,11,.2)}
+.nav-reg-btn{border:1px solid rgba(245,158,11,.35);background:transparent;color:var(--amber-d);border-radius:8px;padding:6px 12px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .18s}
+.nav-reg-btn:hover{background:rgba(245,158,11,.1)}
 
 /* DASHBOARD MODAL */
 .dash-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -893,13 +900,14 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <nav id="main-nav">
   <div class="nav-top">
     <a class="logo" href="#">Сплит<em>Хаб</em></a>
-    <span class="nav-slogan">Кондиционеры, медь и расходники для монтажников</span>
+    <span class="nav-slogan">Кондиционеры, медь и расходники для монтажников и B2B</span>
     <div class="nav-phones">
       <a href="tel:+79785991369" class="nav-ph call">&#128222; <span>+7 978 599-13-69</span></a>
       <a href="https://t.me/Byttehnikaopt" class="nav-ph tg" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> <span>+7 990 002-22-30</span></a>
       <a href="https://t.me/Byttehopt" class="nav-ph tg" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> <span>+7 990 217-03-15</span></a>
       <a href="https://t.me/tsarev_simf" class="nav-ph tg" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> <span>+7 978 839-40-42</span></a>
     </div>
+    <button class="nav-reg-btn" id="navRegBtn" onclick="openRegister()">Регистрация</button>
     <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">Войти</button>
     <button class="btn-amber nav-order-btn" onclick="openD()">Заявка</button>
   </div>
@@ -914,7 +922,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <!-- HERO -->
 <section id="hero">
   <div class="hero-head rv">
-    <div class="hero-eyebrow">Оптовый прайс для монтажников</div>
+    <div class="hero-eyebrow">Оптовый прайс для монтажников и B2B</div>
     <h1 class="hero-h1">Сплит<em>Хаб</em></h1>
     <p class="hero-sub">Мультибренд &middot; Медная труба &middot; Расходники &middot; Опт</p>
   </div>
@@ -1066,7 +1074,13 @@ var LEGACY = {
   alfa:'assets/img/extracted/img_12_7576a97f1e.jpg',
   wr:  'assets/img/extracted/img_01_4642a8d790.jpg'
 };
-var BRAND_ICONS = {inv:'❄', onoff:'🌀', truba:'🔧', poluprom:'🏭'};
+var BRAND_FACTORY = {
+  'ULTIMA COMFORT':'Midea / TCL',
+  'Eurohoff':'Hisense',
+  'Daichi':'GREE',
+  'Funai':'GREE',
+  'THAICON':'Changhong'
+};
 
 function getImg(p) {
   if(p.photo && p.photo !== 'undefined' && p.photo !== '')
@@ -1093,7 +1107,7 @@ function syncFab() {
 function addItem(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===id; });
-  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,qty:1}); }
+  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:1}); }
   syncFab(); renderAll(); openD();
 }
 
@@ -1139,11 +1153,11 @@ var FILTER_MAP = {
   'truba':  {label:'Медная труба',       test:function(p){ return p.group==='truba'; }},
   'rashod': {label:'Расходники',         test:function(p){ return p.group==='rashod'; }},
   'poluprom':{label:'Полупром',          test:function(p){ return p.group==='poluprom'; }},
-  'multi':  {label:'Чёрные сплиты',     test:function(p){ return p.group==='multi'||p.group==='black'; }}
+  'multi':  {label:'Чёрные сплиты',     test:function(p){ return p.group==='multi'||p.group==='black'||p.color==='black'; }}
 };
 
 var GROUP_ORDER  = ['inv','onoff','truba','poluprom','rashod','multi'];
-var GROUP_LABELS = {inv:'❄ ИНВЕРТОРНЫЕ',onoff:'🌀 ON/OFF',truba:'🔧 МЕДНАЯ ТРУБА',poluprom:'🏭 ПОЛУПРОМ',rashod:'🔆 РАСХОДНИКИ',multi:'✽ ЧЁРНЫЕ СПЛИТЫ'};
+var GROUP_LABELS = {inv:'ИНВЕРТОРНЫЕ',onoff:'ON/OFF',truba:'МЕДНАЯ ТРУБА',poluprom:'ПОЛУПРОМ',rashod:'РАСХОДНИКИ',multi:'ЧЁРНЫЕ СПЛИТЫ'};
 
 // ── Card HTML ─────────────────────────────────────────
 function cardHtml(p, delay) {
@@ -1178,11 +1192,18 @@ function renderAll() {
   }
   // Build: group → brand → series → items
   var tree = {};
+  // BrandCode groups to merge into unified blocks
+  var DRAIN_BC   = {dmetplst:1, drenazhg:1};
+  var KREPEJ_BC  = {kpo:1, blt:1, gka:1, shba:1, db:1};
+
   list.forEach(function(p) {
-    var g = p.group;
+    var g   = p.group;
+    var bc  = p.brandCode;
+    var bname = p.brand;
+    if (DRAIN_BC[bc])  { bc = '_drenaj';  bname = 'Дренаж'; }
+    else if (KREPEJ_BC[bc]) { bc = '_krepej'; bname = 'Крепежные элементы'; }
     if(!tree[g]) tree[g] = {};
-    var bc = p.brandCode;
-    if(!tree[g][bc]) tree[g][bc] = {brand:p.brand, series:{}};
+    if(!tree[g][bc]) tree[g][bc] = {brand:bname, series:{}};
     var s = p.series;
     if(!tree[g][bc].series[s]) tree[g][bc].series[s] = {cardBenef:p.cardBenef, items:[]};
     tree[g][bc].series[s].items.push(p);
@@ -1201,22 +1222,32 @@ function renderAll() {
       var bImg = LEGACY[bc] || '';
       html += '<div class="brand-block rv">';
       html += '<div class="brand-head">';
-      if(bImg) html += '<img class="brand-photo" loading="lazy" src="'+bImg+'" alt="'+bData.brand+'">';
-      html += '<div class="brand-info"><div class="brand-name">'+bData.brand+'</div><div class="brand-line"></div></div>';
+      // Brand photos removed per ТЗ п.4 — unified brand headers without icons
+      var factoryTag = BRAND_FACTORY[bData.brand] ? '<span class="brand-factory">Завод: '+BRAND_FACTORY[bData.brand]+'</span>' : '';
+      html += '<div class="brand-info"><div class="brand-name">'+bData.brand+factoryTag+'</div><div class="brand-line"></div></div>';
       html += '</div>';
-      Object.keys(bData.series).forEach(function(sName) {
-        var sData = bData.series[sName];
-        var ico = BRAND_ICONS[gid] || '⭐';
-        var suffix = gid==='inv' ? ' Inverter' : (gid==='onoff' ? ' On/Off' : '');
-        html += '<div class="sub-block">';
-        html += '<div class="series-badge g">'
-          + '<span class="series-badge-ico">'+ico+'</span>'
-          + '<div><b>'+sName+suffix+'</b>'+sData.cardBenef+'</div>'
-          + '</div>';
-        html += '<div class="pgrid">';
-        sData.items.forEach(function(p,i){ html += cardHtml(p,i); });
+      // For accessories/pipes — flat grid without series sub-headings
+      var FLAT_GROUPS = {rashod:1, truba:1, poluprom:1, mobile:1};
+      if (FLAT_GROUPS[gid]) {
+        html += '<div class="sub-block"><div class="pgrid">';
+        var flatIdx = 0;
+        Object.keys(bData.series).forEach(function(sName) {
+          bData.series[sName].items.forEach(function(p) { html += cardHtml(p, flatIdx++); });
+        });
         html += '</div></div>';
-      });
+      } else {
+        Object.keys(bData.series).forEach(function(sName) {
+          var sData = bData.series[sName];
+          var suffix = gid==='inv' ? ' Inverter' : (gid==='onoff' ? ' On/Off' : '');
+          html += '<div class="sub-block">';
+          html += '<div class="series-badge g">'
+            + '<div><b>'+sName+suffix+'</b>'+sData.cardBenef+'</div>'
+            + '</div>';
+          html += '<div class="pgrid">';
+          sData.items.forEach(function(p,i){ html += cardHtml(p,i); });
+          html += '</div></div>';
+        });
+      }
       html += '</div>';
     });
     html += '</div>';
@@ -1328,7 +1359,7 @@ function pdAddToCart() {
   if(!pdCurrentId) return;
   var p = PRODUCTS.find(function(x){ return x.id===pdCurrentId; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===p.id; });
-  if(ex){ ex.qty += pdQty; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,qty:pdQty}); }
+  if(ex){ ex.qty += pdQty; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:pdQty}); }
   closeDetail(); syncFab(); renderAll(); openD();
 }
 
@@ -1482,12 +1513,12 @@ function sendOrder() {
       if (currentUser) loadBonusBalance();
     } else {
       showToast('Ошибка. Позвоните: +7 978 599-13-69', true);
-      if(btn) { btn.disabled=false; btn.textContent='&#128228; Отправить заявку'; }
+      if(btn) { btn.disabled=false; btn.innerHTML='&#128228; Отправить заявку'; }
     }
   })
   .catch(function(){
     showToast('Ошибка сети. Позвоните: +7 978 599-13-69', true);
-    if(btn) { btn.disabled=false; btn.textContent='&#128228; Отправить заявку'; }
+    if(btn) { btn.disabled=false; btn.innerHTML='&#128228; Отправить заявку'; }
   });
 }
 
@@ -1503,9 +1534,9 @@ window.addEventListener('scroll', function() {
 function shareSite() {
   var url = 'https://splithub.ru/';
   if(navigator.share) {
-    navigator.share({title:'СплитХаб', text:'Оптовый прайс кондиционеров для монтажников', url:url}).catch(function(){});
+    navigator.share({title:'СплитХаб', text:'Оптовый прайс кондиционеров для монтажников и B2B', url:url}).catch(function(){});
   } else {
-    window.open('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent('Оптовый прайс кондиционеров для монтажников — СплитХаб'), '_blank');
+    window.open('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent('Оптовый прайс кондиционеров для монтажников и B2B — СплитХаб'), '_blank');
   }
 }
 
@@ -1592,7 +1623,7 @@ function renderUpsell() {
 function addUpsell(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===id; });
-  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,qty:1}); }
+  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:1}); }
   syncFab(); renderAll(); renderD();
   showToast('✓ ' + p.model + ' добавлен');
 }
@@ -1602,19 +1633,28 @@ var currentUser = null;
 var bonusBalance = 0;
 
 function updateNavAuth() {
-  var btn = document.getElementById('navAuthBtn');
+  var btn    = document.getElementById('navAuthBtn');
+  var regBtn = document.getElementById('navRegBtn');
   if (!btn) return;
   if (currentUser) {
     btn.textContent = currentUser.name;
     btn.onclick = openDash;
+    if (regBtn) regBtn.style.display = 'none';
   } else {
     btn.textContent = 'Войти';
     btn.onclick = openAuth;
+    if (regBtn) regBtn.style.display = '';
   }
 }
 
 function openAuth() {
   showAuthForm('login');
+  document.getElementById('auth-ov').classList.add('on');
+  document.getElementById('auth-modal').classList.add('on');
+}
+
+function openRegister() {
+  showAuthForm('register');
   document.getElementById('auth-ov').classList.add('on');
   document.getElementById('auth-modal').classList.add('on');
 }
