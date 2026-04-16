@@ -337,10 +337,10 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
 .inp:focus{border-color:var(--amber);background:#fff;box-shadow:0 0 0 3px rgba(245,158,11,0.12);}
 .inp::placeholder{color:var(--text3);}
 .btns-row{display:flex;gap:10px;}
-.snd{flex:1;padding:15px;border:none;border-radius:13px;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 16px rgba(245,158,11,0.4);}
+.snd{flex:1;padding:14px;border:none;border-radius:13px;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 16px rgba(245,158,11,0.4);}
 .snd:active{background:var(--amber-d);transform:scale(0.98);}
 .snd:disabled{opacity:0.6;cursor:not-allowed;}
-.btn-back{padding:15px 16px;border:1.5px solid var(--blo);border-radius:13px;background:rgba(255,255,255,0.7);color:var(--text2);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.btn-back{flex:1;padding:14px;border:1.5px solid var(--blo);border-radius:13px;background:rgba(255,255,255,0.7);color:var(--text2);font-family:'Inter',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;text-align:center;}
 .btn-back:active{background:var(--glass2);}
 
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(16,185,129,0.95);color:#fff;padding:14px 24px;border-radius:14px;font-size:0.88rem;font-weight:700;display:flex;align-items:center;gap:8px;backdrop-filter:blur(12px);z-index:500;transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 8px 30px rgba(16,185,129,0.4);}
@@ -462,9 +462,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
 .df { flex-shrink: 0; padding: 8px 14px 18px; border-top: 1px solid rgba(0,0,0,0.08); }
 .di { padding: 8px 10px; border-radius: 10px; }
 .snd { width: 100%; padding: 14px; border-radius: 12px; }
-.btn-back { width: 100%; text-align: center; margin-bottom: 6px; }
 .inp { width: 100%; box-sizing: border-box; }
-.btns-row { flex-direction: column; gap: 8px; }
 
 /* ══════════════════════════════════════════
    ДЕСКТОП — переопределяем только что нужно
@@ -635,9 +633,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   .dl { flex: 1 !important; min-height: 0 !important; overflow-y: auto !important; padding: 0 12px 8px !important; -webkit-overflow-scrolling: touch !important; }
   .df { flex-shrink: 0 !important; padding: 10px 14px 20px !important; border-top: 1px solid rgba(0,0,0,0.08) !important; }
   .snd { width: 100% !important; padding: 14px !important; border-radius: 12px !important; font-size: 0.9rem !important; }
-  .btn-back, .btn-continue { width: 100% !important; text-align: center !important; }
   .inp { width: 100% !important; box-sizing: border-box !important; }
-  .btns-row { flex-direction: column !important; gap: 8px !important; }
 }
 
 
@@ -714,37 +710,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   color:var(--text3);
   margin:2px 0 10px;
 }
-.btns-row{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.btn-continue{
-  width:100%;
-  text-align:center;
-  margin-bottom:0;
-}
-.snd{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-}
 .inp-ta{
   min-height:76px;
   resize:vertical;
-}
-
-@media (min-width: 640px){
-  .btns-row{
-    flex-direction:row;
-  }
-  .btn-continue{
-    width:auto;
-    flex:1;
-  }
-  .snd{
-    flex:1.25;
-  }
 }
 
 /* STOCK card indicators */
@@ -991,7 +959,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   <div class="dh">
     <div class="dh-left">
       <div class="dh-title" id="dhTitle">Ваша заявка</div>
-      <div class="dh-count" id="dhCount"></div>
+      <div class="dh-count" id="dhPhone"></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <button id="logoutBtn" onclick="logout()" style="display:none;border:none;background:rgba(239,68,68,.1);color:#EF4444;border-radius:6px;padding:4px 9px;font-size:.68rem;font-weight:600;cursor:pointer;">Выйти</button>
@@ -1081,8 +1049,7 @@ function syncFab() {
   var n = cart.reduce(function(s,c){ return s+c.qty; }, 0);
   document.getElementById('fabN').textContent = n;
   document.getElementById('fab').classList.toggle('on', n>0);
-  var hc = document.getElementById('dhCount');
-  if(hc) hc.textContent = n>0 ? n+' товара в заявке' : '';
+  // dhPhone is updated in renderD()
 }
 
 function addItem(id) {
@@ -1381,12 +1348,17 @@ function renderD() {
   var tQty = cart.reduce(function(s,p){ return s+p.qty; }, 0);
   var tot  = cart.reduce(function(s,p){ return s+p.price*p.qty; }, 0);
 
-  var idHtml = savedName
-    ? '<div class="saved-user-row"><div class="saved-user-name">'+savedName+'</div><button class="saved-user-logout" onclick="logout()">Выйти</button></div>'
-    : '<input class="inp" id="dN" placeholder="Ваше имя" type="text" autocomplete="name">';
-  idHtml += savedPhone
-    ? '<div class="saved-user-phone">'+savedPhone+'</div>'
-    : '<input class="inp" id="dP" placeholder="+7 (___) ___-__-__" type="tel" autocomplete="tel">';
+  // Update header: title + phone, logout button visibility
+  var titleEl = document.getElementById('dhTitle');
+  if(titleEl) titleEl.textContent = savedName ? 'Заявка \u2014 '+savedName : 'Ваша заявка';
+  var phoneEl = document.getElementById('dhPhone');
+  if(phoneEl) phoneEl.textContent = savedPhone || '';
+  var lb = document.getElementById('logoutBtn');
+  if(lb) lb.style.display = savedName ? '' : 'none';
+
+  // Guest inputs (only shown when not identified)
+  var idHtml = savedName ? '' : '<input class="inp" id="dN" placeholder="Ваше имя" type="text" autocomplete="name">';
+  idHtml += savedPhone ? '' : '<input class="inp" id="dP" placeholder="+7 (___) ___-__-__" type="tel" autocomplete="tel">';
 
   df.innerHTML =
     '<div class="dtot">'
@@ -1428,10 +1400,6 @@ function toggleComment() {
 
 function openD() {
   renderD();
-  var title = document.getElementById('dhTitle');
-  if(title) title.textContent = savedName ? 'Заявка — '+savedName : 'Ваша заявка';
-  var lb = document.getElementById('logoutBtn');
-  if(lb) lb.style.display = savedName ? '' : 'none';
   document.getElementById('ov').classList.add('on');
   document.getElementById('dr').classList.add('on');
   document.body.style.overflow = 'hidden';
@@ -1445,8 +1413,6 @@ function logout() {
   if (currentUser) { doLogout(); return; }
   savedName = ''; savedPhone = '';
   localStorage.removeItem('sh_name'); localStorage.removeItem('sh_phone');
-  var title = document.getElementById('dhTitle'); if(title) title.textContent = 'Ваша заявка';
-  var lb = document.getElementById('logoutBtn'); if(lb) lb.style.display = 'none';
   renderD();
 }
 
