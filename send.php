@@ -47,7 +47,12 @@ foreach ($items as $item) {
     $total += $sub;
     $pf  = number_format($p,   0, '.', ' ');
     $sf  = number_format($sub, 0, '.', ' ');
-    $tgLines  .= "  {$num}. {$item['name']} — {$pf} ₽ × {$qty} шт. = {$sf} ₽\n";
+    $itemBrand = trim($item['brand'] ?? '');
+    $itemName  = trim($item['name']  ?? '—');
+    $displayName = ($itemBrand !== '' && mb_strpos($itemName, $itemBrand) === false)
+        ? $itemBrand . ' ' . $itemName
+        : $itemName;
+    $tgLines  .= "  {$num}. {$displayName} — {$pf} ₽ × {$qty} шт. = {$sf} ₽\n";
     $htmlRows .= "<tr>"
         . "<td style='padding:8px 12px;border-bottom:1px solid #eee'>{$num}</td>"
         . "<td style='padding:8px 12px;border-bottom:1px solid #eee'>{$n}</td>"
@@ -150,30 +155,80 @@ try {
     error_log('[SplitHub DB] ' . $e->getMessage());
 }
 
-// ── Email (идентично Desktop send.php) ──
-$commentHtml = $comment !== ''
-    ? '<div style="padding:14px 24px;background:#fffbeb;border-top:2px solid #F59E0B"><strong style="color:#92400E">💬 Комментарий:</strong><br>' . htmlspecialchars($comment) . '</div>'
+// ── Email (мобильно-адаптивная версия) ──
+// Строки товаров — мобильно-адаптивная карточка
+$emailItems = '';
+foreach ($items as $eit) {
+    $en   = htmlspecialchars(trim($eit['name'] ?? '—'));
+    $eb   = htmlspecialchars(trim($eit['brand'] ?? ''));
+    $ep   = intval($eit['price'] ?? 0);
+    $eq   = max(1, intval($eit['qty'] ?? 1));
+    $es   = $ep * $eq;
+    $epf  = number_format($ep, 0, '.', ' ');
+    $esf  = number_format($es, 0, '.', ' ');
+    $fullName = ($eb && mb_strpos($en, $eb) === false) ? $eb . ' ' . $en : $en;
+    $emailItems .= '<tr>'
+        . '<td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top">'
+        . '<div style="font-size:0.84rem;font-weight:600;color:#1f2937;line-height:1.4;word-break:break-word">' . $fullName . '</div>'
+        . '<div style="font-size:0.78rem;color:#6b7280;margin-top:3px">' . $epf . '&nbsp;₽&nbsp;&times;&nbsp;' . $eq . '&nbsp;шт.</div>'
+        . '</td>'
+        . '<td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;text-align:right;white-space:nowrap;font-weight:700;color:#D97706;font-size:0.88rem">' . $esf . '&nbsp;₽</td>'
+        . '</tr>';
+}
+$commentBlock = $comment !== ''
+    ? '<tr><td colspan="2" style="padding:10px 12px;background:#fffbeb;border-top:2px solid #F59E0B;font-size:0.82rem"><strong style="color:#92400E">Комментарий:</strong> ' . htmlspecialchars($comment) . '</td></tr>'
     : '';
-$emailHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head>'
-    . '<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif">'
-    . '<div style="max-width:600px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)">'
-    . '<div style="background:#F59E0B;padding:18px 24px"><h2 style="margin:0;color:#fff;font-size:1.1rem">🛒 Новая заявка — СплитХаб</h2></div>'
-    . '<div style="padding:20px 24px">'
-    . '<table style="width:100%;border-collapse:collapse;margin-bottom:20px">'
-    . "<tr><td style='padding:6px 0;color:#6b7280;width:100px'>Клиент</td><td style='padding:6px 0;font-weight:700'>" . htmlspecialchars($name) . "</td></tr>"
-    . "<tr><td style='padding:6px 0;color:#6b7280'>Телефон</td><td style='padding:6px 0;font-weight:700'>" . htmlspecialchars($phone) . "</td></tr>"
-    . "<tr><td style='padding:6px 0;color:#6b7280'>Время</td><td style='padding:6px 0'>{$date}</td></tr>"
-    . '</table>'
-    . "<h3 style='margin:0 0 12px;color:#374151;font-size:.9rem'>Состав заказа ({$cnt} поз.)</h3>"
-    . '<table style="width:100%;border-collapse:collapse;font-size:.85rem">'
-    . '<thead><tr style="background:#F59E0B"><th style="padding:8px 12px;text-align:left;color:#fff">№</th><th style="padding:8px 12px;text-align:left;color:#fff">Наименование</th><th style="padding:8px 12px;text-align:right;color:#fff">Цена</th><th style="padding:8px 12px;text-align:center;color:#fff">Кол.</th><th style="padding:8px 12px;text-align:right;color:#fff">Сумма</th></tr></thead>'
-    . "<tbody>{$htmlRows}</tbody>"
-    . "<tfoot><tr style='background:#FEF3C7'><td colspan='4' style='padding:10px 12px;font-weight:700'>Итого</td><td style='padding:10px 12px;font-weight:700;font-size:1rem;color:#D97706;text-align:right'>{$totalf} ₽</td></tr></tfoot>"
-    . '</table></div>' . $commentHtml
-    . '<div style="padding:12px 24px;background:#f9fafb;color:#9ca3af;font-size:.75rem">СплитХаб · splithub.ru · Симферополь</div>'
+
+$emailHtml = '<!DOCTYPE html><html lang="ru"><head>'
+    . '<meta charset="UTF-8">'
+    . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    . '<style>'
+    . 'body{margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%}'
+    . '.wrap{max-width:600px;margin:16px auto;background:#fff;border-radius:12px;overflow:hidden}'
+    . '.hdr{background:#F59E0B;padding:16px 18px}'
+    . '.hdr h2{margin:0;color:#fff;font-size:1rem;font-weight:700}'
+    . '.meta{padding:14px 18px}'
+    . '.meta table{width:100%;border-collapse:collapse}'
+    . '.meta td{padding:4px 0;font-size:0.82rem;vertical-align:top}'
+    . '.meta .lbl{color:#6b7280;width:80px}'
+    . '.meta .val{font-weight:700;color:#1f2937}'
+    . '.items{padding:0 18px 14px}'
+    . '.items h3{margin:0 0 8px;font-size:0.85rem;color:#374151}'
+    . '.items table{width:100%;border-collapse:collapse}'
+    . '.items thead tr{background:#F59E0B}'
+    . '.items thead th{padding:7px 12px;color:#fff;font-size:0.78rem;font-weight:600;text-align:left}'
+    . '.items thead th:last-child{text-align:right}'
+    . '.tot td{padding:9px 12px;font-weight:700;background:#FEF3C7}'
+    . '.tot .sum{text-align:right;color:#D97706;font-size:0.95rem}'
+    . '.ftr{padding:10px 18px;background:#f9fafb;color:#9ca3af;font-size:0.72rem}'
+    . '@media(max-width:480px){'
+    . '.wrap{margin:0;border-radius:0}'
+    . '.hdr{padding:12px 14px}'
+    . '.meta{padding:10px 14px}'
+    . '.items{padding:0 14px 12px}'
+    . '.ftr{padding:8px 14px}'
+    . '}'
+    . '</style></head>'
+    . '<body><div class="wrap">'
+    . '<div class="hdr"><h2>🛒 Новая заявка — СплитХаб</h2></div>'
+    . '<div class="meta"><table>'
+    . '<tr><td class="lbl">Клиент</td><td class="val">' . htmlspecialchars($name) . '</td></tr>'
+    . '<tr><td class="lbl">Телефон</td><td class="val">' . htmlspecialchars($phone) . '</td></tr>'
+    . ($clientTg !== '' ? '<tr><td class="lbl">Telegram</td><td class="val">' . htmlspecialchars($clientTg) . '</td></tr>' : '')
+    . '<tr><td class="lbl">Время</td><td class="val" style="font-weight:400">' . $date . '</td></tr>'
+    . '</table></div>'
+    . '<div class="items"><h3>Состав заказа (' . $cnt . ' поз.)</h3>'
+    . '<table>'
+    . '<thead><tr><th>Наименование</th><th>Сумма</th></tr></thead>'
+    . '<tbody>' . $emailItems . $commentBlock . '</tbody>'
+    . '<tfoot><tr class="tot"><td>Итого</td><td class="sum">' . $totalf . '&nbsp;₽</td></tr></tfoot>'
+    . '</table></div>'
+    . '<div class="ftr">СплитХаб · splithub.ru · Симферополь</div>'
     . '</div></body></html>';
+
 $headers   = "From: =?UTF-8?B?" . base64_encode("СплитХаб") . "?= <zakaz@splithub.ru>\r\n";
-$headers  .= "MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
+$headers  .= "MIME-Version: 1.0\r\n";
+$headers  .= "Content-Type: text/html; charset=UTF-8\r\n";
 $emailSubj = "=?UTF-8?B?" . base64_encode("Новая заявка СплитХаб — {$name} — {$totalf} руб") . "?=";
 $mailOk    = @mail(EMAIL_TO, $emailSubj, $emailHtml, $headers);
 

@@ -92,8 +92,9 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .brand-photo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--blo);}
 .brand-info{flex:1;}
 .brand-name{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
-.brand-factory{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;font-family:'Inter',sans-serif;font-size:0.68rem;font-weight:600;color:var(--amber-d);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:6px;letter-spacing:0.01em;vertical-align:middle;white-space:nowrap;}
+.brand-factory{display:inline-flex;align-items:center;padding:3px 9px;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;color:#1a4a3a;background:rgba(209,236,224,0.72);border:1px solid rgba(80,180,130,0.32);border-radius:6px;letter-spacing:0.01em;white-space:nowrap;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .brand-line{height:1px;background:var(--blo);margin-top:5px;}
+.brand-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
 .series-badge{
   display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;
   padding:10px 14px;border-radius:13px;
@@ -1223,8 +1224,8 @@ function renderAll() {
       html += '<div class="brand-block rv">';
       html += '<div class="brand-head">';
       // Brand photos removed per ТЗ п.4 — unified brand headers without icons
-      var factoryTag = BRAND_FACTORY[bData.brand] ? '<span class="brand-factory">Завод: '+BRAND_FACTORY[bData.brand]+'</span>' : '';
-      html += '<div class="brand-info"><div class="brand-name">'+bData.brand+factoryTag+'</div><div class="brand-line"></div></div>';
+      var factoryTag = BRAND_FACTORY[bData.brand] ? '<span class="brand-factory">Завод\u00a0'+BRAND_FACTORY[bData.brand]+'</span>' : '';
+      html += '<div class="brand-info"><div class="brand-title-row"><span class="brand-name">'+bData.brand+'</span>'+factoryTag+'</div><div class="brand-line"></div></div>';
       html += '</div>';
       // For accessories/pipes — flat grid without series sub-headings
       var FLAT_GROUPS = {rashod:1, truba:1, poluprom:1, mobile:1};
@@ -1496,7 +1497,7 @@ function sendOrder() {
     bonus_spend: bonusSpend,
     items: cart.map(function(x){
       var prod = PRODUCTS.find(function(pr){ return pr.id===x.id; });
-      return {name:x.name, price:x.price, qty:x.qty, group: prod ? prod.group : ''};
+      return {name:x.name, brand:x.brand||'', price:x.price, qty:x.qty, group: prod ? prod.group : ''};
     })
   };
   fetch('send.php', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)})
