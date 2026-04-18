@@ -1023,13 +1023,6 @@ var LEGACY = {
   alfa:'assets/img/extracted/img_12_7576a97f1e.jpg',
   wr:  'assets/img/extracted/img_01_4642a8d790.jpg'
 };
-var BRAND_FACTORY = {
-  'ULTIMA COMFORT':'Midea / TCL',
-  'Eurohoff':'Hisense',
-  'Daichi':'GREE',
-  'Funai':'GREE',
-  'THAICON':'Changhong'
-};
 
 function getImg(p) {
   if(p.photo && p.photo !== 'undefined' && p.photo !== '')
@@ -1151,7 +1144,7 @@ function renderAll() {
     if (DRAIN_BC[bc])  { bc = '_drenaj';  bname = 'Дренаж'; }
     else if (KREPEJ_BC[bc]) { bc = '_krepej'; bname = 'Крепеж (болты, гайки)'; }
     if(!tree[g]) tree[g] = {};
-    if(!tree[g][bc]) tree[g][bc] = {brand:bname, series:{}};
+    if(!tree[g][bc]) tree[g][bc] = {brand:bname, factory:p.factory||'', series:{}};
     var s = p.series;
     if(!tree[g][bc].series[s]) tree[g][bc].series[s] = {cardBenef:p.cardBenef, items:[]};
     tree[g][bc].series[s].items.push(p);
@@ -1171,7 +1164,7 @@ function renderAll() {
       html += '<div class="brand-block rv">';
       html += '<div class="brand-head">';
       // Brand photos removed per ТЗ п.4 — unified brand headers without icons
-      var factoryTag = BRAND_FACTORY[bData.brand] ? '<span class="brand-factory">Завод\u00a0'+BRAND_FACTORY[bData.brand]+'</span>' : '';
+      var factoryTag = bData.factory ? '<span class="brand-factory">Завод\u00a0'+bData.factory+'</span>' : '';
       html += '<div class="brand-info"><div class="brand-title-row"><span class="brand-name">'+bData.brand+'</span>'+factoryTag+'</div><div class="brand-line"></div></div>';
       html += '</div>';
       // For accessories/pipes — flat grid without series sub-headings

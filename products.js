@@ -2,10 +2,10 @@ var PRODUCTS = [
   {
     "id": "1001",
     "sku": "ultima-elysium-inv-07",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I07PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I07PN inv",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -29,15 +29,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1002",
     "sku": "ultima-elysium-inv-09",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I09PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I09PN inv",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -61,15 +62,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1003",
     "sku": "ultima-elysium-inv-12",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I12PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I12PN inv",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -93,15 +95,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1004",
     "sku": "ultima-elysium-inv-18",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I18PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I18PN inv",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -125,15 +128,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1005",
     "sku": "ultima-elysium-inv-24",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I24PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I24PN inv",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -157,15 +161,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1006",
     "sku": "ultima-elysium-inv-30",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I30PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I30PN inv",
     "group": "inv",
     "color": "white",
     "btu": "30",
@@ -189,15 +194,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1007",
     "sku": "ultima-elysium-inv-36",
-    "brandCode": "uel",
+    "brandCode": "uelinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM",
-    "model": "ELB-I36PN",
+    "series": "ELYSIUM inverter",
+    "model": "ELYSIUM ELB-I36PN inv",
     "group": "inv",
     "color": "white",
     "btu": "36",
@@ -221,15 +227,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium.webp"
+    "photo": "ultima-elysium.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1008",
     "sku": "ultima-elysium-nero-inv-07",
-    "brandCode": "uel",
+    "brandCode": "uelninv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM NERO",
-    "model": "ELN-I07PN",
+    "series": "ELYSIUM NERO inverter",
+    "model": "ELYSIUM NERO ELN-I07PN inv",
     "group": "inv",
     "color": "black",
     "btu": "07",
@@ -253,15 +260,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium-nero.webp"
+    "photo": "ultima-elysium-nero.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1009",
     "sku": "ultima-elysium-nero-inv-09",
-    "brandCode": "uel",
+    "brandCode": "uelninv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM NERO",
-    "model": "ELN-I09PN",
+    "series": "ELYSIUM NERO inverter",
+    "model": "ELYSIUM NERO ELN-I09PN inv",
     "group": "inv",
     "color": "black",
     "btu": "09",
@@ -285,15 +293,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium-nero.webp"
+    "photo": "ultima-elysium-nero.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1010",
     "sku": "ultima-elysium-nero-inv-12",
-    "brandCode": "uel",
+    "brandCode": "uelninv",
     "brand": "ULTIMA COMFORT",
-    "series": "ELYSIUM NERO",
-    "model": "ELN-I12PN",
+    "series": "ELYSIUM NERO inverter",
+    "model": "ELYSIUM NERO ELN-I12PN inv",
     "group": "inv",
     "color": "black",
     "btu": "12",
@@ -317,15 +326,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elysium-nero.webp"
+    "photo": "ultima-elysium-nero.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1011",
     "sku": "ultima-eclipse-inv-07",
-    "brandCode": "uec",
+    "brandCode": "ueinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ECLIPSE",
-    "model": "ECP-I07PN",
+    "series": "ECLIPSE INVERTOR",
+    "model": "ECLIPSE ECP-I07PN inv",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -347,15 +357,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-inv.webp"
+    "photo": "ultima-eclipse-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1012",
     "sku": "ultima-eclipse-inv-09",
-    "brandCode": "uec",
+    "brandCode": "ueinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ECLIPSE",
-    "model": "ECP-I09PN",
+    "series": "ECLIPSE INVERTOR",
+    "model": "ECLIPSE ECP-I09PN inv",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -377,15 +388,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-inv.webp"
+    "photo": "ultima-eclipse-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1013",
     "sku": "ultima-eclipse-inv-12",
-    "brandCode": "uec",
+    "brandCode": "ueinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ECLIPSE",
-    "model": "ECP-I12PN",
+    "series": "ECLIPSE INVERTOR",
+    "model": "ECLIPSE ECP-I12PN inv",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -407,15 +419,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-inv.webp"
+    "photo": "ultima-eclipse-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1014",
     "sku": "ultima-eclipse-inv-18",
-    "brandCode": "uec",
+    "brandCode": "ueinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ECLIPSE",
-    "model": "ECP-I18PN",
+    "series": "ECLIPSE INVERTOR",
+    "model": "ECLIPSE ECP-I18PN inv",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -437,15 +450,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-inv.webp"
+    "photo": "ultima-eclipse-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1015",
     "sku": "ultima-eclipse-inv-24",
-    "brandCode": "uec",
+    "brandCode": "ueinv",
     "brand": "ULTIMA COMFORT",
-    "series": "ECLIPSE",
-    "model": "ECP-I24PN",
+    "series": "ECLIPSE INVERTOR",
+    "model": "ECLIPSE ECP-I24PN inv",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -467,15 +481,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-inv.webp"
+    "photo": "ultima-eclipse-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1016",
     "sku": "ultima-elysium-onoff-07",
-    "brandCode": "uel",
+    "brandCode": "ueonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM",
-    "model": "ELB-07PN",
+    "model": "ELYSIUM ELB-07PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "07",
@@ -497,15 +512,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-onoff.webp"
+    "photo": "ultima-elisyum-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1017",
     "sku": "ultima-elysium-onoff-09",
-    "brandCode": "uel",
+    "brandCode": "ueonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM",
-    "model": "ELB-09PN",
+    "model": "ELYSIUM ELB-09PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "09",
@@ -527,15 +543,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-onoff.webp"
+    "photo": "ultima-elisyum-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1018",
     "sku": "ultima-elysium-onoff-12",
-    "brandCode": "uel",
+    "brandCode": "ueonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM",
-    "model": "ELB-12PN",
+    "model": "ELYSIUM ELB-12PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "12",
@@ -557,15 +574,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-onoff.webp"
+    "photo": "ultima-elisyum-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1019",
     "sku": "ultima-elysium-onoff-18",
-    "brandCode": "uel",
+    "brandCode": "ueonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM",
-    "model": "ELB-18PN",
+    "model": "ELYSIUM ELB-18PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "18",
@@ -587,15 +605,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-onoff.webp"
+    "photo": "ultima-elisyum-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1020",
     "sku": "ultima-elysium-onoff-24",
-    "brandCode": "uel",
+    "brandCode": "ueonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM",
-    "model": "ELB-24PN",
+    "model": "ELYSIUM ELB-24PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "24",
@@ -617,15 +636,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-onoff.webp"
+    "photo": "ultima-elisyum-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1021",
     "sku": "ultima-elysium-nero-onoff-07",
-    "brandCode": "uel",
+    "brandCode": "uenonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM NERO",
-    "model": "ELN-07PN",
+    "model": "ELYSIUM NERO ELN-07PN on/off",
     "group": "onoff",
     "color": "black",
     "btu": "07",
@@ -647,15 +667,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-nero-onoff.webp"
+    "photo": "ultima-elisyum-nero-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1022",
     "sku": "ultima-elysium-nero-onoff-09",
-    "brandCode": "uel",
+    "brandCode": "uenonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM NERO",
-    "model": "ELN-09PN",
+    "model": "ELYSIUM NERO ELN-09PN on/off",
     "group": "onoff",
     "color": "black",
     "btu": "09",
@@ -677,15 +698,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-nero-onoff.webp"
+    "photo": "ultima-elisyum-nero-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1023",
     "sku": "ultima-elysium-nero-onoff-12",
-    "brandCode": "uel",
+    "brandCode": "uenonof",
     "brand": "ULTIMA COMFORT",
     "series": "ELYSIUM NERO",
-    "model": "ELN-12PN",
+    "model": "ELYSIUM NERO ELN-12PN on/off",
     "group": "onoff",
     "color": "black",
     "btu": "12",
@@ -707,15 +729,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "ultima-elisyum-nero-onoff.webp"
+    "photo": "ultima-elisyum-nero-onoff.webp",
+    "factory": "CHANHONG"
   },
   {
     "id": "1024",
     "sku": "ultima-eclipse-onoff-07",
-    "brandCode": "uec",
+    "brandCode": "ueconof",
     "brand": "ULTIMA COMFORT",
     "series": "ECLIPSE",
-    "model": "ECP-07PN",
+    "model": "ECLIPSE ECP-07PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "07",
@@ -739,15 +762,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-onoff.webp"
+    "photo": "ultima-eclipse-onoff.webp",
+    "factory": "TCL"
   },
   {
     "id": "1025",
     "sku": "ultima-eclipse-onoff-09",
-    "brandCode": "uec",
+    "brandCode": "ueconof",
     "brand": "ULTIMA COMFORT",
     "series": "ECLIPSE",
-    "model": "ECP-09PN",
+    "model": "ECLIPSE ECP-09PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "09",
@@ -771,15 +795,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-onoff.webp"
+    "photo": "ultima-eclipse-onoff.webp",
+    "factory": "TCL"
   },
   {
     "id": "1026",
     "sku": "ultima-eclipse-onoff-12",
-    "brandCode": "uec",
+    "brandCode": "ueconof",
     "brand": "ULTIMA COMFORT",
     "series": "ECLIPSE",
-    "model": "ECP-12PN",
+    "model": "ECLIPSE ECP-12PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "12",
@@ -803,15 +828,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-onoff.webp"
+    "photo": "ultima-eclipse-onoff.webp",
+    "factory": "TCL"
   },
   {
     "id": "1027",
     "sku": "ultima-eclipse-onoff-18",
-    "brandCode": "uec",
+    "brandCode": "ueconof",
     "brand": "ULTIMA COMFORT",
     "series": "ECLIPSE",
-    "model": "ECP-18PN",
+    "model": "ECLIPSE ECP-18PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "18",
@@ -835,15 +861,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-onoff.webp"
+    "photo": "ultima-eclipse-onoff.webp",
+    "factory": "TCL"
   },
   {
     "id": "1028",
     "sku": "ultima-eclipse-onoff-24",
-    "brandCode": "uec",
+    "brandCode": "ueconof",
     "brand": "ULTIMA COMFORT",
     "series": "ECLIPSE",
-    "model": "ECP-24PN",
+    "model": "ECLIPSE ECP-24PN on/off",
     "group": "onoff",
     "color": "white",
     "btu": "24",
@@ -867,15 +894,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "ultima-eclipse-onoff.webp"
+    "photo": "ultima-eclipse-onoff.webp",
+    "factory": "TCL"
   },
   {
     "id": "1029",
     "sku": "eurohoff-callisto-07",
-    "brandCode": "ec",
-    "brand": "Eurohoff",
+    "brandCode": "ehcal",
+    "brand": "EUROHOFF",
     "series": "CALLISTO",
-    "model": "EM-07I",
+    "model": "EUROHOFF EM-07I inv",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -898,15 +926,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-callisto.webp"
+    "photo": "eurohoff-callisto.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1030",
     "sku": "eurohoff-callisto-09",
-    "brandCode": "ec",
-    "brand": "Eurohoff",
+    "brandCode": "ehcal",
+    "brand": "EUROHOFF",
     "series": "CALLISTO",
-    "model": "EM-09I",
+    "model": "EUROHOFF EM-09I inv",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -929,15 +958,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-callisto.webp"
+    "photo": "eurohoff-callisto.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1031",
     "sku": "eurohoff-callisto-12",
-    "brandCode": "ec",
-    "brand": "Eurohoff",
+    "brandCode": "ehcal",
+    "brand": "EUROHOFF",
     "series": "CALLISTO",
-    "model": "EM-12I",
+    "model": "EUROHOFF EM-12I inv",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -960,15 +990,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-callisto.webp"
+    "photo": "eurohoff-callisto.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1032",
     "sku": "eurohoff-callisto-18",
-    "brandCode": "ec",
-    "brand": "Eurohoff",
+    "brandCode": "ehcal",
+    "brand": "EUROHOFF",
     "series": "CALLISTO",
-    "model": "EM-18I",
+    "model": "EUROHOFF EM-18I inv",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -991,15 +1022,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-callisto.webp"
+    "photo": "eurohoff-callisto.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1033",
     "sku": "eurohoff-callisto-24",
-    "brandCode": "ec",
-    "brand": "Eurohoff",
+    "brandCode": "ehcal",
+    "brand": "EUROHOFF",
     "series": "CALLISTO",
-    "model": "EM-24I",
+    "model": "EUROHOFF EM-24I inv",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -1022,15 +1054,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-callisto.webp"
+    "photo": "eurohoff-callisto.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1034",
     "sku": "eurohoff-astrid-07",
-    "brandCode": "ea",
-    "brand": "Eurohoff",
+    "brandCode": "ehas",
+    "brand": "EUROHOFF",
     "series": "ASTRID",
-    "model": "AVE-07M",
+    "model": "EUROHOFF AVE-07M on/off",
     "group": "onoff",
     "color": "white",
     "btu": "07",
@@ -1052,15 +1085,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-astrid.webp"
+    "photo": "eurohoff-astrid.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1035",
     "sku": "eurohoff-astrid-09",
-    "brandCode": "ea",
-    "brand": "Eurohoff",
+    "brandCode": "ehas",
+    "brand": "EUROHOFF",
     "series": "ASTRID",
-    "model": "AVE-09M",
+    "model": "EUROHOFF AVE-09M on/off",
     "group": "onoff",
     "color": "white",
     "btu": "09",
@@ -1082,15 +1116,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-astrid.webp"
+    "photo": "eurohoff-astrid.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1036",
     "sku": "eurohoff-astrid-12",
-    "brandCode": "ea",
-    "brand": "Eurohoff",
+    "brandCode": "ehas",
+    "brand": "EUROHOFF",
     "series": "ASTRID",
-    "model": "AVE-12M",
+    "model": "EUROHOFF AVE-12M on/off",
     "group": "onoff",
     "color": "white",
     "btu": "12",
@@ -1112,15 +1147,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-astrid.webp"
+    "photo": "eurohoff-astrid.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1037",
     "sku": "eurohoff-astrid-18",
-    "brandCode": "ea",
-    "brand": "Eurohoff",
+    "brandCode": "ehas",
+    "brand": "EUROHOFF",
     "series": "ASTRID",
-    "model": "AVE-18M",
+    "model": "EUROHOFF AVE-18M on/off",
     "group": "onoff",
     "color": "white",
     "btu": "18",
@@ -1142,15 +1178,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-astrid.webp"
+    "photo": "eurohoff-astrid.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1038",
     "sku": "eurohoff-astrid-24",
-    "brandCode": "ea",
-    "brand": "Eurohoff",
+    "brandCode": "ehas",
+    "brand": "EUROHOFF",
     "series": "ASTRID",
-    "model": "AVE-24M",
+    "model": "EUROHOFF AVE-24M on/off",
     "group": "onoff",
     "color": "white",
     "btu": "24",
@@ -1172,15 +1209,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC Toshiba",
     "freon": "R32",
-    "photo": "eurohoff-astrid.webp"
+    "photo": "eurohoff-astrid.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1039",
     "sku": "daichi-ice-07",
-    "brandCode": "dai",
-    "brand": "Daichi",
+    "brandCode": "daice",
+    "brand": "DAICHI",
     "series": "ICE",
-    "model": "ICE20AVQS1R-2",
+    "model": "DAICHI ICE20AVQS1R-2",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -1205,15 +1243,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "daichi-ice-inv.webp"
+    "photo": "daichi-ice-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1040",
     "sku": "daichi-ice-09",
-    "brandCode": "dai",
-    "brand": "Daichi",
+    "brandCode": "daice",
+    "brand": "DAICHI",
     "series": "ICE",
-    "model": "ICE25AVQS1R-2",
+    "model": "DAICHI ICE25AVQS1R-2",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -1238,15 +1277,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "daichi-ice-inv.webp"
+    "photo": "daichi-ice-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1041",
     "sku": "daichi-ice-12",
-    "brandCode": "dai",
-    "brand": "Daichi",
+    "brandCode": "daice",
+    "brand": "DAICHI",
     "series": "ICE",
-    "model": "ICE35AVQS1R-2",
+    "model": "DAICHI ICE35AVQS1R-2",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -1271,15 +1311,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "daichi-ice-inv.webp"
+    "photo": "daichi-ice-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1042",
     "sku": "daichi-ice-18",
-    "brandCode": "dai",
-    "brand": "Daichi",
+    "brandCode": "daice",
+    "brand": "DAICHI",
     "series": "ICE",
-    "model": "ICE50AVQS1R-2",
+    "model": "DAICHI ICE50AVQS1R-2",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -1304,15 +1345,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "daichi-ice-inv.webp"
+    "photo": "daichi-ice-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1043",
     "sku": "daichi-ice-24",
-    "brandCode": "dai",
-    "brand": "Daichi",
+    "brandCode": "daice",
+    "brand": "DAICHI",
     "series": "ICE",
-    "model": "ICE70AVQS1R-2",
+    "model": "DAICHI ICE70AVQS1R-2",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -1337,15 +1379,16 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "daichi-ice-inv.webp"
+    "photo": "daichi-ice-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1044",
     "sku": "funai-daijin",
-    "brandCode": "fun",
-    "brand": "Funai",
+    "brandCode": "funai",
+    "brand": "FUNAI",
     "series": "DAIJIN",
-    "model": "RAC-I-DA25HP.D01",
+    "model": "FUNAI Inverter RAC-I-DA25HP.D01",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -1354,7 +1397,7 @@ var PRODUCTS = [
     "stock": "in_stock",
     "stockLabel": "В наличии",
     "descShort": "Инвертор 07 BTU · до 20 м²",
-    "cardBenef": "Завод GREE · А++ · Wi-Fi встроенныый · Самодиагностика · -15°C · 3 года  · Японские технологии ·  Ионизатор · PLASMA SMART · SMART AIR · 7 скоростей вентилятора · Низкий уровень шума",
+    "cardBenef": "Завод GREE · А++ · Wi-Fi встроенныый · Самодиагностика · -15°C · 3 года  · Японские технологии ·  Ионизатор · PLASMA SMART · SMART AIR · 7 скоростей вентилятора · Низкий уровень шума ",
     "benefits": [
       "Завод GREE",
       "Энергоэффективность класса А ++",
@@ -1367,13 +1410,14 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R32",
-    "photo": "funai-daijin-inv.webp"
+    "photo": "funai-daijin-inv.webp",
+    "factory": "GREE"
   },
   {
     "id": "1045",
     "sku": "mednay-truba-1-4",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 15 м.",
     "model": "Медная труба 1/4 · бухта 15 м",
     "group": "truba",
@@ -1394,13 +1438,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-prof-15.webp"
+    "photo": "mednay-truba-prof-15.webp",
+    "factory": ""
   },
   {
     "id": "1046",
     "sku": "mednay-truba-3-8",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 15 м.",
     "model": "Медная труба 3/8 · бухта 15 м",
     "group": "truba",
@@ -1421,13 +1466,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-prof-15.webp"
+    "photo": "mednay-truba-prof-15.webp",
+    "factory": ""
   },
   {
     "id": "1047",
     "sku": "mednay-truba-1-2",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 15 м.",
     "model": "Медная труба 1/2 · бухта 15 м",
     "group": "truba",
@@ -1448,13 +1494,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-prof-15.webp"
+    "photo": "mednay-truba-prof-15.webp",
+    "factory": ""
   },
   {
     "id": "1048",
     "sku": "mednay-truba-5-8",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 15 м.",
     "model": "Медная труба 5/8 · бухта 15 м",
     "group": "truba",
@@ -1475,13 +1522,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-prof-15.webp"
+    "photo": "mednay-truba-prof-15.webp",
+    "factory": ""
   },
   {
     "id": "1049",
     "sku": "mednay-truba-3-4",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 15 м.",
     "model": "Медная труба 3/4 · бухта 15 м",
     "group": "truba",
@@ -1502,13 +1550,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-prof-15.webp"
+    "photo": "mednay-truba-prof-15.webp",
+    "factory": ""
   },
   {
     "id": "1050",
     "sku": "mednay-truba-1-4-50",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 50 м.",
     "model": "Медная труба 1/4 · бухта 50 м",
     "group": "truba",
@@ -1529,13 +1578,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-50m.webp"
+    "photo": "mednay-truba-50m.webp",
+    "factory": ""
   },
   {
     "id": "1051",
     "sku": "mednay-truba-3-8-50",
     "brandCode": "mtruba",
-    "brand": "Медная труба — средняя стенка",
+    "brand": "Медная труба",
     "series": "Средняя 50 м.",
     "model": "Медная труба 3/8 · бухта 50 м",
     "group": "truba",
@@ -1556,13 +1606,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-50m.webp"
+    "photo": "mednay-truba-50m.webp",
+    "factory": ""
   },
   {
     "id": "1052",
     "sku": "mednay-truba-1-4-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 15 м.",
     "model": "Медная труба 1/4 · бухта 15 м",
     "group": "truba",
@@ -1583,13 +1634,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-gost.webp"
+    "photo": "mednay-truba-gost.webp",
+    "factory": ""
   },
   {
     "id": "1053",
     "sku": "mednay-truba-3-8-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 15 м.",
     "model": "Медная труба 3/8 · бухта 15 м",
     "group": "truba",
@@ -1610,13 +1662,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-gost.webp"
+    "photo": "mednay-truba-gost.webp",
+    "factory": ""
   },
   {
     "id": "1054",
     "sku": "mednay-truba-1-2-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 15 м.",
     "model": "Медная труба 1/2 · бухта 15 м",
     "group": "truba",
@@ -1637,13 +1690,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-gost.webp"
+    "photo": "mednay-truba-gost.webp",
+    "factory": ""
   },
   {
     "id": "1055",
     "sku": "mednay-truba-5-8-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 15 м.",
     "model": "Медная труба 5/8 · бухта 15 м",
     "group": "truba",
@@ -1657,20 +1711,21 @@ var PRODUCTS = [
     "cardBenef": "Толстая (ГОСТ) · бухта 15 м · 5/8",
     "benefits": [
       "5/8(15.88мм)",
-      "Толстая (ГОСТ)",
+      "Толстая (ГОСТ)Средняя стенка",
       "Бухта 15 метров",
       "Для кондиционеров",
       "Чистая медь"
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-gost.webp"
+    "photo": "mednay-truba-gost.webp",
+    "factory": ""
   },
   {
     "id": "1056",
     "sku": "mednay-truba-3-4-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 15 м.",
     "model": "Медная труба 3/4 · бухта 15 м",
     "group": "truba",
@@ -1684,20 +1739,21 @@ var PRODUCTS = [
     "cardBenef": "Толстая (ГОСТ) · бухта 15 м · 3/4",
     "benefits": [
       "3/4(19.05мм)",
-      "Толстая (ГОСТ)",
+      "Толстая (ГОСТ)Средняя стенка",
       "Бухта 15 метров",
       "Для кондиционеров",
       "Чистая медь"
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-gost.webp"
+    "photo": "mednay-truba-gost.webp",
+    "factory": ""
   },
   {
     "id": "1057",
     "sku": "mednay-truba-1-4-50-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 50 м.",
     "model": "Медная труба 1/4 · бухта 50 м",
     "group": "truba",
@@ -1718,13 +1774,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-50m.webp"
+    "photo": "mednay-truba-50m.webp",
+    "factory": ""
   },
   {
     "id": "1058",
     "sku": "mednay-truba-3-8-50-gost",
     "brandCode": "mtrubag",
-    "brand": "Медная труба — толстая стенка (ГОСТ)",
+    "brand": "Медная труба",
     "series": "Толстая (ГОСТ) 50 м.",
     "model": "Медная труба 3/8 · бухта 50 м",
     "group": "truba",
@@ -1745,7 +1802,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "mednay-truba-50m.webp"
+    "photo": "mednay-truba-50m.webp",
+    "factory": ""
   },
   {
     "id": "1059",
@@ -1768,7 +1826,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "drenazh-metalloplast.webp"
+    "photo": "drenazh-metalloplast.webp",
+    "factory": ""
   },
   {
     "id": "1060",
@@ -1791,7 +1850,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "drenazh-gofra-ruvinil.webp"
+    "photo": "drenazh-gofra-ruvinil.webp",
+    "factory": ""
   },
   {
     "id": "1061",
@@ -1814,7 +1874,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "drenazh-gofra-ballu.webp"
+    "photo": "drenazh-gofra-ballu.webp",
+    "factory": ""
   },
   {
     "id": "1062",
@@ -1837,7 +1898,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "drenazh-gofra.webp"
+    "photo": "drenazh-gofra.webp",
+    "factory": ""
   },
   {
     "id": "1063",
@@ -1860,7 +1922,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein.webp"
+    "photo": "kronshtein.webp",
+    "factory": ""
   },
   {
     "id": "1064",
@@ -1883,7 +1946,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein.webp"
+    "photo": "kronshtein.webp",
+    "factory": ""
   },
   {
     "id": "1065",
@@ -1906,7 +1970,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein.webp"
+    "photo": "kronshtein.webp",
+    "factory": ""
   },
   {
     "id": "1066",
@@ -1929,7 +1994,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein.webp"
+    "photo": "kronshtein.webp",
+    "factory": ""
   },
   {
     "id": "1067",
@@ -1952,7 +2018,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein-500-600-2,0.webp"
+    "photo": "kronshtein-500-600-2,0.webp",
+    "factory": ""
   },
   {
     "id": "1068",
@@ -1975,7 +2042,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kronshtein-1000-700-3,0.webp"
+    "photo": "kronshtein-1000-700-3,0.webp",
+    "factory": ""
   },
   {
     "id": "1069",
@@ -1998,7 +2066,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "lenta-aviora.webp"
+    "photo": "lenta-aviora.webp",
+    "factory": ""
   },
   {
     "id": "1070",
@@ -2006,7 +2075,7 @@ var PRODUCTS = [
     "brandCode": "tpl",
     "brand": "AVIORA",
     "series": "Aviora ПВХ-изолента",
-    "model": "15мм*20м белая AVIORA",
+    "model": "15мм*20м белая AVIORA ",
     "group": "rashod",
     "color": "white",
     "btu": "-",
@@ -2021,13 +2090,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "izolenta-aviora-15-20.webp"
+    "photo": "izolenta-aviora-15-20.webp",
+    "factory": ""
   },
   {
     "id": "1071",
     "sku": "lenta-k-flex",
     "brandCode": "tpl",
-    "brand": "AVIORA",
+    "brand": "K-Flex",
     "series": "K-FLEX 100-025",
     "model": "Лента виниловая K-FLEX 100-025",
     "group": "rashod",
@@ -2044,13 +2114,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "lenta-k-flex.webp"
+    "photo": "lenta-k-flex.webp",
+    "factory": ""
   },
   {
     "id": "1072",
     "sku": "kabel-pvs-3-1,5",
     "brandCode": "provod",
-    "brand": "Провод ПВС (ГОСТ)",
+    "brand": "АРСЕНАЛ",
     "series": "-",
     "model": "ПВС 3х1,5(ГОСТ)",
     "group": "rashod",
@@ -2067,13 +2138,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kabel-pvs-4-1,5.webp"
+    "photo": "kabel-pvs-4-1,5.webp",
+    "factory": ""
   },
   {
     "id": "1073",
     "sku": "kabel-pvs-4-1,5",
     "brandCode": "provod",
-    "brand": "Провод ПВС (ГОСТ)",
+    "brand": "АРСЕНАЛ",
     "series": "-",
     "model": "ПВС 4х1,5(ГОСТ)",
     "group": "rashod",
@@ -2090,13 +2162,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kabel-pvs-4-1,5.webp"
+    "photo": "kabel-pvs-4-1,5.webp",
+    "factory": ""
   },
   {
     "id": "1074",
     "sku": "kabel-pvs-5-1,5",
     "brandCode": "provod",
-    "brand": "Провод ПВС (ГОСТ)",
+    "brand": "АРСЕНАЛ",
     "series": "-",
     "model": "ПВС 5х1,5(ГОСТ)",
     "group": "rashod",
@@ -2113,13 +2186,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kabel-pvs-4-1,5.webp"
+    "photo": "kabel-pvs-4-1,5.webp",
+    "factory": ""
   },
   {
     "id": "1075",
     "sku": "freon-410a",
     "brandCode": "freon",
-    "brand": "Фреон",
+    "brand": "R410a",
     "series": "R410a",
     "model": "Фреон R-410a",
     "group": "rashod",
@@ -2136,13 +2210,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "freon-410.webp"
+    "photo": "freon-410.webp",
+    "factory": ""
   },
   {
     "id": "1076",
     "sku": "freon-32",
     "brandCode": "freon",
-    "brand": "Фреон",
+    "brand": "R32",
     "series": "R32",
     "model": "Фреон R-32",
     "group": "rashod",
@@ -2159,13 +2234,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "freon-32.webp"
+    "photo": "freon-32.webp",
+    "factory": ""
   },
   {
     "id": "1077",
     "sku": "freon-134a",
     "brandCode": "freon",
-    "brand": "Фреон",
+    "brand": "R134a",
     "series": "R134a",
     "model": "Фреон R-134a",
     "group": "rashod",
@@ -2182,13 +2258,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "freon-134.webp"
+    "photo": "freon-134.webp",
+    "factory": ""
   },
   {
     "id": "1078",
     "sku": "freon-22",
     "brandCode": "freon",
-    "brand": "Фреон",
+    "brand": "R22",
     "series": "R22",
     "model": "Фреон R-22",
     "group": "rashod",
@@ -2205,7 +2282,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "freon-22.webp"
+    "photo": "freon-22.webp",
+    "factory": ""
   },
   {
     "id": "1079",
@@ -2228,7 +2306,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "thermaflex.webp"
+    "photo": "thermaflex.webp",
+    "factory": ""
   },
   {
     "id": "1080",
@@ -2251,7 +2330,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "thermaflex.webp"
+    "photo": "thermaflex.webp",
+    "factory": ""
   },
   {
     "id": "1081",
@@ -2274,7 +2354,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "thermaflex.webp"
+    "photo": "thermaflex.webp",
+    "factory": ""
   },
   {
     "id": "1082",
@@ -2297,7 +2378,8 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "thermaflex.webp"
+    "photo": "thermaflex.webp",
+    "factory": ""
   },
   {
     "id": "1083",
@@ -2320,13 +2402,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "thermaflex.webp"
+    "photo": "thermaflex.webp",
+    "factory": ""
   },
   {
     "id": "1084",
     "sku": "gluhar-8-100-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-100мм",
     "model": "Глухарь 8-100мм(50шт)",
     "group": "rashod",
@@ -2343,13 +2426,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1085",
     "sku": "gluhar-8-120-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-120мм",
     "model": "Глухарь 8-120мм(50шт)",
     "group": "rashod",
@@ -2366,13 +2450,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1086",
     "sku": "gluhar-8-140-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-140мм",
     "model": "Глухарь 8-140мм(50шт)",
     "group": "rashod",
@@ -2389,13 +2474,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1087",
     "sku": "gluhar-8-160-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-160мм",
     "model": "Глухарь 8-160мм(50шт)",
     "group": "rashod",
@@ -2412,13 +2498,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1088",
     "sku": "gluhar-8-180-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-180мм",
     "model": "Глухарь 8-180мм(50шт)",
     "group": "rashod",
@@ -2435,13 +2522,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1089",
     "sku": "gluhar-8-200-50",
     "brandCode": "glh",
-    "brand": "Крепёж",
+    "brand": "Глухарь",
     "series": "Глухарь 8-200мм",
     "model": "Глухарь 8-200мм(50шт)",
     "group": "rashod",
@@ -2458,13 +2546,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gluhar.webp"
+    "photo": "gluhar.webp",
+    "factory": ""
   },
   {
     "id": "1090",
     "sku": "dubel-kpo-12-80",
     "brandCode": "kpo",
-    "brand": "Крепёж",
+    "brand": "Дюбель",
     "series": "Дюбель распорн KPO 12х80(50шт)",
     "model": "Дюбель распорн KPO 12х80(50шт)",
     "group": "rashod",
@@ -2481,13 +2570,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "kpo.webp"
+    "photo": "kpo.webp",
+    "factory": ""
   },
   {
     "id": "1091",
     "sku": "skotch-48-40-100",
-    "brandCode": "tpl",
-    "brand": "AVIORA",
+    "brandCode": "skt",
+    "brand": "(Скотч)Клейкая лента упаковочная 48мм*40мкм 100м ALG",
     "series": "48мм*40мкм 100м",
     "model": "Клейкая лента упаковочная 48мм*40мкм 100м ALG",
     "group": "rashod",
@@ -2504,13 +2594,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "scotch.webp"
+    "photo": "scotch.webp",
+    "factory": ""
   },
   {
     "id": "1092",
     "sku": "bolt-8-25",
     "brandCode": "blt",
-    "brand": "Крепёж",
+    "brand": "Болт 8-25",
     "series": "Болт 8-25",
     "model": "Болт 8-25",
     "group": "rashod",
@@ -2527,13 +2618,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "bolt-m8.webp"
+    "photo": "bolt-m8.webp",
+    "factory": ""
   },
   {
     "id": "1093",
     "sku": "bolt-8-30",
     "brandCode": "blt",
-    "brand": "Крепёж",
+    "brand": "Болт 8-30",
     "series": "Болт 8-30",
     "model": "Болт 8-30",
     "group": "rashod",
@@ -2550,13 +2642,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "bolt-m8.webp"
+    "photo": "bolt-m8.webp",
+    "factory": ""
   },
   {
     "id": "1094",
     "sku": "bolt-8-35",
     "brandCode": "blt",
-    "brand": "Крепёж",
+    "brand": "Болт 8-35",
     "series": "Болт 8-35",
     "model": "Болт 8-35",
     "group": "rashod",
@@ -2573,13 +2666,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "bolt-m8.webp"
+    "photo": "bolt-m8.webp",
+    "factory": ""
   },
   {
     "id": "1095",
     "sku": "gaika-m8",
     "brandCode": "gka",
-    "brand": "Крепёж",
+    "brand": "Гайка М8",
     "series": "Гайка М9",
     "model": "Гайка М10",
     "group": "rashod",
@@ -2596,13 +2690,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gaika-m8.webp"
+    "photo": "gaika-m8.webp",
+    "factory": ""
   },
   {
     "id": "1096",
     "sku": "gaika-m8-flanec",
     "brandCode": "gka",
-    "brand": "Крепёж",
+    "brand": "Гайка М8-пресшайба",
     "series": "Гайка М8-пресшайба",
     "model": "Гайка М8-пресшайба",
     "group": "rashod",
@@ -2619,13 +2714,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "gaika-m8-press.webp"
+    "photo": "gaika-m8-press.webp",
+    "factory": ""
   },
   {
     "id": "1097",
     "sku": "shaiba-8",
     "brandCode": "shba",
-    "brand": "Крепёж",
+    "brand": "шайба м8",
     "series": "шайба м9",
     "model": "шайба м10",
     "group": "rashod",
@@ -2642,13 +2738,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "shaiba.webp"
+    "photo": "shaiba.webp",
+    "factory": ""
   },
   {
     "id": "1098",
     "sku": "shaiba-8-uvelich",
     "brandCode": "shba",
-    "brand": "Крепёж",
+    "brand": "шайба м8 увеличенная",
     "series": "шайба м8 увеличенная",
     "model": "шайба м8 увеличенная",
     "group": "rashod",
@@ -2665,13 +2762,14 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "shaiba-uvelich.webp"
+    "photo": "shaiba-uvelich.webp",
+    "factory": ""
   },
   {
     "id": "1099",
     "sku": "dubel-6-40",
     "brandCode": "db",
-    "brand": "Крепёж",
+    "brand": "Дюбель 6х40",
     "series": "Дюбель 6х40",
     "model": "Дюбель 6х40",
     "group": "rashod",
@@ -2688,15 +2786,16 @@ var PRODUCTS = [
     ],
     "compressor": "-",
     "freon": "-",
-    "photo": "dubel-6-40.webp"
+    "photo": "dubel-6-40.webp",
+    "factory": ""
   },
   {
     "id": "1100",
     "sku": "thaicon-comfort-plus-inverter-9",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC25-FR",
+    "series": "Comfort Plus Invertor",
+    "model": "THAICON TL-RWC25-FR",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -2722,15 +2821,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1101",
     "sku": "thaicon-comfort-plus-inverter-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC35-FR",
+    "series": "Comfort Plus Invertor",
+    "model": "THAICON TL-RWC35-FR",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -2756,15 +2856,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1102",
     "sku": "thaicon-comfort-plus-inverter-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC50-FR",
+    "series": "Comfort Plus Invertor",
+    "model": "THAICON TL-RWC50-FR",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -2790,15 +2891,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1103",
     "sku": "thaicon-comfort-plus-inverter-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC70-FR",
+    "series": "Comfort Plus Invertor",
+    "model": "THAICON TL-RWC70-FR",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -2824,15 +2926,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1104",
     "sku": "thaicon-comfort-plus-07",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC20-NR",
+    "series": "Comfort Plus on-off",
+    "model": "THAICON TL-RWC20-NR",
     "group": "onoff",
     "color": "white",
     "btu": "07",
@@ -2854,15 +2957,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus.webp",
+    "factory": "TCL"
   },
   {
     "id": "1105",
     "sku": "thaicon-comfort-plus-09",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC25-NR",
+    "series": "Comfort Plus on-off",
+    "model": "THAICON TL-RWC25-NR",
     "group": "onoff",
     "color": "white",
     "btu": "09",
@@ -2884,15 +2988,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus.webp",
+    "factory": "TCL"
   },
   {
     "id": "1106",
     "sku": "thaicon-comfort-plus-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC35-NR",
+    "series": "Comfort Plus on-off",
+    "model": "THAICON TL-RWC35-NR",
     "group": "onoff",
     "color": "white",
     "btu": "12",
@@ -2914,15 +3019,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus.webp",
+    "factory": "TCL"
   },
   {
     "id": "1107",
     "sku": "thaicon-comfort-plus-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC50-NR",
+    "series": "Comfort Plus on-off",
+    "model": "THAICON TL-RWC50-NR",
     "group": "onoff",
     "color": "white",
     "btu": "18",
@@ -2944,15 +3050,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus.webp",
+    "factory": "TCL"
   },
   {
     "id": "1108",
     "sku": "thaicon-comfort-plus-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Comfort Plus",
-    "model": "TL-RWC70-NR",
+    "series": "Comfort Plus on-off",
+    "model": "THAICON TL-RWC70-NR",
     "group": "onoff",
     "color": "white",
     "btu": "24",
@@ -2974,15 +3081,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-comfort-plus.webp",
+    "factory": "TCL"
   },
   {
     "id": "1109",
     "sku": "thaicon-balance-invertor-07",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB20-VR",
+    "series": "Balance invertor",
+    "model": "THAICON TL-RWB20-VR",
     "group": "inv",
     "color": "white",
     "btu": "07",
@@ -3005,15 +3113,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1110",
     "sku": "thaicon-balance-invertor-09",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB25-VR",
+    "series": "Balance invertor",
+    "model": "THAICON TL-RWB25-VR",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -3036,15 +3145,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1111",
     "sku": "thaicon-balance-invertor-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB35-VR",
+    "series": "Balance invertor",
+    "model": "THAICON TL-RWB35-VR",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -3067,15 +3177,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1112",
     "sku": "thaicon-balance-invertor-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB50-VR",
+    "series": "Balance invertor",
+    "model": "THAICON TL-RWB50-VR",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -3098,15 +3209,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1113",
     "sku": "thaicon-balance-invertor-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB70-VR",
+    "series": "Balance invertor",
+    "model": "THAICON TL-RWB70-VR",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -3129,15 +3241,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance-inv.webp",
+    "factory": "TCL"
   },
   {
     "id": "1114",
     "sku": "thaicon-balance-on-off-07",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB20-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB20-NR",
     "group": "onoff",
     "color": "white",
     "btu": "07",
@@ -3159,15 +3272,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1115",
     "sku": "thaicon-balance-on-off-09",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB25-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB25-NR",
     "group": "onoff",
     "color": "white",
     "btu": "09",
@@ -3189,15 +3303,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1116",
     "sku": "thaicon-balance-on-off-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB35-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB35-NR",
     "group": "onoff",
     "color": "white",
     "btu": "12",
@@ -3219,15 +3334,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1117",
     "sku": "thaicon-balance-on-off-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB50-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB50-NR",
     "group": "onoff",
     "color": "white",
     "btu": "18",
@@ -3249,15 +3365,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1118",
     "sku": "thaicon-balance-on-off-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB70-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB70-NR",
     "group": "onoff",
     "color": "white",
     "btu": "24",
@@ -3279,15 +3396,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1119",
     "sku": "thaicon-balance-on-off-30",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB80-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB80-NR",
     "group": "onoff",
     "color": "white",
     "btu": "30",
@@ -3309,15 +3427,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1120",
     "sku": "thaicon-balance-on-off-36",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "Balance",
-    "model": "TL-RWB100-NR",
+    "series": "Balance On/off",
+    "model": "THAICON TL-RWB100-NR",
     "group": "onoff",
     "color": "white",
     "btu": "36",
@@ -3339,15 +3458,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": ".webp"
+    "photo": "thaicon-balance.webp",
+    "factory": "TCL"
   },
   {
     "id": "1121",
     "sku": "thaicon-senseair-9",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "SensAIR",
-    "model": "TL-RWS25-FR",
+    "series": "SensAIR inverter",
+    "model": "THAICON TL-RWS25-FR",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -3374,15 +3494,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-senseair.webp"
+    "photo": "thaicon-senseair.webp",
+    "factory": "TCL"
   },
   {
     "id": "1122",
     "sku": "thaicon-senseair-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "SensAIR",
-    "model": "TL-RWS35-FR",
+    "series": "SensAIR inverter",
+    "model": "THAICON TL-RWS35-FR",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -3409,15 +3530,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-senseair.webp"
+    "photo": "thaicon-senseair.webp",
+    "factory": "TCL"
   },
   {
     "id": "1123",
     "sku": "thaicon-senseair-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "SensAIR",
-    "model": "TL-RWS50-FR",
+    "series": "SensAIR inverter",
+    "model": "THAICON TL-RWS50-FR",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -3444,15 +3566,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-senseair.webp"
+    "photo": "thaicon-senseair.webp",
+    "factory": "TCL"
   },
   {
     "id": "1124",
     "sku": "thaicon-senseair-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "SensAIR",
-    "model": "TL-RWS70-FR",
+    "series": "SensAIR inverter",
+    "model": "THAICON TL-RWS70-FR",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -3479,15 +3602,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-senseair.webp"
+    "photo": "thaicon-senseair.webp",
+    "factory": "TCL"
   },
   {
     "id": "1125",
     "sku": "thaicon-phantom-9",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "PHANTOM",
-    "model": "TL-RWP25-FR",
+    "series": "PHANTOM inverter",
+    "model": "THAICON TL-RWP25-FR",
     "group": "inv",
     "color": "white",
     "btu": "09",
@@ -3514,15 +3638,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-phantom.webp"
+    "photo": "thaicon-phantom.webp",
+    "factory": "TCL"
   },
   {
     "id": "1126",
     "sku": "thaicon-phantom-12",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "PHANTOM",
-    "model": "TL-RWP35-FR",
+    "series": "PHANTOM inverter",
+    "model": "THAICON TL-RWP35-FR",
     "group": "inv",
     "color": "white",
     "btu": "12",
@@ -3549,15 +3674,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-phantom.webp"
+    "photo": "thaicon-phantom.webp",
+    "factory": "TCL"
   },
   {
     "id": "1127",
     "sku": "thaicon-phantom-18",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "PHANTOM",
-    "model": "TL-RWP50-FR",
+    "series": "PHANTOM inverter",
+    "model": "THAICON TL-RWP50-FR",
     "group": "inv",
     "color": "white",
     "btu": "18",
@@ -3584,15 +3710,16 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-phantom.webp"
+    "photo": "thaicon-phantom.webp",
+    "factory": "TCL"
   },
   {
     "id": "1128",
     "sku": "thaicon-phantom-24",
     "brandCode": "thai",
     "brand": "THAICON",
-    "series": "PHANTOM",
-    "model": "TL-RWP70-FR",
+    "series": "PHANTOM inverter",
+    "model": "THAICON TL-RWP70-FR",
     "group": "inv",
     "color": "white",
     "btu": "24",
@@ -3619,7 +3746,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "thaicon-phantom.webp"
+    "photo": "thaicon-phantom.webp",
+    "factory": "TCL"
   },
   {
     "id": "1129",
@@ -3654,7 +3782,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1130",
@@ -3689,7 +3818,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1131",
@@ -3724,7 +3854,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1132",
@@ -3759,7 +3890,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1133",
@@ -3794,7 +3926,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1134",
@@ -3825,7 +3958,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1135",
@@ -3856,7 +3990,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1136",
@@ -3887,7 +4022,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1137",
@@ -3918,7 +4054,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1138",
@@ -3949,7 +4086,8 @@ var PRODUCTS = [
     ],
     "compressor": "TCL",
     "freon": "R32",
-    "photo": "kentatsu-haruki.webp"
+    "photo": "kentatsu-haruki.webp",
+    "factory": "TCL"
   },
   {
     "id": "1139",
@@ -3984,7 +4122,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary.webp"
+    "photo": "midea-primary.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1140",
@@ -4019,7 +4158,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary.webp"
+    "photo": "midea-primary.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1141",
@@ -4054,7 +4194,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary.webp"
+    "photo": "midea-primary.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1142",
@@ -4089,7 +4230,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary.webp"
+    "photo": "midea-primary.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1143",
@@ -4124,7 +4266,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary.webp"
+    "photo": "midea-primary.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1144",
@@ -4159,7 +4302,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited.webp"
+    "photo": "midea-unlimited.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1145",
@@ -4194,7 +4338,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited.webp"
+    "photo": "midea-unlimited.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1146",
@@ -4229,7 +4374,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited.webp"
+    "photo": "midea-unlimited.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1147",
@@ -4264,7 +4410,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited.webp"
+    "photo": "midea-unlimited.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1148",
@@ -4299,7 +4446,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited.webp"
+    "photo": "midea-unlimited.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1149",
@@ -4331,7 +4479,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-paramount.webp"
+    "photo": "midea-paramount.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1150",
@@ -4363,7 +4512,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-paramount.webp"
+    "photo": "midea-paramount.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1151",
@@ -4395,7 +4545,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-paramount.webp"
+    "photo": "midea-paramount.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1152",
@@ -4427,7 +4578,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-paramount.webp"
+    "photo": "midea-paramount.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1153",
@@ -4459,7 +4611,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-paramount.webp"
+    "photo": "midea-paramount.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1154",
@@ -4496,7 +4649,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary-inv.webp"
+    "photo": "midea-primary-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1155",
@@ -4533,7 +4687,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary-inv.webp"
+    "photo": "midea-primary-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1156",
@@ -4570,7 +4725,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary-inv.webp"
+    "photo": "midea-primary-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1157",
@@ -4607,7 +4763,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary-inv.webp"
+    "photo": "midea-primary-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1158",
@@ -4644,7 +4801,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-primary-inv.webp"
+    "photo": "midea-primary-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1159",
@@ -4677,7 +4835,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited-inv.webp"
+    "photo": "midea-unlimited-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1160",
@@ -4710,7 +4869,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited-inv.webp"
+    "photo": "midea-unlimited-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1161",
@@ -4743,7 +4903,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited-inv.webp"
+    "photo": "midea-unlimited-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1162",
@@ -4776,7 +4937,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited-inv.webp"
+    "photo": "midea-unlimited-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1163",
@@ -4809,7 +4971,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-unlimited-inv.webp"
+    "photo": "midea-unlimited-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1164",
@@ -4848,7 +5011,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-breezeless.webp"
+    "photo": "midea-breezeless.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1165",
@@ -4887,7 +5051,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-breezeless.webp"
+    "photo": "midea-breezeless.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1166",
@@ -4926,7 +5091,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-breezeless.webp"
+    "photo": "midea-breezeless.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1167",
@@ -4965,7 +5131,8 @@ var PRODUCTS = [
     ],
     "compressor": "MIDEA",
     "freon": "R32",
-    "photo": "midea-breezeless.webp"
+    "photo": "midea-breezeless.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1168",
@@ -4993,7 +5160,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari-inv.webp"
+    "photo": "birusa-safari-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1169",
@@ -5021,7 +5189,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari-inv.webp"
+    "photo": "birusa-safari-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1170",
@@ -5049,7 +5218,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari-inv.webp"
+    "photo": "birusa-safari-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1171",
@@ -5077,7 +5247,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari-inv.webp"
+    "photo": "birusa-safari-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1172",
@@ -5104,7 +5275,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1173",
@@ -5131,7 +5303,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1174",
@@ -5158,7 +5331,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1175",
@@ -5185,7 +5359,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1176",
@@ -5212,7 +5387,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1177",
@@ -5239,7 +5415,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1178",
@@ -5266,7 +5443,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-safari.webp"
+    "photo": "birusa-safari.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1179",
@@ -5294,7 +5472,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend-inv.webp"
+    "photo": "birusa-legend-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1180",
@@ -5322,7 +5501,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend-inv.webp"
+    "photo": "birusa-legend-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1181",
@@ -5350,7 +5530,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend-inv.webp"
+    "photo": "birusa-legend-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1182",
@@ -5378,7 +5559,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend-inv.webp"
+    "photo": "birusa-legend-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1183",
@@ -5406,7 +5588,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend-inv.webp"
+    "photo": "birusa-legend-inv.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1184",
@@ -5434,7 +5617,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend.webp"
+    "photo": "birusa-legend.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1185",
@@ -5462,7 +5646,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend.webp"
+    "photo": "birusa-legend.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1186",
@@ -5490,7 +5675,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend.webp"
+    "photo": "birusa-legend.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1187",
@@ -5518,7 +5704,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend.webp"
+    "photo": "birusa-legend.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1188",
@@ -5546,7 +5733,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-legend.webp"
+    "photo": "birusa-legend.webp",
+    "factory": "MIDEA"
   },
   {
     "id": "1189",
@@ -5574,7 +5762,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna-inv.webp"
+    "photo": "birusa-fortuna-inv.webp",
+    "factory": "AUX"
   },
   {
     "id": "1190",
@@ -5602,7 +5791,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna-inv.webp"
+    "photo": "birusa-fortuna-inv.webp",
+    "factory": "AUX"
   },
   {
     "id": "1191",
@@ -5630,7 +5820,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna-inv.webp"
+    "photo": "birusa-fortuna-inv.webp",
+    "factory": "AUX"
   },
   {
     "id": "1192",
@@ -5658,7 +5849,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna-inv.webp"
+    "photo": "birusa-fortuna-inv.webp",
+    "factory": "AUX"
   },
   {
     "id": "1193",
@@ -5686,7 +5878,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna-inv.webp"
+    "photo": "birusa-fortuna-inv.webp",
+    "factory": "AUX"
   },
   {
     "id": "1194",
@@ -5712,7 +5905,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1195",
@@ -5738,7 +5932,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1196",
@@ -5764,7 +5959,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1197",
@@ -5790,7 +5986,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1198",
@@ -5816,7 +6013,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1199",
@@ -5842,7 +6040,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC",
     "freon": "R32",
-    "photo": "birusa-fortuna.webp"
+    "photo": "birusa-fortuna.webp",
+    "factory": "AUX"
   },
   {
     "id": "1200",
@@ -5871,7 +6070,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-classic.webp"
+    "photo": "birusa-classic.webp",
+    "factory": "CHIGO"
   },
   {
     "id": "1201",
@@ -5900,7 +6100,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-classic.webp"
+    "photo": "birusa-classic.webp",
+    "factory": "CHIGO"
   },
   {
     "id": "1202",
@@ -5929,7 +6130,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-classic.webp"
+    "photo": "birusa-classic.webp",
+    "factory": "CHIGO"
   },
   {
     "id": "1203",
@@ -5958,7 +6160,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-classic.webp"
+    "photo": "birusa-classic.webp",
+    "factory": "CHIGO"
   },
   {
     "id": "1204",
@@ -5987,7 +6190,8 @@ var PRODUCTS = [
     ],
     "compressor": "GMCC-Toshiba",
     "freon": "R32",
-    "photo": "birusa-classic.webp"
+    "photo": "birusa-classic.webp",
+    "factory": "CHIGO"
   },
   {
     "id": "1205",
@@ -6015,7 +6219,8 @@ var PRODUCTS = [
     ],
     "compressor": "MHI",
     "freon": "R32",
-    "photo": "mhi-ztl.webp"
+    "photo": "mhi-ztl.webp",
+    "factory": "MHI"
   },
   {
     "id": "1206",
@@ -6043,7 +6248,8 @@ var PRODUCTS = [
     ],
     "compressor": "MHI",
     "freon": "R32",
-    "photo": "mhi-ztl.webp"
+    "photo": "mhi-ztl.webp",
+    "factory": "MHI"
   },
   {
     "id": "1207",
@@ -6071,7 +6277,8 @@ var PRODUCTS = [
     ],
     "compressor": "MHI",
     "freon": "R32",
-    "photo": "mhi-ztl.webp"
+    "photo": "mhi-ztl.webp",
+    "factory": "MHI"
   },
   {
     "id": "1208",
@@ -6099,7 +6306,8 @@ var PRODUCTS = [
     ],
     "compressor": "MHI",
     "freon": "R32",
-    "photo": "mhi-ztl.webp"
+    "photo": "mhi-ztl.webp",
+    "factory": "MHI"
   },
   {
     "id": "1209",
@@ -6127,7 +6335,8 @@ var PRODUCTS = [
     ],
     "compressor": "MHI",
     "freon": "R32",
-    "photo": "mhi-ztl.webp"
+    "photo": "mhi-ztl.webp",
+    "factory": "MHI"
   },
   {
     "id": "1210",
@@ -6161,7 +6370,8 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R410A",
-    "photo": "dantex-gree.webp"
+    "photo": "dantex-gree.webp",
+    "factory": "GREE"
   },
   {
     "id": "1211",
@@ -6195,7 +6405,8 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R410A",
-    "photo": "dantex-gree.webp"
+    "photo": "dantex-gree.webp",
+    "factory": "GREE"
   },
   {
     "id": "1212",
@@ -6229,7 +6440,8 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R410A",
-    "photo": "dantex-gree.webp"
+    "photo": "dantex-gree.webp",
+    "factory": "GREE"
   },
   {
     "id": "1213",
@@ -6263,7 +6475,8 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R410A",
-    "photo": "dantex-gree.webp"
+    "photo": "dantex-gree.webp",
+    "factory": "GREE"
   },
   {
     "id": "1214",
@@ -6297,6 +6510,7 @@ var PRODUCTS = [
     ],
     "compressor": "GREE",
     "freon": "R410A",
-    "photo": "dantex-gree.webp"
+    "photo": "dantex-gree.webp",
+    "factory": "GREE"
   }
 ];
