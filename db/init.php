@@ -25,6 +25,15 @@ function getDB() {
         if (!$tables) migrate($db);
     }
 
+    // Incremental migrations — safe to run on every boot
+    try {
+        $cols = $db->query("PRAGMA table_info(order_items)")->fetchAll(PDO::FETCH_ASSOC);
+        $colNames = array_column($cols, 'name');
+        if (!in_array('product_id', $colNames)) {
+            $db->exec("ALTER TABLE order_items ADD COLUMN product_id TEXT DEFAULT ''");
+        }
+    } catch (Throwable $e) {}
+
     return $db;
 }
 

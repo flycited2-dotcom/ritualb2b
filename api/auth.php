@@ -169,7 +169,7 @@ switch ($action) {
 
         // Attach items to each order
         foreach ($list as &$order) {
-            $items = $db->prepare('SELECT product_name, price, qty FROM order_items WHERE order_id = ?');
+            $items = $db->prepare('SELECT product_id, product_name, price, qty FROM order_items WHERE order_id = ?');
             $items->execute([$order['id']]);
             $order['items'] = $items->fetchAll();
         }

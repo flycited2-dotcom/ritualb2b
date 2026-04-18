@@ -126,7 +126,8 @@ try {
                 if ($bonusSpent > $total) $bonusSpent = $total;
             }
             $dbItems = array_map(function($i) {
-                return ['name' => $i['name'] ?? '—', 'price' => intval($i['price'] ?? 0),
+                return ['id' => strval($i['id'] ?? ''), 'name' => $i['name'] ?? '—',
+                        'price' => intval($i['price'] ?? 0),
                         'qty'  => max(1, intval($i['qty'] ?? 1)), 'group' => $i['group'] ?? ''];
             }, $items);
             $br          = calculateBonus($total - $bonusSpent, $dbItems);
@@ -136,8 +137,8 @@ try {
             $ins->execute([$userId, $total, $bonusEarned, $bonusSpent, $comment, $clientTg]);
             $orderId = (int)$db->lastInsertId();
 
-            $ii = $db->prepare('INSERT INTO order_items (order_id,product_name,price,qty) VALUES (?,?,?,?)');
-            foreach ($dbItems as $di) $ii->execute([$orderId, $di['name'], $di['price'], $di['qty']]);
+            $ii = $db->prepare('INSERT INTO order_items (order_id,product_name,price,qty,product_id) VALUES (?,?,?,?,?)');
+            foreach ($dbItems as $di) $ii->execute([$orderId, $di['name'], $di['price'], $di['qty'], $di['id']]);
 
             if ($bonusEarned > 0)
                 $db->prepare('INSERT INTO bonus_log (user_id,order_id,amount,type,description) VALUES (?,?,?,"earn",?)')->execute([$userId, $orderId, $bonusEarned, 'Заказ #'.$orderId]);
