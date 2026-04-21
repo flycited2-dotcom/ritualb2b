@@ -1842,11 +1842,13 @@ function repeatOrder(orderId,shNum,itemsEncoded){
     }else{unavailable.push(it.product_name||it.name||'?');}
   });
   saveCart();renderCart();updateFab();
+  // Мгновенно скрыть модал (без transition) чтобы корзина открылась поверх
+  var dOv=document.getElementById('dash-ov'), dM=document.getElementById('dash-modal');
+  if(dOv){dOv.style.transition='none';dOv.classList.remove('on');setTimeout(function(){dOv.style.transition='';},50);}
+  if(dM){dM.style.transition='none';dM.classList.remove('on');setTimeout(function(){dM.style.transition='';},50);}
   if(unavailable.length){
-    closeDash();
     showUnavailModal(shNum,unavailable,added.length);
   } else if(added.length){
-    closeDash();
     openD();
   } else{showToast('\u0422\u043e\u0432\u0430\u0440\u044b \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b \u0432 \u043a\u0430\u0442\u0430\u043b\u043e\u0433\u0435',true);}
 }
