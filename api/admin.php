@@ -16,9 +16,12 @@
 require __DIR__ . '/../db/init.php';
 
 header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
-if (session_status() === PHP_SESSION_NONE) session_start();
-
+// Session started inside authCheck() with correct path
 adminRequire();
 
 $action = $_GET['action'] ?? '';
@@ -183,6 +186,84 @@ switch ($action) {
 
         $db->prepare('UPDATE orders SET status = ? WHERE id = ?')->execute([$status, $orderId]);
         jsonResponse(['ok' => true]);
+        break;
+
+    // ── Stats summary ──
+    case 'stats':
+        $stats = [
+            'orders_count'   => (int)$db->query('SELECT COUNT(*) FROM orders')->fetchColumn(),
+            'orders_new'     => (int)$db->query("SELECT COUNT(*) FROM orders WHERE status='new'")->fetchColumn(),
+            'orders_today'   => (int)$db->query("SELECT COUNT(*) FROM orders WHERE date(created_at)=date('now')")->fetchColumn(),
+            'orders_revenue' => (int)$db->query("SELECT COALESCE(SUM(total),0) FROM orders WHERE status!='cancelled'")->fetchColumn(),
+            'users_count'    => (int)$db->query('SELECT COUNT(*) FROM users')->fetchColumn(),
+            'guests_count'   => (int)$db->query('SELECT COUNT(*) FROM guest_orders')->fetchColumn(),
+        ];
+        jsonResponse(['ok' => true, 'stats' => $stats]);
+        break;
+
+    // ── Guest orders ──
+    case 'guest_orders':
+        $page   = max(1, intval($_GET['page'] ?? 1));
+        $limit  = 50;
+        $offset = ($page - 1) * $limit;
+        $total  = (int)$db->query('SELECT COUNT(*) FROM guest_orders')->fetchColumn();
+        $rows   = $db->prepare('SELECT * FROM guest_orders ORDER BY created_at DESC LIMIT ? OFFSET ?');
+        $rows->execute([$limit, $offset]);
+        $list = $rows->fetchAll();
+        foreach ($list as &$go) {
+            $go['items'] = json_decode($go['items_json'] ?? '[]', true) ?: [];
+        }
+        jsonResponse(['ok' => true, 'orders' => $list, 'total' => $total, 'page' => $page]);
+        break;
+
+    // ── Set user role ──
+    case 'set_role':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw  = json_decode(file_get_contents('php://input'), true);
+        $uid  = intval($raw['user_id'] ?? 0);
+        $role = trim($raw['role'] ?? '');
+        if (!$uid || !in_array($role, ['client', 'admin'])) {
+            jsonResponse(['ok' => false, 'error' => 'user_id и role обязательны'], 422);
+        }
+        $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$role, $uid]);
+        jsonResponse(['ok' => true]);
+        break;
+
+    // ── Send Telegram report on demand ──
+    case 'send_report':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $cfgFile = __DIR__ . '/../config.php';
+        if (file_exists($cfgFile)) require_once $cfgFile;
+        $token  = defined('BOT_TOKEN') ? BOT_TOKEN : '';
+        $chatId = defined('CHAT_ID')   ? CHAT_ID   : '';
+        if (!$token || !$chatId) jsonResponse(['ok' => false, 'error' => 'Bot not configured'], 500);
+
+        $cnt     = (int)$db->query('SELECT COUNT(*) FROM orders')->fetchColumn();
+        $newCnt  = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status='new'")->fetchColumn();
+        $today   = (int)$db->query("SELECT COUNT(*) FROM orders WHERE date(created_at)=date('now')")->fetchColumn();
+        $rev     = (int)$db->query("SELECT COALESCE(SUM(total),0) FROM orders WHERE status!='cancelled'")->fetchColumn();
+        $guests  = (int)$db->query('SELECT COUNT(*) FROM guest_orders')->fetchColumn();
+        $recent  = $db->query("SELECT o.id,o.total,o.status,o.created_at,u.name,u.phone FROM orders o JOIN users u ON o.user_id=u.id ORDER BY o.created_at DESC LIMIT 7")->fetchAll();
+
+        $sIco = ['new'=>'🆕','confirmed'=>'✅','in_progress'=>'⚙️','shipped'=>'📦','completed'=>'✔️','cancelled'=>'❌'];
+        $msg  = "📊 *Отчёт СплитХаб* (по запросу)\n";
+        $msg .= "━━━━━━━━━━━━━━━━\n";
+        $msg .= "📦 Заказов всего: *{$cnt}*  |  🆕 Новых: *{$newCnt}*\n";
+        $msg .= "📅 Сегодня: *{$today}*  |  👥 Гостевых: *{$guests}*\n";
+        $msg .= "💰 Выручка: *".number_format($rev,0,'.',' ')." ₽*\n";
+        if ($recent) {
+            $msg .= "━━━━━━━━━━━━━━━━\n🕐 Последние заказы:\n";
+            foreach ($recent as $r) {
+                $ico = $sIco[$r['status']] ?? '•';
+                $msg .= "{$ico} SH-".str_pad($r['id'],5,'0',STR_PAD_LEFT)." · {$r['name']} · ".number_format($r['total'],0,'.',' ')." ₽\n";
+            }
+        }
+
+        $ch = curl_init("https://api.telegram.org/bot{$token}/sendMessage");
+        curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>json_encode(['chat_id'=>$chatId,'text'=>$msg,'parse_mode'=>'Markdown']),CURLOPT_HTTPHEADER=>['Content-Type: application/json'],CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>10,CURLOPT_SSL_VERIFYPEER=>false]);
+        $res = curl_exec($ch); curl_close($ch);
+        $ok  = (bool)(json_decode($res,true)['ok'] ?? false);
+        jsonResponse(['ok' => $ok, 'tg' => $ok ? 'sent' : 'failed']);
         break;
 
     default:

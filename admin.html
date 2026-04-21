@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Админ — СплитХаб</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#F0F2F5;color:#1A1C22;min-height:100vh}
+body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 900px 700px at 10% 10%,rgba(200,218,255,0.45) 0%,transparent 60%),
+  radial-gradient(ellipse 700px 500px at 90% 5%,rgba(255,200,210,0.25) 0%,transparent 55%)}
+:root{--amber:#F59E0B;--amber-d:#D97706;--glass:rgba(255,255,255,0.75);--blo:rgba(180,188,205,0.4);--r:12px;
+  --green:#16a34a;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+#login-screen.hide{display:none}
+.login-box{background:var(--glass);backdrop-filter:blur(22px);border:1px solid var(--blo);border-radius:20px;
+  padding:36px 32px;width:100%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,.12)}
+.login-logo{font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+.login-logo em{color:var(--amber);font-style:normal}
+.login-sub{font-size:.78rem;color:#6b7280;margin-bottom:24px}
+.l-inp{width:100%;border:1px solid var(--blo);background:rgba(255,255,255,.6);border-radius:10px;
+  padding:11px 14px;font-size:.9rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;
+  transition:border-color .18s}
+.l-inp:focus{border-color:var(--amber)}
+.l-btn{width:100%;background:var(--amber);color:#fff;border:none;border-radius:10px;padding:12px;
+  font-size:.9rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .18s;margin-top:4px}
+.l-btn:hover{background:var(--amber-d)}
+.l-err{color:var(--red);font-size:.78rem;margin-top:8px;min-height:18px}
+
+/* ── MAIN APP ── */
+#app{display:none;position:relative;z-index:1}
+#app.show{display:block}
+
+/* ── HEADER ── */
+.adm-hdr{background:var(--glass);backdrop-filter:blur(18px);border-bottom:1px solid var(--blo);
+  position:sticky;top:0;z-index:50;padding:0 20px}
+.adm-hdr-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;height:56px}
+.adm-logo{font-family:'Unbounded',sans-serif;font-size:.95rem;font-weight:700;flex:1}
+.adm-logo em{color:var(--amber);font-style:normal}
+.adm-logo span{font-size:.68rem;font-weight:600;color:#9298A8;margin-left:6px;font-family:'Inter',sans-serif}
+.hdr-btn{border:none;border-radius:9px;padding:7px 14px;font-size:.75rem;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s}
+.hdr-btn-tg{background:rgba(34,158,217,.12);color:#1a6fa0}
+.hdr-btn-tg:hover{background:rgba(34,158,217,.22)}
+.hdr-btn-out{background:rgba(239,68,68,.1);color:var(--red)}
+.hdr-btn-out:hover{background:rgba(239,68,68,.2)}
+
+/* ── STATS ── */
+.stats-bar{max-width:1400px;margin:20px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:1024px){.stats-bar{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.stats-bar{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--blo);border-radius:var(--r);
+  padding:14px 16px;text-align:center}
+.stat-val{font-family:'Unbounded',sans-serif;font-size:1.4rem;font-weight:700;line-height:1}
+.stat-lbl{font-size:.68rem;color:#9298A8;margin-top:4px;font-weight:500}
+.stat-card.alert .stat-val{color:var(--amber-d)}
+
+/* ── TABS ── */
+.tab-bar{max-width:1400px;margin:18px auto 0;padding:0 20px;display:flex;gap:4px;border-bottom:2px solid var(--blo)}
+.tab-btn{border:none;background:none;padding:10px 18px;font-size:.82rem;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;color:#9298A8;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .18s}
+.tab-btn.active{color:var(--amber-d);border-bottom-color:var(--amber)}
+.tab-btn:hover:not(.active){color:#1A1C22}
+
+/* ── CONTENT ── */
+.tab-content{max-width:1400px;margin:20px auto 40px;padding:0 20px}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ── STATUS BADGE/SELECT ── */
+.s-sel{border:none;border-radius:20px;padding:4px 10px;font-size:.7rem;font-weight:700;font-family:'Inter',sans-serif;
+  cursor:pointer;appearance:none;-webkit-appearance:none;outline:none}
+.s-new{background:rgba(245,158,11,.15);color:#b45309}
+.s-confirmed{background:rgba(59,130,246,.15);color:#1d4ed8}
+.s-in_progress{background:rgba(139,92,246,.15);color:#6d28d9}
+.s-shipped{background:rgba(6,182,212,.15);color:#0e7490}
+.s-completed{background:rgba(22,163,74,.15);color:#166534}
+.s-cancelled{background:rgba(239,68,68,.15);color:#b91c1c}
+
+/* ── ORDER CARD ── */
+.ord-card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--blo);border-radius:var(--r);
+  margin-bottom:10px;overflow:hidden}
+.ord-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;flex-wrap:wrap}
+.ord-num{font-weight:700;font-size:.82rem;font-family:'Unbounded',sans-serif;white-space:nowrap}
+.ord-date{font-size:.7rem;color:#9298A8;white-space:nowrap}
+.ord-client{font-size:.8rem;font-weight:600;flex:1;min-width:120px}
+.ord-phone{font-size:.75rem;color:#3b82f6;white-space:nowrap;text-decoration:none}
+.ord-phone:hover{text-decoration:underline}
+.ord-total{font-family:'Unbounded',sans-serif;font-size:.85rem;font-weight:700;color:var(--amber-d);white-space:nowrap}
+.ord-tg{font-size:.72rem;color:#229ED9;white-space:nowrap}
+.ord-expand{margin-left:auto;font-size:.8rem;color:#9298A8;transition:transform .2s;flex-shrink:0}
+.ord-card.open .ord-expand{transform:rotate(180deg)}
+
+.ord-body{display:none;padding:0 16px 14px;border-top:1px solid var(--blo)}
+.ord-card.open .ord-body{display:block}
+.ord-items{margin-top:10px}
+.ord-item-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-size:.78rem;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.ord-item-row:last-child{border-bottom:none}
+.ord-item-name{color:#1A1C22;font-weight:500;flex:1;min-width:0;word-break:break-word}
+.ord-item-meta{color:#9298A8;font-size:.72rem;white-space:nowrap;flex-shrink:0}
+.ord-footer-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,.06)}
+.ord-bonus-info{font-size:.72rem;color:var(--green);background:rgba(22,163,74,.08);border-radius:20px;padding:3px 9px}
+.ord-comment{font-size:.75rem;color:#6b7280;flex:1;font-style:italic}
+
+/* ── GRID (desktop) ── */
+@media(min-width:900px){
+  .orders-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .orders-grid .ord-card{margin-bottom:0}
+}
+@media(min-width:1200px){.orders-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── PAGINATION ── */
+.pager{display:flex;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap}
+.pg-btn{border:1px solid var(--blo);background:var(--glass);border-radius:8px;padding:6px 12px;
+  font-size:.78rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
+.pg-btn.cur{background:var(--amber);color:#fff;border-color:var(--amber)}
+.pg-btn:hover:not(.cur){background:rgba(245,158,11,.1)}
+
+/* ── USERS TABLE ── */
+.usr-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.usr-table th{text-align:left;padding:8px 12px;font-size:.68rem;color:#9298A8;font-weight:600;
+  border-bottom:2px solid var(--blo);white-space:nowrap}
+.usr-table td{padding:10px 12px;border-bottom:1px solid var(--blo);vertical-align:top}
+.usr-table tr:hover td{background:rgba(245,158,11,.04)}
+.usr-wrap{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--blo);border-radius:var(--r);overflow:hidden}
+.usr-name{font-weight:600}
+.usr-role-admin{background:rgba(245,158,11,.15);color:#b45309;border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700}
+.usr-role-client{background:rgba(156,163,175,.12);color:#4b5563;border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:600}
+@media(max-width:700px){.usr-table{display:block;overflow-x:auto}}
+
+/* ── ACTION BUTTONS ── */
+.act-btn{border:none;border-radius:8px;padding:5px 10px;font-size:.7rem;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s}
+.act-btn-bonus{background:rgba(22,163,74,.1);color:var(--green)}
+.act-btn-bonus:hover{background:rgba(22,163,74,.2)}
+.act-btn-role{background:rgba(245,158,11,.1);color:var(--amber-d)}
+.act-btn-role:hover{background:rgba(245,158,11,.2)}
+.act-btn-tg{background:rgba(34,158,217,.1);color:#1a6fa0}
+.act-btn-tg:hover{background:rgba(34,158,217,.2)}
+
+/* ── PROMO RULES ── */
+.promo-card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--blo);border-radius:var(--r);
+  padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.promo-name{font-weight:600;font-size:.85rem;flex:1}
+.promo-detail{font-size:.72rem;color:#9298A8}
+.toggle-btn{border:none;border-radius:20px;padding:5px 12px;font-size:.72rem;font-weight:700;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s}
+.toggle-on{background:rgba(22,163,74,.12);color:var(--green)}
+.toggle-off{background:rgba(156,163,175,.12);color:#9298A8}
+.promo-form{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--blo);border-radius:var(--r);
+  padding:18px;margin-top:16px}
+.promo-form h4{font-size:.85rem;font-weight:700;margin-bottom:14px}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.form-inp{border:1px solid var(--blo);background:rgba(255,255,255,.6);border-radius:9px;
+  padding:9px 12px;font-size:.82rem;font-family:'Inter',sans-serif;outline:none;flex:1;min-width:120px}
+.form-inp:focus{border-color:var(--amber)}
+.form-btn{background:var(--amber);color:#fff;border:none;border-radius:9px;padding:9px 18px;
+  font-size:.8rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(4px);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px}
+.modal-ov.show{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:380px;
+  box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.modal-box h3{font-size:1rem;font-weight:700;margin-bottom:16px}
+.modal-box .l-inp{margin-bottom:10px}
+.modal-btns{display:flex;gap:10px;margin-top:16px}
+.modal-cancel{flex:1;border:1px solid var(--blo);background:transparent;border-radius:9px;padding:10px;
+  font-size:.82rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
+.modal-ok{flex:1;background:var(--amber);color:#fff;border:none;border-radius:9px;padding:10px;
+  font-size:.82rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer}
+
+/* ── MISC ── */
+.empty{text-align:center;color:#9298A8;padding:40px;font-size:.9rem}
+.loading{text-align:center;padding:30px;color:#9298A8}
+.section-title{font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;letter-spacing:.06em;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-cnt{background:var(--amber);color:#fff;border-radius:20px;padding:1px 7px;font-size:.65rem;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Сплит<em>Хаб</em></div>
+    <div class="login-sub">Панель администратора</div>
+    <input class="l-inp" id="lPhone" type="tel" placeholder="+7 (___) ___-__-__" autocomplete="tel">
+    <input class="l-inp" id="lPass"  type="password" placeholder="Пароль" autocomplete="current-password">
+    <button class="l-btn" onclick="doLogin()">Войти</button>
+    <div class="l-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="adm-hdr">
+    <div class="adm-hdr-inner">
+      <div class="adm-logo">Сплит<em>Хаб</em> <span>Администратор</span></div>
+      <button class="hdr-btn hdr-btn-tg" onclick="sendReport()">&#128232; Отчёт в TG</button>
+      <button class="hdr-btn hdr-btn-out" onclick="doLogout()">Выйти</button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card"><div class="stat-val" id="sOrders">—</div><div class="stat-lbl">Всего заказов</div></div>
+    <div class="stat-card alert"><div class="stat-val" id="sNew">—</div><div class="stat-lbl">Новых ⚡</div></div>
+    <div class="stat-card"><div class="stat-val" id="sToday">—</div><div class="stat-lbl">Сегодня</div></div>
+    <div class="stat-card"><div class="stat-val" id="sRev">—</div><div class="stat-lbl">Выручка ₽</div></div>
+    <div class="stat-card"><div class="stat-val" id="sUsers">—</div><div class="stat-lbl">Клиентов</div></div>
+    <div class="stat-card"><div class="stat-val" id="sGuests">—</div><div class="stat-lbl">Гостевых</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('orders')">&#128230; Заказы</button>
+    <button class="tab-btn" onclick="switchTab('guests')">&#128100; Гостевые</button>
+    <button class="tab-btn" onclick="switchTab('users')">&#128101; Клиенты</button>
+    <button class="tab-btn" onclick="switchTab('promo')">&#127381; Промо</button>
+  </div>
+
+  <!-- TAB CONTENT -->
+  <div class="tab-content">
+
+    <!-- ORDERS -->
+    <div class="tab-pane active" id="pane-orders">
+      <div class="loading" id="ordLoading">Загрузка...</div>
+      <div id="ordList"></div>
+      <div class="pager" id="ordPager"></div>
+    </div>
+
+    <!-- GUESTS -->
+    <div class="tab-pane" id="pane-guests">
+      <div class="loading" id="gstLoading">Загрузка...</div>
+      <div id="gstList"></div>
+      <div class="pager" id="gstPager"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="tab-pane" id="pane-users">
+      <div class="loading" id="usrLoading">Загрузка...</div>
+      <div id="usrList"></div>
+    </div>
+
+    <!-- PROMO -->
+    <div class="tab-pane" id="pane-promo">
+      <div class="loading" id="promoLoading">Загрузка...</div>
+      <div id="promoList"></div>
+      <div class="promo-form">
+        <h4>+ Новое правило</h4>
+        <div class="form-row">
+          <input class="form-inp" id="pName"    type="text"   placeholder="Название (напр. Ретробонус 5%)">
+          <input class="form-inp" id="pPercent" type="number" placeholder="% бонуса" step="0.5" min="0" max="100" style="max-width:120px">
+          <input class="form-inp" id="pMin"     type="number" placeholder="Мин. сумма ₽" min="0" style="max-width:140px">
+        </div>
+        <button class="form-btn" onclick="createPromo()">Создать правило</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BONUS ADJUST MODAL -->
+<div class="modal-ov" id="bonusModal">
+  <div class="modal-box">
+    <h3>Корректировка бонусов</h3>
+    <input class="l-inp" id="bUser" type="text" placeholder="Клиент" readonly>
+    <input class="l-inp" id="bAmt"  type="number" placeholder="Сумма (+ начислить / - списать)">
+    <input class="l-inp" id="bDesc" type="text" placeholder="Причина (необязательно)">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('bonusModal')">Отмена</button>
+      <button class="modal-ok" onclick="submitBonus()">Применить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────
+var _ordPage=1, _gstPage=1;
+var _bonusUserId=0;
+
+// ── Helpers ────────────────────────────────
+function api(path){return 'api/'+path;}
+function fmt(n){return parseInt(n||0).toLocaleString('ru-RU');}
+function fmtDate(s){
+  var d=new Date((s||'').replace(' ','T'));
+  return isNaN(d.getTime())?s:d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+var SMAP={new:'Новый',confirmed:'Подтверждён',in_progress:'В работе',shipped:'Отгружен',completed:'Выполнен',cancelled:'Отменён'};
+
+// ── Auth ────────────────────────────────────
+function doLogin(){
+  var phone=document.getElementById('lPhone').value.trim();
+  var pass=document.getElementById('lPass').value;
+  if(!phone||!pass){document.getElementById('lErr').textContent='Заполните поля';return;}
+  fetch(api('auth.php?action=login'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({phone:phone,password:pass})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(!d.ok){document.getElementById('lErr').textContent=d.error||'Ошибка';return;}
+    if(d.user.role!=='admin'){
+      fetch(api('auth.php?action=logout'),{method:'POST'});
+      document.getElementById('lErr').textContent='Доступ только для администраторов';return;
+    }
+    initApp();
+  }).catch(function(){document.getElementById('lErr').textContent='Ошибка соединения';});
+}
+document.getElementById('lPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+function doLogout(){
+  fetch(api('auth.php?action=logout'),{method:'POST'}).finally(function(){
+    document.getElementById('app').classList.remove('show');
+    document.getElementById('login-screen').classList.remove('hide');
+    document.getElementById('lPass').value='';
+    document.getElementById('lErr').textContent='';
+  });
+}
+
+function initApp(){
+  document.getElementById('login-screen').classList.add('hide');
+  document.getElementById('app').classList.add('show');
+  loadStats();
+  loadOrders(1);
+}
+
+// Check if already logged in
+fetch(api('auth.php?action=profile'))
+.then(function(r){return r.json();}).then(function(d){
+  if(d.ok&&d.user&&d.user.role==='admin') initApp();
+}).catch(function(){});
+
+// ── Stats ───────────────────────────────────
+function loadStats(){
+  fetch(api('admin.php?action=stats'))
+  .then(function(r){return r.json();}).then(function(d){
+    if(!d.ok)return;
+    var s=d.stats;
+    document.getElementById('sOrders').textContent=s.orders_count;
+    document.getElementById('sNew').textContent=s.orders_new;
+    document.getElementById('sToday').textContent=s.orders_today;
+    document.getElementById('sRev').textContent=fmt(s.orders_revenue);
+    document.getElementById('sUsers').textContent=s.users_count;
+    document.getElementById('sGuests').textContent=s.guests_count;
+  }).catch(function(){});
+}
+
+// ── Tabs ────────────────────────────────────
+var _loaded={orders:false,guests:false,users:false,promo:false};
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.toggle('active',['orders','guests','users','promo'][i]===name);
+  });
+  document.querySelectorAll('.tab-pane').forEach(function(p){
+    p.classList.toggle('active',p.id==='pane-'+name);
+  });
+  if(!_loaded[name]){
+    _loaded[name]=true;
+    if(name==='guests')loadGuests(1);
+    if(name==='users')loadUsers();
+    if(name==='promo')loadPromo();
+  }
+}
+
+// ── Orders ──────────────────────────────────
+function loadOrders(page){
+  _ordPage=page;
+  document.getElementById('ordLoading').style.display='block';
+  document.getElementById('ordList').innerHTML='';
+  document.getElementById('ordPager').innerHTML='';
+  fetch(api('admin.php?action=orders&page='+page))
+  .then(function(r){return r.json();}).then(function(d){
+    document.getElementById('ordLoading').style.display='none';
+    if(!d.ok){document.getElementById('ordList').innerHTML='<div class="empty">Ошибка загрузки</div>';return;}
+    if(!d.orders.length){document.getElementById('ordList').innerHTML='<div class="empty">Заказов нет</div>';return;}
+    renderOrders(d.orders,d.total,page,'ordList','ordPager',loadOrders);
+  }).catch(function(){document.getElementById('ordLoading').style.display='none';});
+}
+
+function renderOrders(orders,total,page,listId,pagerId,loadFn){
+  var grid=document.createElement('div');
+  grid.className='orders-grid';
+  orders.forEach(function(o){
+    var card=document.createElement('div');
+    card.className='ord-card';
+    var shNum='SH-'+String(o.id||o.order_id||o.ID||'?').padStart(5,'0');
+    var tg=o.client_tg||o.client_telegram||'';
+    var comment=o.comment||'';
+    var items=o.items||[];
+    var statusSel=o.status?'<select class="s-sel s-'+o.status+'" onchange="setStatus('+o.id+',this)" onclick="event.stopPropagation()">'
+      +Object.keys(SMAP).map(function(s){return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+SMAP[s]+'</option>';}).join('')
+      +'</select>':'' ;
+
+    var headHtml='<div class="ord-head">'
+      +'<span class="ord-num">'+shNum+'</span>'
+      +'<span class="ord-date">'+fmtDate(o.created_at)+'</span>'
+      +'<span class="ord-client">'+(o.user_name||o.name||'—')+'</span>';
+    if(o.user_phone||o.phone){
+      var ph=(o.user_phone||o.phone||'').replace(/\D/g,'');
+      headHtml+='<a class="ord-phone" href="tel:+'+ph+'" onclick="event.stopPropagation()">+'+ph+'</a>';
+    }
+    headHtml+=statusSel
+      +'<span class="ord-total">'+fmt(o.total)+'&thinsp;₽</span>'
+      +'<span class="ord-expand">▾</span></div>';
+
+    var bodyHtml='<div class="ord-body"><div class="ord-items">';
+    if(items.length){
+      items.forEach(function(it){
+        var name=it.product_name||it.name||'—';
+        var price=it.price||0, qty=it.qty||1;
+        bodyHtml+='<div class="ord-item-row"><span class="ord-item-name">'+name+'</span>'
+          +'<span class="ord-item-meta">'+qty+'&nbsp;шт.&nbsp;·&nbsp;'+fmt(price*qty)+'&nbsp;₽</span></div>';
+      });
+    }else{bodyHtml+='<div style="color:#9298A8;font-size:.78rem">Позиции не загружены</div>';}
+    bodyHtml+='</div>';
+    bodyHtml+='<div class="ord-footer-row">';
+    if(o.bonus_earned>0)bodyHtml+='<span class="ord-bonus-info">+'+o.bonus_earned+'&nbsp;бон</span>';
+    if(o.bonus_spent>0)bodyHtml+='<span class="ord-bonus-info" style="color:var(--red);background:rgba(239,68,68,.08)">−'+o.bonus_spent+'&nbsp;списано</span>';
+    if(tg)bodyHtml+='<a class="ord-tg" href="https://t.me/'+tg.replace('@','')+'" target="_blank">@'+tg.replace('@','')+'</a>';
+    if(comment)bodyHtml+='<span class="ord-comment">💬&nbsp;'+comment+'</span>';
+    bodyHtml+='</div></div>';
+
+    card.innerHTML=headHtml+bodyHtml;
+    card.querySelector('.ord-head').addEventListener('click',function(){card.classList.toggle('open');});
+    grid.appendChild(card);
+  });
+  document.getElementById(listId).appendChild(grid);
+
+  // Pager
+  var pages=Math.ceil(total/50);
+  if(pages>1){
+    var pHtml='';
+    for(var p=Math.max(1,page-2);p<=Math.min(pages,page+2);p++){
+      pHtml+='<button class="pg-btn'+(p===page?' cur':'')+'" onclick="'+loadFn.name+'('+p+')">'+p+'</button>';
+    }
+    document.getElementById(pagerId).innerHTML=pHtml;
+  }
+}
+
+function setStatus(orderId,sel){
+  var newStatus=sel.value;
+  sel.className='s-sel s-'+newStatus;
+  fetch(api('admin.php?action=order_status'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({order_id:orderId,status:newStatus})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok)loadStats();
+  });
+}
+
+// ── Guest Orders ─────────────────────────────
+function loadGuests(page){
+  _gstPage=page;
+  document.getElementById('gstLoading').style.display='block';
+  document.getElementById('gstList').innerHTML='';
+  fetch(api('admin.php?action=guest_orders&page='+page))
+  .then(function(r){return r.json();}).then(function(d){
+    document.getElementById('gstLoading').style.display='none';
+    if(!d.ok||!d.orders.length){document.getElementById('gstList').innerHTML='<div class="empty">Гостевых заказов нет</div>';return;}
+    renderOrders(d.orders,d.total,page,'gstList','gstPager',loadGuests);
+  }).catch(function(){document.getElementById('gstLoading').style.display='none';});
+}
+
+// ── Users ────────────────────────────────────
+function loadUsers(){
+  document.getElementById('usrLoading').style.display='block';
+  fetch(api('admin.php?action=users'))
+  .then(function(r){return r.json();}).then(function(d){
+    document.getElementById('usrLoading').style.display='none';
+    if(!d.ok||!d.users.length){document.getElementById('usrList').innerHTML='<div class="empty">Пользователей нет</div>';return;}
+    var html='<div class="usr-wrap"><table class="usr-table"><thead><tr>'
+      +'<th>Клиент</th><th>Телефон</th><th>Telegram</th><th>Заказов</th><th>Потрачено</th>'
+      +'<th>Бонусы</th><th>Роль</th><th>С нами с</th><th>Действия</th></tr></thead><tbody>';
+    d.users.forEach(function(u){
+      var regDate=new Date((u.created_at||'').replace(' ','T'));
+      var regStr=isNaN(regDate.getTime())?u.created_at:regDate.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit'});
+      html+='<tr>'
+        +'<td><div class="usr-name">'+u.name+'</div></td>'
+        +'<td><a class="ord-phone" href="tel:+'+u.phone+'">'+u.phone+'</a></td>'
+        +'<td>'+(u.telegram?'<a class="ord-tg" href="https://t.me/'+u.telegram.replace('@','')+'" target="_blank">@'+u.telegram.replace('@','')+'</a>':'—')+'</td>'
+        +'<td>'+u.order_count+'</td>'
+        +'<td>'+fmt(u.total_spent)+'&thinsp;₽</td>'
+        +'<td>'+fmt(u.bonus_balance)+'&thinsp;б</td>'
+        +'<td><span class="usr-role-'+u.role+'">'+(u.role==='admin'?'Админ':'Клиент')+'</span></td>'
+        +'<td>'+regStr+'</td>'
+        +'<td style="display:flex;gap:6px;flex-wrap:wrap">'
+        +'<button class="act-btn act-btn-bonus" onclick="openBonusModal('+u.id+',\''+u.name+'\')">Бонусы</button>'
+        +(u.role!=='admin'?'<button class="act-btn act-btn-role" onclick="promoteAdmin('+u.id+',\''+u.name+'\')">→ Админ</button>':'')
+        +(u.telegram?'<a class="act-btn act-btn-tg" href="https://t.me/'+u.telegram.replace('@','')+'" target="_blank">TG</a>':'')
+        +'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('usrList').innerHTML=html;
+  }).catch(function(){document.getElementById('usrLoading').style.display='none';});
+}
+
+function openBonusModal(uid,name){
+  _bonusUserId=uid;
+  document.getElementById('bUser').value=name;
+  document.getElementById('bAmt').value='';
+  document.getElementById('bDesc').value='';
+  document.getElementById('bonusModal').classList.add('show');
+}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function submitBonus(){
+  var amt=parseInt(document.getElementById('bAmt').value||0);
+  var desc=document.getElementById('bDesc').value||'Ручная корректировка';
+  if(!amt||!_bonusUserId)return;
+  fetch(api('admin.php?action=bonus_adjust'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:_bonusUserId,amount:amt,description:desc})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){closeModal('bonusModal');loadUsers();loadStats();}
+  });
+}
+function promoteAdmin(uid,name){
+  if(!confirm('Сделать '+name+' администратором?'))return;
+  fetch(api('admin.php?action=set_role'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:uid,role:'admin'})})
+  .then(function(r){return r.json();}).then(function(d){if(d.ok)loadUsers();});
+}
+
+// ── Promo ────────────────────────────────────
+function loadPromo(){
+  document.getElementById('promoLoading').style.display='block';
+  fetch(api('admin.php?action=promo_list'))
+  .then(function(r){return r.json();}).then(function(d){
+    document.getElementById('promoLoading').style.display='none';
+    var html='';
+    if(!d.ok||!d.rules.length){html='<div class="empty" style="padding:20px 0">Правил нет — создайте первое</div>';}
+    else{d.rules.forEach(function(r){
+      var onCls=r.active?'toggle-on':'toggle-off';
+      var onTxt=r.active?'Активно':'Выключено';
+      var detail=r.bonus_percent+'%'+(r.product_group?' · '+r.product_group:'')+(r.min_order>0?' · от '+fmt(r.min_order)+'₽':'');
+      html+='<div class="promo-card">'
+        +'<div><div class="promo-name">'+r.name+'</div><div class="promo-detail">'+detail+'</div></div>'
+        +'<button class="toggle-btn '+onCls+'" onclick="togglePromo('+r.id+','+r.active+')">'+onTxt+'</button>'
+        +'<button class="act-btn" style="background:rgba(239,68,68,.1);color:var(--red)" onclick="deletePromo('+r.id+')">Удалить</button>'
+        +'</div>';
+    });}
+    document.getElementById('promoList').innerHTML=html;
+  }).catch(function(){document.getElementById('promoLoading').style.display='none';});
+}
+function togglePromo(id,active){
+  fetch(api('admin.php?action=promo_toggle'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:id,active:active?0:1})})
+  .then(function(r){return r.json();}).then(function(d){if(d.ok)loadPromo();});
+}
+function deletePromo(id){
+  if(!confirm('Удалить правило?'))return;
+  fetch(api('admin.php?action=promo_delete'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:id})})
+  .then(function(r){return r.json();}).then(function(d){if(d.ok)loadPromo();});
+}
+function createPromo(){
+  var name=document.getElementById('pName').value.trim();
+  var pct=parseFloat(document.getElementById('pPercent').value||3);
+  var min=parseInt(document.getElementById('pMin').value||0);
+  if(!name)return;
+  fetch(api('admin.php?action=promo_create'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:name,bonus_percent:pct,min_order:min,active:1})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){document.getElementById('pName').value='';document.getElementById('pPercent').value='';document.getElementById('pMin').value='';loadPromo();}
+  });
+}
+
+// ── Report ───────────────────────────────────
+function sendReport(){
+  var btn=document.querySelector('.hdr-btn-tg');
+  btn.textContent='Отправляю...';btn.disabled=true;
+  fetch(api('admin.php?action=send_report'),{method:'POST'})
+  .then(function(r){return r.json();}).then(function(d){
+    btn.disabled=false;
+    btn.textContent=d.ok?'✓ Отправлено':'✗ Ошибка';
+    setTimeout(function(){btn.textContent='📨 Отчёт в TG';},3000);
+  }).catch(function(){btn.disabled=false;btn.textContent='✗ Ошибка';setTimeout(function(){btn.textContent='📨 Отчёт в TG';},3000);});
+}
+</script>
+</body>
+</html>
