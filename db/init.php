@@ -124,7 +124,11 @@ function jsonResponse($data, $code = 200) {
  * Start session and return user_id or null.
  */
 function authCheck() {
-    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        $sessDir = sys_get_temp_dir() . '/splithub_sess';
+        if (is_dir($sessDir) && is_writable($sessDir)) session_save_path($sessDir);
+        session_start();
+    }
     return $_SESSION['user_id'] ?? null;
 }
 
