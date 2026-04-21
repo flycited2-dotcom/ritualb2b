@@ -813,7 +813,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* DASHBOARD MODAL */
 .dash-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s}
 .dash-ov.on{opacity:1;pointer-events:auto}
-.dash-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:94%;max-width:480px;max-height:85vh;overflow-y:auto;background:var(--glass2);backdrop-filter:var(--blur);border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:24px 18px 18px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
+.dash-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:96%;max-width:520px;max-height:90vh;overflow-y:auto;background:var(--glass2);backdrop-filter:var(--blur);border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:24px 18px 18px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
+@media(min-width:640px){.dash-modal{max-width:860px;max-height:88vh;width:90%;padding:28px 28px 24px}}
+@media(min-width:1024px){.dash-modal{max-width:1000px;width:80%}}
 .dash-modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 .dash-modal h3{font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:700;margin-bottom:14px}
 .dash-close{position:absolute;top:10px;right:14px;border:none;background:none;font-size:1.2rem;color:var(--text3);cursor:pointer}
@@ -1169,7 +1171,7 @@ function cardHtml(p, delay) {
     + '<div class="pcard-name">'+p.model+'</div>'
     + '<div class="pcard-desc">'+p.descShort+'</div>'
     + getStockHtml(p)
-    + '<div class="pcard-price"><span class="pcard-price-val">'+p.price.toLocaleString('ru-RU')+'</span><small>опт · комплект</small></div>'
+    + '<div class="pcard-price"><span class="pcard-price-val">'+p.price.toLocaleString('ru-RU')+'&thinsp;₽</span><small>опт · комплект</small></div>'
     + addBtn
     + '</div></div>';
 }
