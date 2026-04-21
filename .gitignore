@@ -1,4 +1,5 @@
 config.php
+converter/config/deploy.json
 db/*.sqlite
 db/*.sqlite-wal
 db/*.sqlite-shm
