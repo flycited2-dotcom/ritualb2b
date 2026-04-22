@@ -204,12 +204,12 @@ async function _fetchAsJpegSafe(url) {
 }
 
 /* ────────────────────────────────────────────────
-   PDF — on-page html2pdf → blob → кнопка Сохранить
+   PDF — pdfmake (векторный) → blob → кнопка Сохранить
 ─────────────────────────────────────────────────*/
 async function downloadPricePDF() {
   closePriceModal();
 
-  if (typeof html2pdf === 'undefined') {
+  if (typeof pdfMake === 'undefined') {
     alert('Библиотека PDF ещё загружается. Подождите 5 секунд и повторите.');
     return;
   }
@@ -218,146 +218,157 @@ async function downloadPricePDF() {
   const fname = 'splithub-price-' + date.replace(/\./g, '-') + '.pdf';
   const ui    = _showProgressModal('📄 Генерируем PDF…');
 
-  // Контейнер позади модала — html2canvas его рендерит по DOM-ссылке
-  const container = document.createElement('div');
-  container.style.cssText = 'position:absolute;left:0;top:0;width:900px;background:#fff;z-index:-9999;';
-  container.innerHTML = _buildPriceContent(date);
-  document.body.appendChild(container);
-  // Ждём, пока браузер разложит контент (без этого высота = 0 → пустой PDF)
-  await new Promise(r => setTimeout(r, 300));
-
-  const priceWrap = container.querySelector('.price-wrap') || container;
-
-  // Псевдо-прогресс пока html2pdf работает (реальный прогресс недоступен)
-  ui.update(5, 'Рендерим страницы… это займёт 30–60 сек');
-  let pct = 5;
-  const ticker = setInterval(() => {
-    if (pct < 82) { pct += 1.5; ui.update(pct, 'Рендерим страницы… ' + Math.round(pct) + '%'); }
-  }, 1000);
-
   try {
-    const blob = await html2pdf()
-      .from(priceWrap)
-      .set({
-        margin:      [8, 8, 8, 8],
-        image:       { type: 'jpeg', quality: 0.82 },
-        html2canvas: { scale: 1.2, useCORS: true, logging: false, imageTimeout: 15000 },
-        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:   { mode: ['css'], before: '.pb-before' },
-      })
-      .outputPdf('blob');
+    /* Шаг 1: загрузка фото батчами по 5 (та же логика, что в Excel) */
+    const uniquePhotos = [...new Set(PRODUCTS.filter(p => p.photo).map(p => p.photo))];
+    const photos = {};
+    const total  = uniquePhotos.length;
+    let   loaded = 0;
 
-    clearInterval(ticker);
-    ui.update(100, '✅ Готово! Нажмите «Сохранить файл»');
+    for (let i = 0; i < uniquePhotos.length; i += 5) {
+      const batch = uniquePhotos.slice(i, i + 5);
+      await Promise.allSettled(batch.map(async ph => {
+        const b64 = await _fetchAsJpegSafe(`${PRICE_SITE}/assets/img/products/${ph}`);
+        if (b64) photos[ph] = b64;
+        loaded++;
+        ui.update(Math.round((loaded / total) * 55), `Фото ${loaded} из ${total}…`);
+      }));
+    }
+
+    /* Шаг 2: строим docDefinition */
+    ui.update(60, 'Строим документ…');
+    const docDef = _buildPdfDocDef(date, photos);
+
+    /* Шаг 3: генерируем blob через pdfmake (векторный рендер) */
+    ui.update(65, 'Генерируем PDF… это займёт 10–30 сек');
+    const blob = await new Promise((resolve, reject) => {
+      try { pdfMake.createPdf(docDef).getBlob(resolve); }
+      catch(e) { reject(e); }
+    });
+
+    ui.update(100, `✅ Готово! Фото: ${Object.keys(photos).length}/${total}. Нажмите «Сохранить файл»`);
     ui.enableSave(blob, fname);
+
   } catch(e) {
-    clearInterval(ticker);
     ui.update(0, '❌ Ошибка: ' + e.message);
     console.error('PDF error:', e);
-  } finally {
-    container.remove();
   }
 }
 
-/* ── HTML-контент прайса (для PDF) ── */
-function _buildPriceContent(date) {
+/* ── pdfmake docDefinition для прайса ── */
+function _buildPdfDocDef(date, photos) {
   const { ac, rashod, truba } = _groupProducts();
+
+  const C_AMBER = '#F59E0B';
+  const C_WHITE = '#FFFFFF';
+  const C_GRAY  = '#F5F5F5';
+  const C_HDR   = '#E0E0E0';
+  const C_PRICE = '#D97706';
+  const C_OK    = '#10B981';
+  const C_WARN  = '#F59E0B';
+  const C_NO    = '#EF4444';
+  const C_ALT   = '#FAFAFA';
+
+  /* Ширины колонок A4: [№, ID, Модель, Описание, Цена, Фото, Наличие] */
+  const WIDTHS = [18, 40, '*', 88, 50, 50, 62];
+
+  const body = [];
   let rowNum = 1;
-  let body   = '';
 
-  const styles = `<style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Arial,sans-serif;background:#fff;font-size:12px;color:#111}
-    .hdr{text-align:center;margin-bottom:24px}
-    .hdr h1{font-size:20px;margin-bottom:4px}
-    .hdr p{color:#888;font-size:12px}
-    .brand-group{margin-bottom:28px}
-    .brand-title{background:#F59E0B;color:#fff;font-weight:700;font-size:13px;padding:9px 14px;border-radius:6px;margin-bottom:4px}
-    .brand-title.truba{background:#b45309}
-    .brand-title.rashod{background:#0d9488}
-    .series-title{background:#f5f5f5;border-left:3px solid #F59E0B;padding:5px 12px;margin-bottom:6px;font-size:11px;color:#555}
-    .series-title.rashod{border-left-color:#0d9488}
-    table{width:100%;border-collapse:collapse;margin-bottom:14px;table-layout:fixed}
-    col.c-num{width:26px} col.c-id{width:54px} col.c-model{width:195px} col.c-desc{width:138px}
-    col.c-price{width:72px} col.c-photo{width:56px} col.c-stock{width:80px}
-    th{background:#f0f0f0;padding:7px 5px;text-align:left;font-size:10px;border-bottom:2px solid #ddd;overflow:hidden}
-    td{padding:7px 5px;border-bottom:1px solid #eee;vertical-align:middle;overflow:hidden;word-break:break-word}
-    .c-num{text-align:center} .c-id{font-family:monospace;font-size:10px;color:#888}
-    .c-desc{font-size:10px;color:#666}
-    .c-price{text-align:right;font-weight:700;color:#D97706;white-space:nowrap}
-    .c-photo{text-align:center} .c-photo img{width:48px;height:48px;object-fit:contain;display:block;margin:0 auto}
-    .s-ok{color:#10B981;font-weight:700} .s-warn{color:#F59E0B;font-weight:700} .s-no{color:#EF4444;font-weight:700}
-    .pb-before{page-break-before:always}
-  </style>`;
+  /* Шапка колонок (повторяется на каждой странице через headerRows:1) */
+  body.push(
+    ['№', 'ID', 'Модель', 'Описание', 'Цена, ₽', 'Фото', 'Наличие'].map((t, i) => ({
+      text: t, bold: true, fontSize: 8, fillColor: C_HDR,
+      alignment: i === 4 ? 'right' : (i === 0 || i === 5) ? 'center' : 'left',
+      margin: [3, 5, 3, 5],
+    }))
+  );
 
-  function buildTable(items) {
-    let t = `<table><colgroup>
-      <col class="c-num"><col class="c-id"><col class="c-model">
-      <col class="c-desc"><col class="c-price"><col class="c-photo"><col class="c-stock">
-    </colgroup><thead><tr>
-      <th class="c-num">№</th><th class="c-id">ID</th>
-      <th>Модель</th><th class="c-desc">Описание</th>
-      <th class="c-price">Цена</th><th class="c-photo">Фото</th><th>Наличие</th>
-    </tr></thead><tbody>`;
-
-    items.forEach(p => {
-      const fmt   = new Intl.NumberFormat('ru-RU').format(p.price);
-      const sc    = p.stock === 'in_stock' ? 'ok' : (p.stock || '').startsWith('days') ? 'warn' : 'no';
-      const photo = p.photo
-        ? `<img src="${PRICE_SITE}/assets/img/products/${p.photo}" />`
-        : '—';
-      t += `<tr>
-        <td class="c-num">${rowNum}</td><td class="c-id">${p.id}</td>
-        <td>${p.model || ''}</td><td class="c-desc">${p.descShort || ''}</td>
-        <td class="c-price">${fmt}&nbsp;₽</td>
-        <td class="c-photo">${photo}</td>
-        <td class="s-${sc}">${p.stockLabel || ''}</td>
-      </tr>`;
-      rowNum++;
-    });
-    return t + `</tbody></table>`;
+  function addBrand(label) {
+    body.push([
+      { text: label, colSpan: 7, bold: true, fontSize: 11, color: C_WHITE, fillColor: C_AMBER, margin: [6, 7, 6, 7] },
+      {}, {}, {}, {}, {}, {},
+    ]);
   }
 
-  let first = true;
+  function addSeries(label) {
+    body.push([
+      {},
+      { text: label, colSpan: 6, bold: true, fontSize: 9, color: '#444444', fillColor: C_GRAY, margin: [6, 5, 6, 5] },
+      {}, {}, {}, {}, {},
+    ]);
+  }
+
+  function addProduct(p, alt) {
+    const bg  = alt ? C_ALT : C_WHITE;
+    const sc  = p.stock === 'in_stock' ? C_OK : (p.stock || '').startsWith('days') ? C_WARN : C_NO;
+    const fmt = new Intl.NumberFormat('ru-RU').format(p.price) + ' ₽';
+    const base = { fillColor: bg, margin: [3, 3, 3, 3] };
+    body.push([
+      { ...base, text: String(rowNum++), alignment: 'center', fontSize: 8 },
+      { ...base, text: p.id || '', fontSize: 7, color: '#888888' },
+      { ...base, text: p.model || '', fontSize: 9 },
+      { ...base, text: p.descShort || '', fontSize: 8, color: '#555555' },
+      { ...base, text: fmt, alignment: 'right', bold: true, color: C_PRICE, fontSize: 9 },
+      photos[p.photo]
+        ? { ...base, image: 'data:image/jpeg;base64,' + photos[p.photo], width: 44, height: 44, alignment: 'center' }
+        : { ...base, text: '—', alignment: 'center', color: '#CCCCCC' },
+      { ...base, text: p.stockLabel || '', bold: true, color: sc, fontSize: 8 },
+    ]);
+  }
+
+  /* AC бренды */
   Object.keys(ac).sort().forEach(brand => {
-    const cls = first ? 'brand-group' : 'brand-group pb-before';
-    first = false;
-    body += `<div class="${cls}"><div class="brand-title">${brand}</div>`;
+    addBrand(brand);
     Object.keys(ac[brand]).sort().forEach(series => {
       const items = ac[brand][series];
       if (!items.length) return;
-      const info = (items[0].benefits || []).slice(0, 3).join(' · ');
-      body += `<div class="series-title"><strong>${series}</strong>${info ? ' — ' + info : ''}</div>`;
-      body += buildTable(items);
+      addSeries(series);
+      items.forEach((p, i) => addProduct(p, i % 2 === 1));
     });
-    body += `</div>`;
   });
 
+  /* Медная труба */
   if (truba.length) {
-    body += `<div class="brand-group pb-before"><div class="brand-title truba">Медная труба</div>`;
-    body += buildTable(truba);
-    body += `</div>`;
+    addBrand('Медная труба');
+    truba.forEach((p, i) => addProduct(p, i % 2 === 1));
   }
 
-  const grpOrder = ['Фреон','Дренаж','Лента','Кабель','Крепёж','Кронштейны','Изоляция','Прочее'];
+  /* Расходники */
+  const grpOrder = ['Фреон', 'Дренаж', 'Лента', 'Кабель', 'Крепёж', 'Кронштейны', 'Изоляция', 'Прочее'];
   if (grpOrder.some(g => rashod[g] && rashod[g].length)) {
-    body += `<div class="brand-group pb-before"><div class="brand-title rashod">Расходники</div>`;
-    grpOrder.forEach(grpName => {
-      const items = rashod[grpName];
+    addBrand('Расходники');
+    grpOrder.forEach(grp => {
+      const items = rashod[grp];
       if (!items || !items.length) return;
-      body += `<div class="series-title rashod"><strong>${grpName}</strong></div>`;
-      body += buildTable(items);
+      addSeries(grp);
+      items.forEach((p, i) => addProduct(p, i % 2 === 1));
     });
-    body += `</div>`;
   }
 
-  return `${styles}<div class="price-wrap">
-<div class="hdr">
-  <h1>Прайс-лист СплитХаб</h1>
-  <p>Оптовые кондиционеры для монтажников и B2B · Симферополь</p>
-  <p style="margin-top:5px;color:#bbb">Дата: ${date} · Товаров: ${PRODUCTS.length}</p>
-</div>
-${body}</div>`;
+  return {
+    pageSize: 'A4',
+    pageMargins: [28, 28, 18, 24],
+    defaultStyle: { font: 'Roboto', fontSize: 9 },
+    content: [
+      { text: 'Прайс-лист СплитХаб', fontSize: 18, bold: true, alignment: 'center', margin: [0, 0, 0, 4] },
+      { text: `Оптовые кондиционеры · Симферополь · ${date} · Товаров: ${PRODUCTS.length}`,
+        fontSize: 9, color: '#888888', alignment: 'center', margin: [0, 0, 0, 14] },
+      {
+        table: { headerRows: 1, dontBreakRows: true, widths: WIDTHS, body },
+        layout: {
+          hLineWidth: (i, node) => i === 0 || i === node.table.body.length ? 0.8 : 0.4,
+          vLineWidth: () => 0.4,
+          hLineColor: () => '#CCCCCC',
+          vLineColor: () => '#EEEEEE',
+        },
+      },
+    ],
+    footer: (page, count) => ({
+      text: `СплитХаб · Оптовые кондиционеры · Симферополь · Страница ${page} из ${count}`,
+      fontSize: 7, color: '#AAAAAA', alignment: 'center', margin: [0, 4, 0, 0],
+    }),
+  };
 }
 
 /* ────────────────────────────────────────────────
