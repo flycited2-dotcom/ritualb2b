@@ -98,50 +98,42 @@ function closePriceModal() {
   if (m) m.remove();
 }
 
-/* ── PDF (html2pdf.js — настоящий скачиваемый файл) ── */
+/* ── PDF (html2pdf.js в popup-окне — настоящий скачиваемый файл) ── */
 function downloadPricePDF() {
-  if (typeof html2pdf === 'undefined') {
-    alert('Библиотека PDF ещё загружается. Подождите несколько секунд и повторите.');
-    return;
-  }
   closePriceModal();
-
   const date = new Date().toLocaleDateString('ru-RU');
-  const fname = `splithub-price-${date.replace(/\./g,'-')}.pdf`;
+  const fname = 'splithub-price-' + date.replace(/\./g, '-') + '.pdf';
+  const content = _buildPriceContent(date);
 
-  // Показываем индикатор генерации
-  const overlay = document.createElement('div');
-  overlay.id = 'pdf-gen-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,14,26,0.7);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
-  overlay.innerHTML = `
-    <div style="width:52px;height:52px;border:4px solid rgba(255,255,255,0.2);border-top-color:#14B8A6;border-radius:50%;animation:pdfSpin 0.8s linear infinite;"></div>
-    <div style="color:#fff;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;">Генерируем PDF…</div>
-    <div style="color:rgba(255,255,255,0.6);font-size:0.78rem;">Обычно занимает 15–30 секунд</div>
-    <style>@keyframes pdfSpin{to{transform:rotate(360deg)}}</style>`;
-  document.body.appendChild(overlay);
-
-  // Создаём скрытый контейнер с контентом прайса
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;background:#fff;font-family:Arial,sans-serif;font-size:12px;padding:20px;';
-  wrap.innerHTML = _buildPriceContent(date);
-  document.body.appendChild(wrap);
-
-  html2pdf(wrap, {
-    margin:        [8, 8, 8, 8],
-    filename:      fname,
-    image:         { type: 'jpeg', quality: 0.88 },
-    html2canvas:   { scale: 1.4, useCORS: true, logging: false, imageTimeout: 20000 },
-    jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:     { mode: ['css','legacy'], before: '.pb-before' },
-  }).then(() => {
-    wrap.remove();
-    overlay.remove();
-  }).catch(err => {
-    wrap.remove();
-    overlay.remove();
-    console.error('PDF error:', err);
-    alert('Ошибка генерации PDF. Попробуйте ещё раз.');
+  const fullHtml = `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
+<title>Прайс СплитХаб</title></head>
+<body style="margin:0;padding:0;background:#fff">
+<div id="msg" style="position:fixed;top:16px;right:16px;z-index:9999;background:#0d9488;color:#fff;padding:12px 20px;border-radius:10px;font-family:Arial;font-size:14px;font-weight:bold;box-shadow:0 4px 14px rgba(0,0,0,.3)">⏳ Генерируем PDF…</div>
+${content}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+<script>
+window.onload = function() {
+  html2pdf(document.querySelector('.price-wrap'), {
+    margin:[8,8,8,8],
+    filename:'${fname}',
+    image:{type:'jpeg',quality:0.88},
+    html2canvas:{scale:1.4,useCORS:true,logging:false,imageTimeout:20000},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['css','legacy'],before:'.pb-before'}
+  }).then(function(){
+    document.getElementById('msg').textContent = '✓ PDF готов! Закрываю…';
+    setTimeout(function(){ window.close(); }, 2500);
+  }).catch(function(e){
+    document.getElementById('msg').textContent = '❌ ' + e.message;
   });
+};
+<\/script>
+</body></html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if (!w) { alert('Разрешите всплывающие окна для splithub.ru'); return; }
+  w.document.write(fullHtml);
+  w.document.close();
 }
 
 /* ── HTML-контент прайса (для PDF) ── */
@@ -251,12 +243,14 @@ function _buildPriceContent(date) {
   }
 
   return `${styles}
+<div class="price-wrap">
 <div class="hdr">
   <h1>Прайс-лист СплитХаб</h1>
   <p>Оптовые кондиционеры для монтажников и B2B · Симферополь</p>
   <p style="margin-top:5px;color:#bbb">Дата: ${date} · Товаров: ${PRODUCTS.length}</p>
 </div>
-${body}`;
+${body}
+</div>`;
 }
 
 /* ── Excel (ExcelJS — цвета, стили, форматирование) ── */
@@ -313,8 +307,6 @@ async function downloadPriceExcel() {
     /* Цвета */
     const C_BRAND_BG  = 'FFF59E0B';  // amber
     const C_BRAND_FG  = 'FFFFFFFF';
-    const C_TRUBA_BG  = 'FFB45309';  // brown
-    const C_RASHOD_BG = 'FF0D9488';  // teal
     const C_SERIES_BG = 'FFF5F5F5';
     const C_HDR_BG    = 'FFE0E0E0';
     const C_PRICE_FG  = 'FFD97706';
@@ -424,7 +416,7 @@ async function downloadPriceExcel() {
 
     /* Медная труба */
     if (truba.length) {
-      addBrandRow('Медная труба', C_TRUBA_BG);
+      addBrandRow('Медная труба', C_BRAND_BG);
       addTableHeader();
       truba.forEach((p, i) => { addItemRow(p, rowNum++, i%2===1); });
     }
@@ -433,11 +425,11 @@ async function downloadPriceExcel() {
     const grpOrder = ['Фреон','Дренаж','Лента','Кабель','Крепёж','Кронштейны','Изоляция','Прочее'];
     const hasRashod = grpOrder.some(g => rashod[g] && rashod[g].length);
     if (hasRashod) {
-      addBrandRow('Расходники', C_RASHOD_BG);
+      addBrandRow('Расходники', C_BRAND_BG);
       grpOrder.forEach(grpName => {
         const items = rashod[grpName];
         if (!items || !items.length) return;
-        addSeriesRow(grpName, true);
+        addSeriesRow(grpName, false);
         addTableHeader();
         items.forEach((p, i) => { addItemRow(p, rowNum++, i%2===1); });
       });
