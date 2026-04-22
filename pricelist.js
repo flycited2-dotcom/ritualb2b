@@ -1,24 +1,57 @@
 /**
  * pricelist.js — Генератор прайса СплитХаб
- * Форматы: PDF (print) / Excel (SheetJS)
- * Группировка: Бренд → Серия
+ * PDF: html2pdf.js (настоящий скачиваемый файл)
+ * Excel: ExcelJS (цвета, стили, форматирование)
+ * Группировка: Бренд → Серия, Расходники → подгруппы
  */
+
+const PRICE_SITE = 'https://splithub.ru';
+
+/* ── Маппинг расходников → смысловые группы ── */
+const RASHOD_GROUP_MAP = {
+  'Фреон':      ['R134a','R22','R32','R410a'],
+  'Дренаж':     ['OTMO','Ballu','Ruvinil','Дренаж гибкий'],
+  'Лента':      ['AVIORA','K-Flex','(Скотч)Клейкая лента упаковочная 48мм*40мкм 100м ALG'],
+  'Кабель':     ['АРСЕНАЛ'],
+  'Крепёж':     ['Болт 8-25','Болт 8-30','Болт 8-35','Гайка М8','Гайка М8-пресшайба',
+                 'Глухарь','Дюбель','Дюбель 6х40','шайба м8','шайба м8 увеличенная'],
+  'Кронштейны': ['Кронштейны'],
+  'Изоляция':   ['ТермаЭКО'],
+};
+
+const _RASHOD_BRAND_GRP = {};
+for (const [grp, brands] of Object.entries(RASHOD_GROUP_MAP)) {
+  for (const b of brands) _RASHOD_BRAND_GRP[b] = grp;
+}
 
 /* ── Группировка товаров ── */
 function _groupProducts() {
-  const grouped = {};
+  const ac     = {};   // brand → series → []
+  const rashod = {};   // subgroup → []
+  const truba  = [];
+
   PRODUCTS.forEach(p => {
-    const brand  = p.brand  || 'Без бренда';
-    const series = p.series || 'Без серии';
-    if (!grouped[brand])         grouped[brand] = {};
-    if (!grouped[brand][series]) grouped[brand][series] = [];
-    grouped[brand][series].push(p);
+    if (p.group === 'truba') {
+      truba.push(p);
+    } else if (p.group === 'rashod') {
+      const grp = _RASHOD_BRAND_GRP[p.brand] || 'Прочее';
+      if (!rashod[grp]) rashod[grp] = [];
+      rashod[grp].push(p);
+    } else {
+      const brand  = p.brand  || 'Без бренда';
+      const series = p.series || 'Без серии';
+      if (!ac[brand])         ac[brand] = {};
+      if (!ac[brand][series]) ac[brand][series] = [];
+      ac[brand][series].push(p);
+    }
   });
-  return grouped;
+
+  return { ac, rashod, truba };
 }
 
 /* ── Модальное окно: выбор формата ── */
 function openPricelistModal() {
+  if (document.getElementById('priceModal')) return;
   document.body.insertAdjacentHTML('beforeend', `
 <div id="priceModal" onclick="if(event.target===this)closePriceModal()"
   style="position:fixed;inset:0;background:rgba(10,14,26,0.55);backdrop-filter:blur(8px);
@@ -65,157 +98,369 @@ function closePriceModal() {
   if (m) m.remove();
 }
 
-/* ── PDF ── */
+/* ── PDF (html2pdf.js — настоящий скачиваемый файл) ── */
 function downloadPricePDF() {
-  const w = window.open('', '', 'width=960,height=1200');
-  w.document.write(_buildPriceHTML());
-  w.document.close();
-  setTimeout(() => { w.print(); }, 300);
+  if (typeof html2pdf === 'undefined') {
+    alert('Библиотека PDF ещё загружается. Подождите несколько секунд и повторите.');
+    return;
+  }
   closePriceModal();
+
+  const date = new Date().toLocaleDateString('ru-RU');
+  const fname = `splithub-price-${date.replace(/\./g,'-')}.pdf`;
+
+  // Показываем индикатор генерации
+  const overlay = document.createElement('div');
+  overlay.id = 'pdf-gen-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,14,26,0.7);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = `
+    <div style="width:52px;height:52px;border:4px solid rgba(255,255,255,0.2);border-top-color:#14B8A6;border-radius:50%;animation:pdfSpin 0.8s linear infinite;"></div>
+    <div style="color:#fff;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;">Генерируем PDF…</div>
+    <div style="color:rgba(255,255,255,0.6);font-size:0.78rem;">Обычно занимает 15–30 секунд</div>
+    <style>@keyframes pdfSpin{to{transform:rotate(360deg)}}</style>`;
+  document.body.appendChild(overlay);
+
+  // Создаём скрытый контейнер с контентом прайса
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;background:#fff;font-family:Arial,sans-serif;font-size:12px;padding:20px;';
+  wrap.innerHTML = _buildPriceContent(date);
+  document.body.appendChild(wrap);
+
+  html2pdf(wrap, {
+    margin:        [8, 8, 8, 8],
+    filename:      fname,
+    image:         { type: 'jpeg', quality: 0.88 },
+    html2canvas:   { scale: 1.4, useCORS: true, logging: false, imageTimeout: 20000 },
+    jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:     { mode: ['css','legacy'], before: '.pb-before' },
+  }).then(() => {
+    wrap.remove();
+    overlay.remove();
+  }).catch(err => {
+    wrap.remove();
+    overlay.remove();
+    console.error('PDF error:', err);
+    alert('Ошибка генерации PDF. Попробуйте ещё раз.');
+  });
 }
 
-function _buildPriceHTML() {
-  const grouped = _groupProducts();
-  const date    = new Date().toLocaleDateString('ru-RU');
+/* ── HTML-контент прайса (для PDF) ── */
+function _buildPriceContent(date) {
+  const { ac, rashod, truba } = _groupProducts();
   let rowNum = 1;
   let body = '';
 
-  Object.keys(grouped).sort().forEach(brand => {
-    body += `<div class="brand-group">
-      <div class="brand-title">${brand}</div>`;
+  /* Стили встроены в генерируемый HTML */
+  const styles = `
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:#fff;font-size:12px;color:#111}
+    .hdr{text-align:center;margin-bottom:24px}
+    .hdr h1{font-size:20px;margin-bottom:4px}
+    .hdr p{color:#888;font-size:12px}
+    .brand-group{margin-bottom:28px}
+    .brand-title{background:#F59E0B;color:#fff;font-weight:700;font-size:13px;padding:9px 14px;border-radius:6px;margin-bottom:4px}
+    .brand-title.truba{background:#b45309}
+    .brand-title.rashod{background:#0d9488}
+    .series-title{background:#f5f5f5;border-left:3px solid #F59E0B;padding:5px 12px;margin-bottom:6px;font-size:11px;color:#555}
+    .series-title.rashod{border-left-color:#0d9488}
+    table{width:100%;border-collapse:collapse;margin-bottom:14px;table-layout:fixed}
+    col.c-num{width:26px} col.c-id{width:54px} col.c-model{width:195px} col.c-desc{width:138px}
+    col.c-price{width:72px} col.c-photo{width:56px} col.c-stock{width:80px}
+    th{background:#f0f0f0;padding:7px 5px;text-align:left;font-size:10px;border-bottom:2px solid #ddd;overflow:hidden}
+    td{padding:7px 5px;border-bottom:1px solid #eee;vertical-align:middle;overflow:hidden;word-break:break-word}
+    .c-num{text-align:center}
+    .c-id{font-family:monospace;font-size:10px;color:#888}
+    .c-desc{font-size:10px;color:#666}
+    .c-price{text-align:right;font-weight:700;color:#D97706;white-space:nowrap}
+    .c-photo{text-align:center}
+    .c-photo img{width:48px;height:48px;object-fit:contain;display:block;margin:0 auto}
+    .s-ok{color:#10B981;font-weight:700}
+    .s-warn{color:#F59E0B;font-weight:700}
+    .s-no{color:#EF4444;font-weight:700}
+    .pb-before{page-break-before:always}
+    </style>
+  `;
 
-    Object.keys(grouped[brand]).sort().forEach(series => {
-      const items = grouped[brand][series];
+  function buildTable(items) {
+    let t = `<table><colgroup>
+      <col class="c-num"><col class="c-id"><col class="c-model">
+      <col class="c-desc"><col class="c-price"><col class="c-photo"><col class="c-stock">
+    </colgroup><thead><tr>
+      <th class="c-num">№</th><th class="c-id">ID</th>
+      <th>Модель</th><th class="c-desc">Описание</th>
+      <th class="c-price">Цена</th><th class="c-photo">Фото</th><th>Наличие</th>
+    </tr></thead><tbody>`;
+
+    items.forEach(p => {
+      const fmt  = new Intl.NumberFormat('ru-RU').format(p.price);
+      const sc   = p.stock === 'in_stock' ? 'ok' : (p.stock || '').startsWith('days') ? 'warn' : 'no';
+      const photo = p.photo
+        ? `<img src="${PRICE_SITE}/assets/img/products/${p.photo}" crossorigin="anonymous" />`
+        : '—';
+      t += `<tr>
+        <td class="c-num">${rowNum}</td>
+        <td class="c-id">${p.id}</td>
+        <td>${p.model || ''}</td>
+        <td class="c-desc">${p.descShort || ''}</td>
+        <td class="c-price">${fmt}&nbsp;₽</td>
+        <td class="c-photo">${photo}</td>
+        <td class="s-${sc}">${p.stockLabel || ''}</td>
+      </tr>`;
+      rowNum++;
+    });
+
+    return t + `</tbody></table>`;
+  }
+
+  /* Кондиционеры: бренд → серия */
+  let first = true;
+  Object.keys(ac).sort().forEach(brand => {
+    const cls = first ? 'brand-group' : 'brand-group pb-before';
+    first = false;
+    body += `<div class="${cls}"><div class="brand-title">${brand}</div>`;
+    Object.keys(ac[brand]).sort().forEach(series => {
+      const items = ac[brand][series];
       if (!items.length) return;
       const info = (items[0].benefits || []).slice(0, 3).join(' · ');
-
-      body += `<div class="series-title"><strong>${series}</strong>${info ? ' — ' + info : ''}</div>
-      <table><thead><tr>
-        <th class="c-num">№</th><th class="c-id">ID</th>
-        <th>Модель</th><th class="c-desc">Описание</th>
-        <th class="c-price">Цена</th><th class="c-photo">Фото</th><th>Наличие</th>
-      </tr></thead><tbody>`;
-
-      items.forEach(p => {
-        const fmt  = new Intl.NumberFormat('ru-RU').format(p.price);
-        const sc   = p.stock === 'in_stock' ? 'ok' : p.stock.startsWith('days') ? 'warn' : 'no';
-        const photo = p.photo ? `<img src="assets/img/products/${p.photo}" />` : '—';
-        body += `<tr>
-          <td class="c-num">${rowNum}</td>
-          <td class="c-id">${p.id}</td>
-          <td>${p.model}</td>
-          <td class="c-desc">${p.descShort || ''}</td>
-          <td class="c-price">${fmt} ₽</td>
-          <td class="c-photo">${photo}</td>
-          <td class="s-${sc}">${p.stockLabel}</td>
-        </tr>`;
-        rowNum++;
-      });
-
-      body += `</tbody></table>`;
+      body += `<div class="series-title"><strong>${series}</strong>${info ? ' — ' + info : ''}</div>`;
+      body += buildTable(items);
     });
     body += `</div>`;
   });
 
-  return `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
-<title>Прайс СплитХаб</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#fff;padding:20px;font-size:12px}
-.wrap{max-width:960px;margin:0 auto}
-.hdr{text-align:center;margin-bottom:28px}
-.hdr h1{font-size:20px;margin-bottom:4px}
-.hdr p{color:#888;font-size:12px}
-.brand-group{margin-bottom:32px;page-break-inside:avoid}
-.brand-title{background:#F59E0B;color:#fff;font-weight:700;font-size:14px;padding:10px 14px;border-radius:6px;margin-bottom:4px}
-.series-title{background:#f5f5f5;border-left:3px solid #F59E0B;padding:6px 12px;margin-bottom:8px;font-size:11px;color:#555}
-table{width:100%;border-collapse:collapse;margin-bottom:16px}
-th{background:#f0f0f0;padding:8px 6px;text-align:left;font-size:11px;border-bottom:2px solid #ddd}
-td{padding:8px 6px;border-bottom:1px solid #eee;vertical-align:middle}
-.c-num{width:28px;text-align:center}
-.c-id{width:60px;font-family:monospace;font-size:10px;color:#888}
-.c-desc{font-size:10px;color:#666;max-width:160px}
-.c-price{text-align:right;font-weight:700;color:#D97706;white-space:nowrap}
-.c-photo{width:56px;text-align:center}
-.c-photo img{width:50px;height:50px;object-fit:contain}
-.s-ok{color:#10B981;font-weight:700}
-.s-warn{color:#F59E0B;font-weight:700}
-.s-no{color:#EF4444;font-weight:700}
-@media print{body{padding:0}.brand-group{page-break-inside:avoid}}
-</style></head>
-<body><div class="wrap">
+  /* Медная труба */
+  if (truba.length) {
+    body += `<div class="brand-group pb-before"><div class="brand-title truba">Медная труба</div>`;
+    body += buildTable(truba);
+    body += `</div>`;
+  }
+
+  /* Расходники по подгруппам */
+  const grpOrder = ['Фреон','Дренаж','Лента','Кабель','Крепёж','Кронштейны','Изоляция','Прочее'];
+  const hasRashod = grpOrder.some(g => rashod[g] && rashod[g].length);
+  if (hasRashod) {
+    body += `<div class="brand-group pb-before"><div class="brand-title rashod">Расходники</div>`;
+    grpOrder.forEach(grpName => {
+      const items = rashod[grpName];
+      if (!items || !items.length) return;
+      body += `<div class="series-title rashod"><strong>${grpName}</strong></div>`;
+      body += buildTable(items);
+    });
+    body += `</div>`;
+  }
+
+  return `${styles}
 <div class="hdr">
   <h1>Прайс-лист СплитХаб</h1>
   <p>Оптовые кондиционеры для монтажников и B2B · Симферополь</p>
-  <p style="margin-top:6px;color:#bbb">Дата: ${date} · Товаров: ${PRODUCTS.length}</p>
+  <p style="margin-top:5px;color:#bbb">Дата: ${date} · Товаров: ${PRODUCTS.length}</p>
 </div>
-${body}
-</div></body></html>`;
+${body}`;
 }
 
-/* ── Excel (SheetJS) ── */
-function downloadPriceExcel() {
-  if (typeof XLSX === 'undefined') {
-    alert('Библиотека Excel не загружена. Попробуйте обновить страницу.');
+/* ── Excel (ExcelJS — цвета, стили, форматирование) ── */
+async function downloadPriceExcel() {
+  if (typeof ExcelJS === 'undefined') {
+    alert('Библиотека Excel ещё загружается. Подождите несколько секунд и повторите.');
     return;
   }
+  closePriceModal();
 
-  const grouped = _groupProducts();
-  const wb = XLSX.utils.book_new();
-  const rows = [];
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,14,26,0.7);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = `
+    <div style="width:52px;height:52px;border:4px solid rgba(255,255,255,0.2);border-top-color:#1D6F42;border-radius:50%;animation:xlSpin 0.8s linear infinite;"></div>
+    <div style="color:#fff;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;">Генерируем Excel…</div>
+    <style>@keyframes xlSpin{to{transform:rotate(360deg)}}</style>`;
+  document.body.appendChild(overlay);
 
-  // Заголовок
-  rows.push(['Прайс-лист СплитХаб', '', '', '', '', '']);
-  rows.push([`Дата: ${new Date().toLocaleDateString('ru-RU')} · Товаров: ${PRODUCTS.length}`, '', '', '', '', '']);
-  rows.push([]);
+  try {
+    const wb  = new ExcelJS.Workbook();
+    wb.creator = 'СплитХаб';
+    wb.created = new Date();
+    const ws  = wb.addWorksheet('Прайс');
 
-  // Шапка таблицы
-  rows.push(['№', 'ID', 'Модель', 'Описание', 'Цена, ₽', 'Наличие']);
+    ws.columns = [
+      { key:'num',   width:5  },
+      { key:'id',    width:9  },
+      { key:'model', width:42 },
+      { key:'desc',  width:30 },
+      { key:'price', width:14 },
+      { key:'photo', width:32 },
+      { key:'stock', width:18 },
+    ];
 
-  let rowNum = 1;
+    const date = new Date().toLocaleDateString('ru-RU');
 
-  Object.keys(grouped).sort().forEach(brand => {
-    // Заголовок бренда
-    rows.push([brand, '', '', '', '', '']);
+    /* Заголовок книги */
+    ws.mergeCells('A1:G1');
+    const titleCell = ws.getCell('A1');
+    titleCell.value = 'Прайс-лист СплитХаб';
+    titleCell.font  = { name:'Arial', size:16, bold:true, color:{argb:'FF111111'} };
+    titleCell.alignment = { horizontal:'center', vertical:'middle' };
+    ws.getRow(1).height = 30;
 
-    Object.keys(grouped[brand]).sort().forEach(series => {
-      const items = grouped[brand][series];
-      if (!items.length) return;
-      const info = (items[0].benefits || []).slice(0, 3).join(' · ');
+    ws.mergeCells('A2:G2');
+    const subCell = ws.getCell('A2');
+    subCell.value = `Оптовые кондиционеры для монтажников и B2B · Симферополь · Дата: ${date} · Товаров: ${PRODUCTS.length}`;
+    subCell.font  = { name:'Arial', size:10, color:{argb:'FF888888'} };
+    subCell.alignment = { horizontal:'center', vertical:'middle' };
+    ws.getRow(2).height = 18;
 
-      // Заголовок серии
-      rows.push([`  ${series}${info ? ' — ' + info : ''}`, '', '', '', '', '']);
+    ws.addRow([]);
 
-      items.forEach(p => {
-        rows.push([
-          rowNum,
-          p.id,
-          p.model,
-          p.descShort || '',
-          p.price,
-          p.stockLabel,
-        ]);
-        rowNum++;
+    /* Цвета */
+    const C_BRAND_BG  = 'FFF59E0B';  // amber
+    const C_BRAND_FG  = 'FFFFFFFF';
+    const C_TRUBA_BG  = 'FFB45309';  // brown
+    const C_RASHOD_BG = 'FF0D9488';  // teal
+    const C_SERIES_BG = 'FFF5F5F5';
+    const C_HDR_BG    = 'FFE0E0E0';
+    const C_PRICE_FG  = 'FFD97706';
+    const C_OK_FG     = 'FF10B981';
+    const C_WARN_FG   = 'FFF59E0B';
+    const C_NO_FG     = 'FFEF4444';
+    const C_LINK_FG   = 'FF2563EB';
+    const C_ROW_ALT   = 'FFFAFAFA';
+
+    function borderThin() {
+      const s = {style:'thin',color:{argb:'FFDDDDDD'}};
+      return {top:s,left:s,bottom:s,right:s};
+    }
+    function borderBrand() {
+      const s = {style:'medium',color:{argb:'FF888888'}};
+      return {top:s,left:s,bottom:s,right:s};
+    }
+
+    function addBrandRow(label, bgArgb) {
+      ws.addRow([]);
+      const r = ws.addRow([label,'','','','','','']);
+      ws.mergeCells(`A${r.number}:G${r.number}`);
+      const c = ws.getCell(`A${r.number}`);
+      c.font  = { name:'Arial', size:13, bold:true, color:{argb:C_BRAND_FG} };
+      c.fill  = { type:'pattern', pattern:'solid', fgColor:{argb:bgArgb} };
+      c.alignment = { vertical:'middle', horizontal:'left', indent:1 };
+      c.border = borderBrand();
+      r.height = 24;
+    }
+
+    function addSeriesRow(label, isTealGroup) {
+      const r = ws.addRow(['',label,'','','','','']);
+      ws.mergeCells(`B${r.number}:G${r.number}`);
+      const c = ws.getCell(`B${r.number}`);
+      c.font  = { name:'Arial', size:11, bold:true, color:{argb:isTealGroup ? 'FF0D9488' : 'FF555555'} };
+      c.fill  = { type:'pattern', pattern:'solid', fgColor:{argb:C_SERIES_BG} };
+      c.alignment = { vertical:'middle', horizontal:'left', indent:1 };
+      r.height = 18;
+    }
+
+    function addTableHeader() {
+      const r = ws.addRow(['№','ID','Модель','Описание','Цена, ₽','Фото','Наличие']);
+      r.height = 18;
+      r.eachCell(cell => {
+        cell.font   = { name:'Arial', size:10, bold:true };
+        cell.fill   = { type:'pattern', pattern:'solid', fgColor:{argb:C_HDR_BG} };
+        cell.border = borderThin();
+        cell.alignment = { horizontal:'center', vertical:'middle', wrapText:false };
+      });
+      ws.getCell(`E${r.number}`).alignment = { horizontal:'right', vertical:'middle' };
+    }
+
+    function addItemRow(p, num, isAlt) {
+      const fmt = new Intl.NumberFormat('ru-RU').format(p.price);
+      const sc  = p.stock === 'in_stock' ? 'ok' : (p.stock||'').startsWith('days') ? 'warn' : 'no';
+      const scColor = sc==='ok' ? C_OK_FG : sc==='warn' ? C_WARN_FG : C_NO_FG;
+      const rowBg = isAlt ? C_ROW_ALT : 'FFFFFFFF';
+
+      const r = ws.addRow([num, p.id, p.model||'', p.descShort||'', p.price, '', p.stockLabel||'']);
+      r.height = 40;
+
+      r.eachCell((cell, col) => {
+        cell.fill   = { type:'pattern', pattern:'solid', fgColor:{argb:rowBg} };
+        cell.border = borderThin();
+        cell.font   = { name:'Arial', size:10 };
+        cell.alignment = { vertical:'middle', wrapText:false };
+      });
+
+      // № — центр
+      ws.getCell(`A${r.number}`).alignment = { horizontal:'center', vertical:'middle' };
+      // ID — моно
+      ws.getCell(`B${r.number}`).font = { name:'Courier New', size:9, color:{argb:'FF888888'} };
+      // Цена
+      const priceCell = ws.getCell(`E${r.number}`);
+      priceCell.numFmt  = '#,##0" ₽"';
+      priceCell.value   = p.price;
+      priceCell.font    = { name:'Arial', size:10, bold:true, color:{argb:C_PRICE_FG} };
+      priceCell.alignment = { horizontal:'right', vertical:'middle' };
+      // Фото — ссылка
+      if (p.photo) {
+        const photoCell = ws.getCell(`F${r.number}`);
+        photoCell.value = {
+          text: p.photo,
+          hyperlink: `${PRICE_SITE}/assets/img/products/${p.photo}`,
+        };
+        photoCell.font = { name:'Arial', size:9, color:{argb:C_LINK_FG}, underline:true };
+        photoCell.alignment = { horizontal:'center', vertical:'middle' };
+      }
+      // Наличие
+      ws.getCell(`G${r.number}`).font = { name:'Arial', size:10, bold:true, color:{argb:scColor} };
+    }
+
+    let rowNum = 1;
+    const { ac, rashod, truba } = _groupProducts();
+
+    /* Кондиционеры */
+    Object.keys(ac).sort().forEach(brand => {
+      addBrandRow(brand, C_BRAND_BG);
+      addTableHeader();
+      Object.keys(ac[brand]).sort().forEach(series => {
+        const items = ac[brand][series];
+        if (!items.length) return;
+        addSeriesRow(series, false);
+        items.forEach((p, i) => { addItemRow(p, rowNum++, i%2===1); });
       });
     });
 
-    rows.push([]); // пустая строка между брендами
-  });
+    /* Медная труба */
+    if (truba.length) {
+      addBrandRow('Медная труба', C_TRUBA_BG);
+      addTableHeader();
+      truba.forEach((p, i) => { addItemRow(p, rowNum++, i%2===1); });
+    }
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+    /* Расходники */
+    const grpOrder = ['Фреон','Дренаж','Лента','Кабель','Крепёж','Кронштейны','Изоляция','Прочее'];
+    const hasRashod = grpOrder.some(g => rashod[g] && rashod[g].length);
+    if (hasRashod) {
+      addBrandRow('Расходники', C_RASHOD_BG);
+      grpOrder.forEach(grpName => {
+        const items = rashod[grpName];
+        if (!items || !items.length) return;
+        addSeriesRow(grpName, true);
+        addTableHeader();
+        items.forEach((p, i) => { addItemRow(p, rowNum++, i%2===1); });
+      });
+    }
 
-  // Ширина столбцов
-  ws['!cols'] = [
-    { wch: 5  },  // №
-    { wch: 8  },  // ID
-    { wch: 40 },  // Модель
-    { wch: 28 },  // Описание
-    { wch: 12 },  // Цена
-    { wch: 18 },  // Наличие
-  ];
+    /* Freeze top rows (заголовок всегда виден) */
+    ws.views = [{ state:'frozen', ySplit:3, activeCell:'A4' }];
 
-  XLSX.utils.book_append_sheet(wb, ws, 'Прайс');
-  XLSX.writeFile(wb, `splithub-price-${new Date().toLocaleDateString('ru-RU').replace(/\./g, '-')}.xlsx`);
+    const buf  = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `splithub-price-${date.replace(/\./g,'-')}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-  closePriceModal();
+  } catch(err) {
+    console.error('Excel error:', err);
+    alert('Ошибка генерации Excel: ' + err.message);
+  } finally {
+    overlay.remove();
+  }
 }
