@@ -288,10 +288,13 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
 .fc{font-size:0.63rem;color:var(--text3);}
 
 /* FAB */
-.fab{position:fixed;bottom:80px;right:16px;z-index:200;display:flex;align-items:center;gap:7px;padding:12px 20px;border-radius:999px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;box-shadow:0 4px 22px rgba(245,158,11,0.55);transition:all 0.3s cubic-bezier(0.34,1.4,0.64,1);opacity:0;transform:translateY(14px) scale(0.96);pointer-events:none;}
+.fab{position:fixed;bottom:80px;right:16px;z-index:200;display:flex;align-items:center;padding:12px 22px;border-radius:999px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;box-shadow:0 4px 22px rgba(245,158,11,0.55);transition:all 0.3s cubic-bezier(0.34,1.4,0.64,1);opacity:0;transform:translateY(14px) scale(0.96);pointer-events:none;}
 .fab.on{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
 .fab:active{transform:scale(0.96);}
-.fab-n{background:rgba(255,255,255,0.28);border-radius:999px;padding:2px 8px;font-size:0.76rem;font-weight:700;border:1px solid rgba(255,255,255,0.35);}
+.fab-n{position:absolute;top:-7px;right:-7px;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:#EF4444;color:#fff;border:2px solid #fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);pointer-events:none;line-height:1;}
+.fab-n.hide{display:none;}
+.nav-cart-badge{display:inline-flex;align-items:center;justify-content:center;margin-left:7px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#fff;color:var(--amber-d);font-size:0.7rem;font-weight:800;line-height:1;box-shadow:inset 0 0 0 1px rgba(245,158,11,0.25);}
+.nav-cart-badge.hide{display:none;}
 
 /* ══════════════════════════════
    BOTTOM SHEET КОРЗИНА
@@ -960,7 +963,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     <button class="nav-reg-btn" id="navRegBtn" onclick="openRegister()">Регистрация</button>
     <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">Войти</button>
     <button class="nav-logout-btn" id="navLogoutBtn" style="display:none" onclick="logout()">Выйти</button>
-    <button class="btn-amber nav-order-btn" onclick="openD()">Заявка</button>
+    <button class="btn-amber nav-order-btn" onclick="openD()">Заявка<span class="nav-cart-badge hide" id="navCartN">0</span></button>
   </div>
   <div class="nav-phones-mobile">
     <a href="tel:+79785991369" class="nav-ph call">&#128222; +7 978 599-13-69</a>
@@ -1062,7 +1065,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 </footer>
 
 <!-- FAB -->
-<button class="fab" id="fab" onclick="openD()">Заявка <span class="fab-n" id="fabN">0</span></button>
+<button class="fab" id="fab" onclick="openD()">Заявка<span class="fab-n hide" id="fabN">0</span></button>
 
 <!-- DRAWER OVERLAY + DRAWER -->
 <div class="ov" id="ov" onclick="closeD()"></div>
@@ -1156,8 +1159,16 @@ function getQty(id) { var it = cart.find(function(c){ return c.id===id; }); retu
 
 function syncFab() {
   var n = cart.reduce(function(s,c){ return s+c.qty; }, 0);
-  document.getElementById('fabN').textContent = n;
+  var label = n > 99 ? '99+' : String(n);
+  var fabN = document.getElementById('fabN');
+  fabN.textContent = label;
+  fabN.classList.toggle('hide', n === 0);
   document.getElementById('fab').classList.toggle('on', n>0);
+  var navN = document.getElementById('navCartN');
+  if (navN) {
+    navN.textContent = label;
+    navN.classList.toggle('hide', n === 0);
+  }
   // dhPhone is updated in renderD()
 }
 

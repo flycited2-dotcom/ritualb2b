@@ -159,48 +159,46 @@ function _showProgressModal(title) {
 
 /* ────────────────────────────────────────────────
    УТИЛИТЫ ЗАГРУЗКИ ФОТО
+   Стратегия: fetch + AbortController (надёжный timeout
+   на мобильных), затем blob → object URL → Image → canvas.
+   Канвас 200×200 @ JPEG 0.90 даёт чёткое фото в PDF/Excel
+   при разумном размере (~25 КБ × 60 ≈ 1.5 МБ на прайс).
 ─────────────────────────────────────────────────*/
-function _withTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-  ]);
-}
-
-function _fetchViaImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 80; canvas.height = 80;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, 80, 80);
-        ctx.drawImage(img, 0, 0, 80, 80);
-        resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
-      } catch(e) { reject(e); }
+function _fetchAsJpegSafe(url, timeoutMs) {
+  return new Promise(resolve => {
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), timeoutMs || 25000);
+    let   objUrl = null;
+    const done = (val) => {
+      clearTimeout(tid);
+      if (objUrl) URL.revokeObjectURL(objUrl);
+      resolve(val);
     };
-    img.onerror = () => reject(new Error('img error'));
-    img.src = url;
+
+    fetch(url, { credentials: 'same-origin', signal: ctrl.signal, cache: 'force-cache' })
+      .then(r => r.ok ? r.blob() : null)
+      .then(blob => {
+        if (!blob) return done(null);
+        objUrl = URL.createObjectURL(blob);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const W = 200, H = 200;
+            const canvas = document.createElement('canvas');
+            canvas.width = W; canvas.height = H;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, W, H);
+            ctx.drawImage(img, 0, 0, W, H);
+            done(canvas.toDataURL('image/jpeg', 0.90).split(',')[1]);
+          } catch(e) { done(null); }
+        };
+        img.onerror = () => done(null);
+        img.src = objUrl;
+      })
+      .catch(() => done(null));
   });
-}
-
-async function _fetchViaBlob(url) {
-  const resp = await fetch(url, { credentials: 'same-origin' });
-  if (!resp.ok) throw new Error('fetch ' + resp.status);
-  const blob   = await resp.blob();
-  const objUrl = URL.createObjectURL(blob);
-  try   { return await _fetchViaImage(objUrl); }
-  finally { URL.revokeObjectURL(objUrl); }
-}
-
-async function _fetchAsJpegSafe(url) {
-  try   { return await _withTimeout(_fetchViaImage(url), 10000); }
-  catch {
-    try   { return await _withTimeout(_fetchViaBlob(url), 10000); }
-    catch { return null; }
-  }
 }
 
 /* ────────────────────────────────────────────────
