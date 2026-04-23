@@ -886,9 +886,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .dash-tabs{display:flex;gap:6px;margin-bottom:14px}
 .dash-tab{flex:1;padding:9px;border:1px solid var(--blo);border-radius:10px;background:rgba(255,255,255,.5);font-size:.76rem;font-weight:600;cursor:pointer;text-align:center;font-family:'Inter',sans-serif}
 .dash-tab.active{background:var(--amber);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(245,158,11,.3)}
-.dash-bonus-card{background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:14px;padding:18px;color:#fff;margin-bottom:14px;text-align:center}
-.dash-bonus-card .bonus-val{font-family:'Unbounded',sans-serif;font-size:1.8rem;font-weight:700}
-.dash-bonus-card .bonus-label{font-size:.72rem;opacity:.85;margin-top:2px}
 .do-card{background:rgba(255,255,255,.72);border:1px solid var(--blo);border-radius:14px;padding:12px 14px;margin-bottom:10px}
 .do-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
 .do-head-left{display:flex;flex-direction:column;gap:2px}
@@ -904,26 +901,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .do-total-block{display:flex;align-items:baseline;gap:5px;flex:1}
 .do-total-label{font-size:.68rem;color:var(--text3)}
 .do-total-val{font-family:'Unbounded',sans-serif;font-size:.9rem;font-weight:700;color:var(--amber-d)}
-.do-bonus{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:20px}
-.do-bonus.plus{background:rgba(22,163,74,.1);color:#16a34a}
-.do-bonus.minus{background:rgba(239,68,68,.1);color:#ef4444}
 .do-repeat{margin-left:auto;flex-shrink:0;border:none;background:#16a34a;color:#fff;font-size:.72rem;font-weight:700;padding:7px 12px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif}
 .do-repeat:active{background:#15803d}
-.dash-bonus-log{font-size:.76rem}
-.dash-bonus-log .bl-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06)}
-.dash-bonus-log .bl-amt{font-weight:700}
-.dash-bonus-log .bl-amt.plus{color:#059669}
-.dash-bonus-log .bl-amt.minus{color:#EF4444}
-.dash-bonus-log .bl-desc{color:var(--text2);font-size:.7rem}
 .dash-empty{text-align:center;padding:24px;color:var(--text3);font-size:.82rem}
-
-/* BONUS ROW IN CART */
-.bonus-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:.8rem}
-.bonus-row .bonus-bal{font-weight:700;color:#059669}
-.bonus-spend-row{display:flex;align-items:center;gap:8px;padding:6px 0}
-.bonus-spend-row label{font-size:.76rem;color:var(--text2)}
-.bonus-spend-row input{width:80px;padding:6px 10px;border:1px solid var(--blo);border-radius:8px;font-size:.82rem;text-align:center;font-family:'Inter',sans-serif}
-.bonus-spend-row .bonus-max{font-size:.68rem;color:var(--amber);cursor:pointer;font-weight:600}
 
 .qbtn-black{background:rgba(15,20,35,.72)!important;color:rgba(255,255,255,.92)!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 4px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;}
 .qbtn-black:hover{background:rgba(15,20,35,.88)!important;}
@@ -1495,10 +1475,6 @@ function renderD() {
       + '<div class="dtot-s">'+tot.toLocaleString('ru-RU')+' ₽</div>'
     + '</div>'
     + idHtml
-    + (currentUser && bonusBalance > 0
-      ? '<div class="bonus-row"><span>Бонусный баланс:</span><span class="bonus-bal">' + bonusBalance.toLocaleString('ru-RU') + ' ₽</span></div>'
-        + '<div class="bonus-spend-row"><label>Списать бонусы:</label><input type="number" id="dBonus" min="0" max="' + Math.min(bonusBalance, tot) + '" value="0" placeholder="0"><span class="bonus-max" onclick="document.getElementById(\'dBonus\').value=' + Math.min(bonusBalance, tot) + '">Макс</span></div>'
-      : '')
     + '<button class="comment-toggle" onclick="toggleComment()">Добавить комментарий</button>'
     + '<div id="commentWrap" hidden><textarea class="inp inp-ta" id="dC" placeholder="Комментарий к заявке" rows="2"></textarea></div>'
     + '<div class="send-hint">После нажатия заявка сразу отправляется менеджеру</div>'
@@ -1571,14 +1547,10 @@ function sendOrder() {
   var tg      = (document.getElementById('dTg') || {}).value || '';
   var btn = document.getElementById('sndBtn');
   if(btn) { btn.disabled = true; btn.textContent = 'Отправка...'; }
-  var bonusSpend = 0;
-  var bonusEl = document.getElementById('dBonus');
-  if (bonusEl) bonusSpend = Math.max(0, parseInt(bonusEl.value) || 0);
   var payload = {
     name: n, phone: p,
     comment: comment.trim(),
     client_tg: tg.trim(),
-    bonus_spend: bonusSpend,
     items: cart.map(function(x){
       var prod = PRODUCTS.find(function(pr){ return pr.id===x.id; });
       return {name:x.name, brand:x.brand||'', price:x.price, qty:x.qty, group: prod ? prod.group : ''};
@@ -1591,11 +1563,7 @@ function sendOrder() {
       savedName = n; savedPhone = p;
       localStorage.setItem('sh_name', n); localStorage.setItem('sh_phone', p);
       closeD(); cart = []; syncFab(); renderAll();
-      var msg = 'Заявка отправлена! Менеджер перезвонит';
-      if (d.bonus_earned > 0) msg += ' | +' + d.bonus_earned + ' бонусов начислено';
-      if (d.bonus_spent > 0) msg += ' | −' + d.bonus_spent + ' бонусов списано';
-      showToast(msg);
-      if (currentUser) loadBonusBalance();
+      showToast('Заявка отправлена! Менеджер перезвонит');
     } else {
       showToast('Ошибка. Позвоните: +7 978 599-13-69', true);
       if(btn) { btn.disabled=false; btn.innerHTML='&#128228; Отправить заявку'; }
@@ -1716,7 +1684,6 @@ function addUpsell(id) {
 
 // ── Auth State ───────────────────────────────────────
 var currentUser = null;
-var bonusBalance = 0;
 
 function updateNavAuth() {
   var btn       = document.getElementById('navAuthBtn');
@@ -1819,7 +1786,7 @@ function doLogin() {
       savedName = d.user.name; savedPhone = d.user.phone;
       localStorage.setItem('sh_name', d.user.name);
       localStorage.setItem('sh_phone', d.user.phone);
-      closeAuth(); updateNavAuth(); loadBonusBalance();
+      closeAuth(); updateNavAuth();
       showToast('Добро пожаловать, ' + d.user.name + '!');
     } else {
       err.textContent = d.error || 'Ошибка входа';
@@ -1846,7 +1813,7 @@ function doRegister() {
       savedName = d.user.name; savedPhone = d.user.phone;
       localStorage.setItem('sh_name', d.user.name);
       localStorage.setItem('sh_phone', d.user.phone);
-      closeAuth(); updateNavAuth(); loadBonusBalance();
+      closeAuth(); updateNavAuth();
       showToast('Регистрация успешна!');
     } else {
       err.textContent = d.error || 'Ошибка регистрации';
@@ -1858,24 +1825,12 @@ function doRegister() {
 function doLogout() {
   fetch('api/auth.php?action=logout', {method:'POST'})
   .then(function(){
-    currentUser = null; bonusBalance = 0;
+    currentUser = null;
     savedName = ''; savedPhone = '';
     localStorage.removeItem('sh_name'); localStorage.removeItem('sh_phone');
     updateNavAuth(); closeDash(); renderD();
     showToast('Вы вышли из аккаунта');
   });
-}
-
-function loadBonusBalance() {
-  fetch('api/auth.php?action=profile')
-  .then(function(r){ return r.json(); })
-  .then(function(d) {
-    if (d.ok) {
-      bonusBalance = d.bonus_balance || 0;
-      currentUser = d.user;
-      updateNavAuth();
-    }
-  }).catch(function(){});
 }
 
 // Check session on load
@@ -1884,7 +1839,6 @@ fetch('api/auth.php?action=profile')
 .then(function(d) {
   if (d.ok) {
     currentUser = d.user;
-    bonusBalance = d.bonus_balance || 0;
     savedName = d.user.name; savedPhone = d.user.phone;
     localStorage.setItem('sh_name', d.user.name);
     localStorage.setItem('sh_phone', d.user.phone);
@@ -1986,8 +1940,6 @@ function renderOrdersList(orders,listEl){
     cards+='</div><div class="do-footer">'
       +'<div class="do-total-block"><span class="do-total-label">\u0418\u0442\u043e\u0433\u043e</span>'
       +'<span class="do-total-val">'+parseInt(o.total).toLocaleString('ru-RU')+'\u00a0\u20bd</span></div>'
-      +(o.bonus_earned>0?'<span class="do-bonus plus">+'+o.bonus_earned+'\u00a0\u0431\u043e\u043d</span>':'')
-      +(o.bonus_spent>0?'<span class="do-bonus minus">\u2212'+o.bonus_spent+'\u00a0\u0441\u043f\u0438\u0441\u0430\u043d\u043e</span>':'')
       +'<button class="do-repeat" onclick="repeatOrder('+o.id+',\''+shNum+'\',\''+enc+'\')">\u21ba\u00a0\u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u044c</button>'
       +'</div></div>';
   });
@@ -2011,7 +1963,6 @@ function renderDashTab(tab) {
   var body = document.getElementById('dashBody');
   var tabs = '<div class="dash-tabs">'
     + '<div class="dash-tab' + (tab==='orders'?' active':'') + '" onclick="renderDashTab(\'orders\')">Заказы</div>'
-    + '<div class="dash-tab' + (tab==='bonus'?' active':'') + '" onclick="renderDashTab(\'bonus\')">Бонусы</div>'
     + '<div class="dash-tab' + (tab==='profile'?' active':'') + '" onclick="renderDashTab(\'profile\')">Профиль</div>'
     + '</div>';
 
@@ -2040,28 +1991,6 @@ function renderDashTab(tab) {
     document.getElementById('oPeriod').addEventListener('change',function(){_ordersPeriod=this.value;_ordersPage=1;loadOrders();});
     loadOrders();
 
-  } else if (tab === 'bonus') {
-    body.innerHTML = tabs + '<div class="dash-empty">Загрузка...</div>';
-    fetch('api/auth.php?action=bonus')
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      if (!d.ok) { body.innerHTML = tabs + '<div class="dash-empty">Ошибка загрузки</div>'; return; }
-      bonusBalance = d.balance;
-      var html = tabs
-        + '<div class="dash-bonus-card"><div class="bonus-val">' + d.balance.toLocaleString('ru-RU') + ' ₽</div><div class="bonus-label">Бонусный баланс</div></div>';
-      if (!d.log.length) {
-        html += '<div class="dash-empty">История бонусов пуста</div>';
-      } else {
-        html += '<div class="dash-bonus-log">';
-        d.log.forEach(function(l) {
-          var cls = l.amount > 0 ? 'plus' : 'minus';
-          var sign = l.amount > 0 ? '+' : '';
-          html += '<div class="bl-row"><div><div>' + l.description + '</div><div class="bl-desc">' + l.created_at + '</div></div><div class="bl-amt ' + cls + '">' + sign + l.amount + ' ₽</div></div>';
-        });
-        html += '</div>';
-      }
-      body.innerHTML = html;
-    });
   } else if (tab === 'profile') {
     var u = currentUser || {};
     body.innerHTML = tabs
