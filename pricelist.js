@@ -159,105 +159,24 @@ function _showProgressModal(title) {
 
 /* ────────────────────────────────────────────────
    УТИЛИТЫ ЗАГРУЗКИ ФОТО
-   Единая точка входа: _fetchAsJpegSafe(url) → base64 | null
-
-   Алгоритм (каждый шаг только если предыдущий вернул null):
-   1. fetch → blob → createImageBitmap → canvas → toBlob → FileReader
-   2. fetch → blob → <img objURL>      → canvas → toBlob → FileReader
-   3. fetch → blob → FileReader (возвращает исходный formат;
-      pdfmake принимает jpeg/png — если сервер отдаёт WebP, шаг 3 даст null)
-
-   Диагностика: первый вызов логирует результат каждой стратегии.
+   Сервер (api/img.php) конвертирует WebP/PNG → JPEG.
+   Клиент делает только fetch → FileReader → base64.
+   Никакого canvas, никаких CORS/tainting проблем.
 ─────────────────────────────────────────────────*/
-var _diagLogged = false;
-
-function _canvasToJpeg(cv, onDone) {
-  /* canvas → JPEG base64 через toBlob (обходит anti-fingerprinting) */
-  if (typeof cv.toBlob === 'function') {
-    cv.toBlob(function(b) {
-      if (!b) return onDone(null);
-      var fr = new FileReader();
-      fr.onload  = function() { onDone((fr.result || '').split(',')[1] || null); };
-      fr.onerror = function() { onDone(null); };
-      fr.readAsDataURL(b);
-    }, 'image/jpeg', 0.85);
-  } else {
-    /* fallback — старые браузеры без toBlob */
-    try {
-      var d = cv.toDataURL('image/jpeg', 0.85);
-      onDone(d && d.length > 100 ? d.split(',')[1] : null);
-    } catch(e) { onDone(null); }
-  }
-}
-
 function _fetchAsJpegSafe(url, timeoutMs) {
   return new Promise(function(resolve) {
-    var timer = setTimeout(function() { resolve(null); }, timeoutMs || 30000);
-    function done(val, strategy) {
-      clearTimeout(timer);
-      if (!_diagLogged) {
-        _diagLogged = true;
-        console.log('[SH photo] url=' + url + ' strategy=' + strategy + ' ok=' + !!val);
-      }
-      resolve(val);
-    }
-
+    var tid = setTimeout(function() { resolve(null); }, timeoutMs || 25000);
+    function done(v) { clearTimeout(tid); resolve(v); }
     fetch(url, { credentials: 'same-origin' })
-      .then(function(r) {
-        if (!r.ok) { done(null, 'fetch-' + r.status); return; }
-        return r.blob().then(function(blob) {
-          if (!blob || blob.size === 0) { done(null, 'empty-blob'); return; }
-
-          /* Стратегия 1: createImageBitmap — нативный WebP декодер */
-          var tryS2 = function() {
-            /* Стратегия 2: <img> через object URL → canvas */
-            var objUrl = URL.createObjectURL(blob);
-            var img = new Image();
-            img.onload = function() {
-              var cv = document.createElement('canvas');
-              cv.width = 200; cv.height = 200;
-              var ctx = cv.getContext('2d');
-              if (!ctx) { URL.revokeObjectURL(objUrl); done(null, 's2-no-ctx'); return; }
-              ctx.fillStyle = '#fff'; ctx.fillRect(0,0,200,200);
-              ctx.drawImage(img, 0,0,200,200);
-              URL.revokeObjectURL(objUrl);
-              _canvasToJpeg(cv, function(b64) { done(b64, 's2' + (b64 ? '-ok' : '-null')); });
-            };
-            img.onerror = function() {
-              URL.revokeObjectURL(objUrl);
-              /* Стратегия 3: прямой blob base64 (jpeg/png только) */
-              var ext = (url.split('.').pop() || '').toLowerCase();
-              if (ext === 'jpg' || ext === 'jpeg' || ext === 'png') {
-                var fr = new FileReader();
-                fr.onload  = function() { done((fr.result||'').split(',')[1]||null, 's3'); };
-                fr.onerror = function() { done(null, 's3-fail'); };
-                fr.readAsDataURL(blob);
-              } else {
-                done(null, 's2-onerror-noraw');
-              }
-            };
-            img.src = objUrl;
-          };
-
-          if (typeof createImageBitmap === 'function') {
-            createImageBitmap(blob).then(function(bmp) {
-              var cv = document.createElement('canvas');
-              cv.width = 200; cv.height = 200;
-              var ctx = cv.getContext('2d');
-              if (!ctx) { bmp.close && bmp.close(); tryS2(); return; }
-              ctx.fillStyle = '#fff'; ctx.fillRect(0,0,200,200);
-              ctx.drawImage(bmp, 0,0,200,200);
-              bmp.close && bmp.close();
-              _canvasToJpeg(cv, function(b64) {
-                if (b64) { done(b64, 's1-ok'); } else { tryS2(); }
-              });
-            }).catch(tryS2);
-          } else {
-            tryS2();
-          }
-        });
+      .then(function(r) { return r.ok ? r.blob() : null; })
+      .then(function(blob) {
+        if (!blob || blob.size < 50) return done(null);
+        var fr = new FileReader();
+        fr.onload  = function() { done((fr.result || '').split(',')[1] || null); };
+        fr.onerror = function() { done(null); };
+        fr.readAsDataURL(blob);
       })
-      .catch(function(e) { done(null, 'fetch-err:' + (e.message||'')); });
+      .catch(function() { done(null); });
   });
 }
 
@@ -278,7 +197,6 @@ async function downloadPricePDF() {
 
   try {
     /* Шаг 1: загрузка фото батчами по 3 */
-    _diagLogged = false;
     const uniquePhotos = [...new Set(PRODUCTS.filter(p => p.photo).map(p => p.photo))];
     const photos = {};
     const total  = uniquePhotos.length;
@@ -287,10 +205,10 @@ async function downloadPricePDF() {
     for (let i = 0; i < uniquePhotos.length; i += 3) {
       const batch = uniquePhotos.slice(i, i + 3);
       await Promise.allSettled(batch.map(async ph => {
-        const b64 = await _fetchAsJpegSafe(`${PRICE_SITE}/assets/img/products/${ph}`);
+        const b64 = await _fetchAsJpegSafe(`${PRICE_SITE}/api/img.php?f=${encodeURIComponent(ph)}`);
         if (b64) photos[ph] = b64;
         loaded++;
-        ui.update(Math.round((loaded / total) * 55), `Фото ${loaded}/${total} (загружено: ${Object.keys(photos).length})…`);
+        ui.update(Math.round((loaded / total) * 55), `Фото ${loaded} из ${total}…`);
       }));
     }
 
@@ -451,7 +369,6 @@ async function downloadPriceExcel() {
 
   try {
     /* ── Шаг 1: загрузка фото батчами по 3 ── */
-    _diagLogged = false;
     const uniquePhotos = [...new Set(PRODUCTS.filter(p => p.photo).map(p => p.photo))];
     const photos = {};
     const total  = uniquePhotos.length;
@@ -460,10 +377,10 @@ async function downloadPriceExcel() {
     for (let i = 0; i < uniquePhotos.length; i += 3) {
       const batch = uniquePhotos.slice(i, i + 3);
       await Promise.allSettled(batch.map(async fname => {
-        const result = await _fetchAsJpegSafe(`${PRICE_SITE}/assets/img/products/${fname}`);
+        const result = await _fetchAsJpegSafe(`${PRICE_SITE}/api/img.php?f=${encodeURIComponent(fname)}`);
         if (result) photos[fname] = result;
         loaded++;
-        ui.update(Math.round((loaded / total) * 50), `Фото ${loaded}/${total} (загружено: ${Object.keys(photos).length})…`);
+        ui.update(Math.round((loaded / total) * 50), `Фото ${loaded} из ${total}…`);
       }));
     }
 
