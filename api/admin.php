@@ -11,8 +11,18 @@ header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
-// CSV export — override Content-Type before auth check output
+// Public product overrides — no auth required
 $action = $_GET['action'] ?? '';
+if ($action === 'products_overrides_public') {
+    $db = getDB();
+    $rows = $db->query("SELECT sku, description, badge, badge_label FROM product_overrides WHERE badge != '' OR description != ''")->fetchAll();
+    $map = [];
+    foreach ($rows as $r) { $map[$r['sku']] = $r; }
+    jsonResponse(['ok' => true, 'overrides' => $map]);
+    exit;
+}
+
+// CSV export — override Content-Type before auth check output
 if ($action === 'export_orders_csv') {
     adminRequire();
     exportOrdersCsv(getDB());
@@ -312,6 +322,11 @@ switch ($action) {
                 }
             }
         }
+        // Merge app_settings (bonuses_enabled etc.)
+        try {
+            $appRows = $db->query("SELECT key, value FROM app_settings")->fetchAll();
+            foreach ($appRows as $r) { $cfg[$r['key']] = $r['value']; }
+        } catch (Throwable $e) {}
         jsonResponse(['ok' => true, 'settings' => $cfg]);
         break;
 
@@ -332,7 +347,58 @@ switch ($action) {
         $content .= "define('RATE_LIMIT_SEC', 30);\n";
 
         file_put_contents($cfgFile, $content);
-        // Reload constants
+
+        // Save app_settings (bonuses_enabled)
+        if (isset($raw['bonuses_enabled'])) {
+            $bval = ($raw['bonuses_enabled'] === true || $raw['bonuses_enabled'] === '1' || $raw['bonuses_enabled'] === 1) ? '1' : '0';
+            try {
+                $db->prepare("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('bonuses_enabled', ?)")->execute([$bval]);
+            } catch (Throwable $e) {}
+        }
+        jsonResponse(['ok' => true]);
+        break;
+
+    // ── List products + overrides ──
+    case 'products_list':
+        $jsFile = __DIR__ . '/../products.js';
+        $products = [];
+        if (file_exists($jsFile)) {
+            $js = file_get_contents($jsFile);
+            $js = preg_replace('/^\s*var\s+PRODUCTS\s*=\s*/', '', trim($js));
+            $js = rtrim($js, ";\r\n ");
+            $products = json_decode($js, true) ?: [];
+        }
+        $ovRows = $db->query("SELECT sku, description, badge, badge_label FROM product_overrides")->fetchAll();
+        $ovMap = [];
+        foreach ($ovRows as $r) { $ovMap[$r['sku']] = $r; }
+        foreach ($products as &$p) {
+            if (isset($ovMap[$p['sku']])) { $p['_override'] = $ovMap[$p['sku']]; }
+        }
+        $search = trim($_GET['search'] ?? '');
+        if ($search !== '') {
+            $sl = mb_strtolower($search);
+            $products = array_values(array_filter($products, function($p) use ($sl) {
+                return mb_strpos(mb_strtolower($p['model'] ?? ''), $sl) !== false
+                    || mb_strpos(mb_strtolower($p['brand'] ?? ''), $sl) !== false
+                    || mb_strpos(mb_strtolower($p['sku'] ?? ''), $sl) !== false
+                    || mb_strpos(mb_strtolower($p['series'] ?? ''), $sl) !== false;
+            }));
+        }
+        jsonResponse(['ok' => true, 'products' => array_slice($products, 0, 200), 'total' => count($products)]);
+        break;
+
+    // ── Save product override ──
+    case 'product_save_override':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true);
+        $sku    = trim($raw['sku'] ?? '');
+        $desc   = trim($raw['description'] ?? '');
+        $badge  = trim($raw['badge'] ?? '');
+        $blabel = trim($raw['badge_label'] ?? '');
+        if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        if (!in_array($badge, ['', 'new', 'sale', 'clearance'])) jsonResponse(['ok' => false, 'error' => 'Invalid badge'], 422);
+        $db->prepare("INSERT OR REPLACE INTO product_overrides (sku, description, badge, badge_label, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)")
+            ->execute([$sku, $desc, $badge, $blabel]);
         jsonResponse(['ok' => true]);
         break;
 

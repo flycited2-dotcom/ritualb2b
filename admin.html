@@ -308,6 +308,46 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .toast{position:fixed;bottom:24px;right:24px;background:#1A1C22;color:#fff;border-radius:10px;padding:12px 20px;
   font-size:.82rem;font-weight:600;z-index:999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
+
+/* ── BONUS TOGGLE ── */
+.bonus-toggle-wrap{display:flex;align-items:center;gap:14px;padding:16px 20px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:var(--r);margin-bottom:20px}
+.bonus-toggle-label{font-size:.88rem;font-weight:600;flex:1}
+.bonus-toggle-label span{font-size:.75rem;color:#9298A8;display:block;font-weight:400;margin-top:2px}
+.toggle-switch{position:relative;width:48px;height:26px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:#D1D5DB;border-radius:26px;cursor:pointer;transition:background .25s}
+.toggle-track::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-switch input:checked + .toggle-track{background:var(--green)}
+.toggle-switch input:checked + .toggle-track::before{transform:translateX(22px)}
+.bonus-status-on{color:var(--green);font-size:.72rem;font-weight:700}
+.bonus-status-off{color:#9298A8;font-size:.72rem;font-weight:700}
+
+/* ── PRODUCT EDITOR ── */
+.prod-search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.prod-card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--blo);border-radius:var(--r);
+  padding:14px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.prod-card:hover{border-color:var(--amber);box-shadow:0 4px 16px rgba(245,158,11,.12)}
+.prod-card-sku{font-size:.65rem;color:#9298A8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.prod-card-name{font-size:.8rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+.prod-card-brand{font-size:.72rem;color:#6b7280;margin-bottom:8px}
+.prod-card-price{font-family:'Unbounded',sans-serif;font-size:.82rem;font-weight:700;color:var(--amber-d)}
+.prod-badge{position:absolute;top:10px;right:10px;border-radius:20px;padding:3px 9px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pb-new{background:rgba(22,163,74,.15);color:#166534}
+.pb-sale{background:rgba(245,158,11,.18);color:#92400e}
+.pb-clearance{background:rgba(239,68,68,.15);color:#991b1b}
+.prod-card-desc{font-size:.72rem;color:#6b7280;margin-top:6px;line-height:1.4;max-height:40px;overflow:hidden;text-overflow:ellipsis}
+.prod-edit-modal .modal-box{max-width:500px}
+.badge-select-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 16px}
+.badge-opt{border:2px solid var(--blo);border-radius:9px;padding:8px 6px;text-align:center;cursor:pointer;font-size:.72rem;font-weight:700;transition:all .18s;user-select:none}
+.badge-opt.active{border-color:var(--amber);background:rgba(245,158,11,.08)}
+.badge-opt[data-v=new].active{border-color:var(--green);background:rgba(22,163,74,.08);color:#166534}
+.badge-opt[data-v=sale].active{border-color:#d97706;background:rgba(245,158,11,.10);color:#92400e}
+.badge-opt[data-v=clearance].active{border-color:var(--red);background:rgba(239,68,68,.08);color:#991b1b}
+.custom-label-inp{width:100%;border:1px solid var(--blo);background:rgba(255,255,255,.6);border-radius:9px;
+  padding:9px 12px;font-size:.82rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px}
+.custom-label-inp:focus{border-color:var(--amber)}
+.prod-count-badge{background:var(--amber);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:700;margin-left:6px}
 </style>
 </head>
 <body>
@@ -354,6 +394,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
     <button class="tab-btn" onclick="switchTab('promo')">&#127381; Промо</button>
     <button class="tab-btn" onclick="switchTab('analytics')">&#128202; Аналитика</button>
     <button class="tab-btn" onclick="switchTab('catalog')">&#128230; Каталог</button>
+    <button class="tab-btn" onclick="switchTab('products')">&#9998; Товары</button>
     <button class="tab-btn" onclick="switchTab('settings')">&#9881; Настройки</button>
   </div>
 
@@ -457,11 +498,32 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
       </div>
     </div>
 
+    <!-- PRODUCTS -->
+    <div class="tab-pane" id="pane-products">
+      <div class="prod-search-bar">
+        <input class="search-inp" id="prodSearch" type="text" placeholder="Поиск по модели, бренду, артикулу..." style="max-width:400px">
+        <button class="form-btn" onclick="loadProducts()">Найти</button>
+        <span id="prodTotal" style="font-size:.78rem;color:#9298A8"></span>
+      </div>
+      <div class="loading" id="prodLoading" style="display:none">Загрузка...</div>
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="tab-pane" id="pane-settings">
       <div class="settings-section">
         <h3>&#9881; Настройки системы</h3>
         <div class="settings-desc">Изменения применяются сразу после сохранения. Перезагрузка сервера не требуется.</div>
+        <div class="bonus-toggle-wrap">
+          <div class="bonus-toggle-label">Бонусная программа
+            <span>Начисление и списание бонусных баллов клиентам</span>
+          </div>
+          <span id="bonusStatusText" class="bonus-status-off">Выключено</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="cfg_bonuses_enabled" onchange="updateBonusStatus()">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
         <div class="settings-grid" id="settingsGrid">
           <div class="settings-field">
             <label>BOT_TOKEN — Telegram Bot</label>
@@ -531,6 +593,28 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
   </div>
 </div>
 
+<!-- PRODUCT EDIT MODAL -->
+<div class="modal-ov prod-edit-modal" id="prodEditModal">
+  <div class="modal-box" style="max-width:500px">
+    <h3 id="peModalTitle">Редактировать товар</h3>
+    <div style="font-size:.72rem;color:#9298A8;margin-bottom:12px" id="peModalSku"></div>
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Бейдж</div>
+    <div class="badge-select-grid">
+      <div class="badge-opt active" data-v="" onclick="selectBadge(this)">Нет</div>
+      <div class="badge-opt" data-v="new" onclick="selectBadge(this)">🆕 Новинка</div>
+      <div class="badge-opt" data-v="sale" onclick="selectBadge(this)">🔥 Акция</div>
+      <div class="badge-opt" data-v="clearance" onclick="selectBadge(this)">🏷 Распродажа</div>
+    </div>
+    <input class="custom-label-inp" id="peBadgeLabel" type="text" placeholder="Своя подпись бейджа (необязательно, переопределяет стандартную)">
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Описание / заметка к карточке</div>
+    <textarea class="note-area" id="peDescription" style="min-height:80px" placeholder="Дополнительное описание, характеристики, акционные условия..."></textarea>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="modal-cancel" onclick="closeModal('prodEditModal')">Отмена</button>
+      <button class="modal-ok" onclick="saveProdOverride()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <!-- BONUS ADJUST MODAL -->
 <div class="modal-ov" id="bonusModal">
   <div class="modal-box">
@@ -569,8 +653,8 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 var _ordPage=1, _gstPage=1, _ordSearchTimer=null;
 var _bonusUserId=0;
 var _charts={};
-var _tabNames=['orders','guests','users','promo','analytics','catalog','settings'];
-var _loaded={orders:false,guests:false,users:false,promo:false,analytics:false,catalog:false,settings:false};
+var _tabNames=['orders','guests','users','promo','analytics','catalog','products','settings'];
+var _loaded={orders:false,guests:false,users:false,promo:false,analytics:false,catalog:false,products:false,settings:false};
 var _pollInterval=null, _lastNewCount=-1;
 var _bulkMode=false, _bulkSelected={};
 
@@ -710,6 +794,7 @@ function switchTab(name){
     if(name==='promo')loadPromo();
     if(name==='analytics')loadAnalytics(7);
     if(name==='catalog')checkCatalogStatus();
+    if(name==='products')loadProducts();
     if(name==='settings')loadSettings();
   }
 }
@@ -1201,7 +1286,18 @@ function loadSettings(){
       var el=document.getElementById('cfg_'+k);
       if(el&&s[k]!==undefined)el.value=s[k];
     });
+    var bonusCb=document.getElementById('cfg_bonuses_enabled');
+    if(bonusCb) bonusCb.checked = (s['bonuses_enabled']!=='0');
+    updateBonusStatus();
   }).catch(function(){});
+}
+
+function updateBonusStatus(){
+  var cb=document.getElementById('cfg_bonuses_enabled');
+  var txt=document.getElementById('bonusStatusText');
+  if(!cb||!txt)return;
+  if(cb.checked){txt.textContent='Включено';txt.className='bonus-status-on';}
+  else{txt.textContent='Выключено';txt.className='bonus-status-off';}
 }
 
 function saveSettings(){
@@ -1210,6 +1306,8 @@ function saveSettings(){
     var el=document.getElementById('cfg_'+k);
     if(el)data[k]=el.value.trim();
   });
+  var bonusCb=document.getElementById('cfg_bonuses_enabled');
+  if(bonusCb)data['bonuses_enabled']=bonusCb.checked;
   fetch(api('admin.php?action=settings_save'),{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify(data)})
   .then(function(r){return r.json();}).then(function(d){
@@ -1217,6 +1315,84 @@ function saveSettings(){
     else toast(d.error||'Ошибка',false);
   }).catch(function(){toast('Ошибка соединения',false);});
 }
+
+
+// ── Products editor ──────────────────────────────────────────────────────────
+var _peCurrentSku = '';
+var _peBadge = '';
+
+function loadProducts(search) {
+  var s = search !== undefined ? search : (document.getElementById('prodSearch')||{}).value||'';
+  document.getElementById('prodLoading').style.display = 'block';
+  document.getElementById('prodGrid').innerHTML = '';
+  document.getElementById('prodTotal').textContent = '';
+  fetch(api('admin.php?action=products_list&search='+encodeURIComponent(s)))
+  .then(function(r){return r.json();}).then(function(d){
+    document.getElementById('prodLoading').style.display = 'none';
+    if(!d.ok){document.getElementById('prodGrid').innerHTML='<div class="empty">Ошибка загрузки</div>';return;}
+    if(!d.products.length){document.getElementById('prodGrid').innerHTML='<div class="empty">Товаров не найдено</div>';return;}
+    document.getElementById('prodTotal').textContent = 'Найдено: '+d.total;
+    var html = '';
+    d.products.forEach(function(p){
+      var ov = p._override || {};
+      var badgeHtml = '';
+      var bv = ov.badge || '';
+      var bl = ov.badge_label || ({new:'Новинка',sale:'Акция',clearance:'Распродажа'}[bv]||'');
+      if(bv) badgeHtml = '<div class="prod-badge pb-'+bv+'">'+bl+'</div>';
+      var descHtml = (ov.description) ? '<div class="prod-card-desc">'+ov.description+'</div>' : '';
+      html += '<div class="prod-card" onclick="openProdEdit(''+p.sku+'','+JSON.stringify(p).replace(/\/g,'\\').replace(/'/g,"\'")+')">'+badgeHtml
+        +'<div class="prod-card-sku">'+p.sku+'</div>'
+        +'<div class="prod-card-name">'+p.model+'</div>'
+        +'<div class="prod-card-brand">'+p.brand+'</div>'
+        +'<div class="prod-card-price">'+parseInt(p.price||0).toLocaleString('ru-RU')+'&thinsp;₽</div>'
+        +descHtml
+        +'</div>';
+    });
+    document.getElementById('prodGrid').innerHTML = html;
+  }).catch(function(){
+    document.getElementById('prodLoading').style.display = 'none';
+    document.getElementById('prodGrid').innerHTML='<div class="empty">Ошибка соединения</div>';
+  });
+}
+
+function openProdEdit(sku, p) {
+  _peCurrentSku = sku;
+  var ov = p._override || {};
+  _peBadge = ov.badge || '';
+  document.getElementById('peModalTitle').textContent = p.model || sku;
+  document.getElementById('peModalSku').textContent = 'SKU: '+sku+' · '+p.brand;
+  document.getElementById('peDescription').value = ov.description || '';
+  document.getElementById('peBadgeLabel').value = ov.badge_label || '';
+  document.querySelectorAll('.badge-opt').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-v') === _peBadge);
+  });
+  document.getElementById('prodEditModal').classList.add('show');
+}
+
+function selectBadge(el) {
+  _peBadge = el.getAttribute('data-v');
+  document.querySelectorAll('.badge-opt').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+function saveProdOverride() {
+  var desc = document.getElementById('peDescription').value;
+  var label = document.getElementById('peBadgeLabel').value.trim();
+  fetch(api('admin.php?action=product_save_override'), {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sku:_peCurrentSku, description:desc, badge:_peBadge, badge_label:label})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      closeModal('prodEditModal');
+      toast('Товар обновлён');
+      loadProducts();
+    } else toast(d.error||'Ошибка', false);
+  }).catch(function(){toast('Ошибка соединения', false);});
+}
+
+(function(){
+  var si = document.getElementById('prodSearch');
+  if(si) si.addEventListener('keydown', function(e){ if(e.key==='Enter') loadProducts(); });
+})();
 
 // ── Report ────────────────────────────────────────────────────────────────────
 function sendReport(){
