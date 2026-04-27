@@ -2,7 +2,7 @@
 /**
  * send.php — СплитХаб
  * База: рабочий Desktop send.php (идентичная логика TG).
- * Вторичные функции (DB, email, bonus) изолированы в try/catch.
+ * Вторичные функции (DB, email) изолированы в try/catch.
  */
 
 // ── Credentials (идентично Desktop send.php) ──
@@ -104,10 +104,8 @@ $tgOk     = $tgResult['result']['ok'] ?? false;
 
 // ── Вторичные функции (сбой не влияет на ответ) ──
 
-$orderId     = null;
-$bonusEarned = 0;
-$bonusSpent  = 0;
-$guestSaved  = false;
+$orderId    = null;
+$guestSaved = false;
 
 try {
     $dbFile = __DIR__ . '/db/init.php';
@@ -116,34 +114,20 @@ try {
         $userId = authCheck();
 
         if ($userId) {
-            $db         = getDB();
-            $bonusSpent = max(0, intval($data['bonus_spend'] ?? 0));
-            if ($bonusSpent > 0) {
-                $s = $db->prepare('SELECT COALESCE(SUM(amount),0) as b FROM bonus_log WHERE user_id=?');
-                $s->execute([$userId]);
-                $bal = (int)$s->fetch()['b'];
-                if ($bonusSpent > $bal)   $bonusSpent = $bal;
-                if ($bonusSpent > $total) $bonusSpent = $total;
-            }
+            $db = getDB();
+            // Бонусная система отключена: ни начисления, ни списания
             $dbItems = array_map(function($i) {
                 return ['id' => strval($i['id'] ?? ''), 'name' => $i['name'] ?? '—',
                         'price' => intval($i['price'] ?? 0),
                         'qty'  => max(1, intval($i['qty'] ?? 1)), 'group' => $i['group'] ?? ''];
             }, $items);
-            $br          = calculateBonus($total - $bonusSpent, $dbItems);
-            $bonusEarned = $br['bonus'];
 
-            $ins = $db->prepare('INSERT INTO orders (user_id,total,bonus_earned,bonus_spent,status,comment,client_tg) VALUES (?,?,?,?,"new",?,?)');
-            $ins->execute([$userId, $total, $bonusEarned, $bonusSpent, $comment, $clientTg]);
+            $ins = $db->prepare('INSERT INTO orders (user_id,total,bonus_earned,bonus_spent,status,comment,client_tg) VALUES (?,?,0,0,"new",?,?)');
+            $ins->execute([$userId, $total, $comment, $clientTg]);
             $orderId = (int)$db->lastInsertId();
 
             $ii = $db->prepare('INSERT INTO order_items (order_id,product_name,price,qty,product_id) VALUES (?,?,?,?,?)');
             foreach ($dbItems as $di) $ii->execute([$orderId, $di['name'], $di['price'], $di['qty'], $di['id']]);
-
-            if ($bonusEarned > 0)
-                $db->prepare('INSERT INTO bonus_log (user_id,order_id,amount,type,description) VALUES (?,?,?,"earn",?)')->execute([$userId, $orderId, $bonusEarned, 'Заказ #'.$orderId]);
-            if ($bonusSpent > 0)
-                $db->prepare('INSERT INTO bonus_log (user_id,order_id,amount,type,description) VALUES (?,?,?,"spend",?)')->execute([$userId, $orderId, -$bonusSpent, 'Списано на заказ #'.$orderId]);
         } else {
             // Гостевой заказ
             $db = getDB();
@@ -238,9 +222,7 @@ error_log('[SplitHub] tg=' . ($tgOk?'ok':'FAIL:'.($tgResult['resp']??'')) . ' ma
 // ── Ответ ──
 if ($tgOk || $orderId || $guestSaved) {
     $resp = ['ok' => true, 'email' => $mailOk ? 'sent' : 'failed', 'tg' => $tgOk ? 'sent' : 'failed'];
-    if ($orderId)     $resp['order_id']     = $orderId;
-    if ($bonusEarned) $resp['bonus_earned'] = $bonusEarned;
-    if ($bonusSpent)  $resp['bonus_spent']  = $bonusSpent;
+    if ($orderId) $resp['order_id'] = $orderId;
     echo json_encode($resp);
 } else {
     error_log('[SplitHub] TG error: ' . ($tgResult['resp'] ?? ''));
