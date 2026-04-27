@@ -1128,7 +1128,7 @@ function loadUsers(){
         +(u.role!=='admin'?'<button class="act-btn act-btn-role" onclick="promoteAdmin('+u.id+',\''+u.name+'\')">→ Админ</button>':'')
         +(u.telegram?'<a class="act-btn act-btn-tg" href="https://t.me/'+u.telegram.replace('@','')+'" target="_blank">TG</a>':'')
         +'<button class="act-btn act-btn-edit" onclick="openEditUser('+u.id+')">&#9998; Изменить</button>'
-        +'<button class="act-btn act-btn-del" onclick="deleteUser('+u.id+',''+u.name.replace(/'/g,"\'")+'')" title="Удалить">&#128465;</button>'
+        +'<button class="act-btn act-btn-del" onclick="deleteUser('+u.id+')" title="Удалить">&#128465;</button>'
         +'</td></tr>';
     });
     html+='</tbody></table></div>';
@@ -1505,8 +1505,8 @@ function bulkDeleteOrders(){
 }
 
 // ── Delete user ───────────────────────────────────────────────────────────
-function deleteUser(uid,name){
-  if(!confirm('Удалить клиента «'+name+'» и все его заказы? Действие необратимо.'))return;
+function deleteUser(uid){
+  if(!confirm('Удалить клиента и все его заказы? Действие необратимо.'))return;
   fetch(api('admin.php?action=delete_user'),{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({user_id:uid})})
   .then(function(r){return r.json();}).then(function(d){
