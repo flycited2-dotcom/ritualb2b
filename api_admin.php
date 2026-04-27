@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 $action = $_GET['action'] ?? '';
 if ($action === 'products_overrides_public') {
     $db = getDB();
-    $rows = $db->query("SELECT sku, description, badge, badge_label FROM product_overrides WHERE badge != '' OR description != ''")->fetchAll();
+    $rows = $db->query("SELECT sku, description, badge, badge_label FROM product_overrides WHERE (badge != '' OR description != '') AND COALESCE(active,1) = 1")->fetchAll();
     $map = [];
     foreach ($rows as $r) { $map[$r['sku']] = $r; }
     jsonResponse(['ok' => true, 'overrides' => $map]);
@@ -372,7 +372,7 @@ switch ($action) {
             $js = rtrim($js, ";\r\n ");
             $products = json_decode($js, true) ?: [];
         }
-        $ovRows = $db->query("SELECT sku, description, badge, badge_label FROM product_overrides")->fetchAll();
+        $ovRows = $db->query("SELECT sku, description, badge, badge_label, active FROM product_overrides")->fetchAll();
         $ovMap = [];
         foreach ($ovRows as $r) { $ovMap[$r['sku']] = $r; }
         foreach ($products as &$p) {
@@ -499,6 +499,129 @@ switch ($action) {
         $reports = $db->query('SELECT * FROM monthly_reports ORDER BY period DESC LIMIT 24')->fetchAll();
         jsonResponse(['ok' => true, 'reports' => $reports]);
         break;
+
+    // ── Change password ──
+    case 'change_password':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true);
+        $targetUid = intval($raw['user_id'] ?? 0);
+        $newPass   = $raw['new_password'] ?? '';
+        if (!$targetUid || strlen($newPass) < 4) jsonResponse(['ok' => false, 'error' => 'user_id и пароль (мин. 4 символа) обязательны'], 422);
+        $hash = password_hash($newPass, PASSWORD_DEFAULT);
+        $db->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $targetUid]);
+        jsonResponse(['ok' => true]);
+        break;
+
+    // ── Toggle product active ──
+    case 'product_toggle_active':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw    = json_decode(file_get_contents('php://input'), true);
+        $sku    = trim($raw['sku'] ?? '');
+        $active = intval($raw['active'] ?? 1);
+        if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        $db->prepare("INSERT INTO product_overrides (sku, active) VALUES (?, ?) ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=CURRENT_TIMESTAMP")
+            ->execute([$sku, $active]);
+        jsonResponse(['ok' => true]);
+        break;
+
+    // ── Bulk toggle products active ──
+    case 'product_bulk_toggle_active':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw    = json_decode(file_get_contents('php://input'), true);
+        $skus   = array_filter(array_map('trim', $raw['skus'] ?? []), 'strlen');
+        $active = intval($raw['active'] ?? 1);
+        if (empty($skus)) jsonResponse(['ok' => false, 'error' => 'skus required'], 422);
+        foreach ($skus as $sku) {
+            $db->prepare("INSERT INTO product_overrides (sku, active) VALUES (?, ?) ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=CURRENT_TIMESTAMP")
+                ->execute([$sku, $active]);
+        }
+        jsonResponse(['ok' => true, 'updated' => count($skus)]);
+        break;
+
+    // ── Send order to TG / email ──
+    case 'order_send':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw     = json_decode(file_get_contents('php://input'), true);
+        $orderId = intval($raw['order_id'] ?? 0);
+        $channel = trim($raw['channel'] ?? 'tg'); // 'tg' or 'email'
+        if (!$orderId) jsonResponse(['ok' => false, 'error' => 'order_id required'], 422);
+
+        $ord = $db->prepare('SELECT o.*, u.name as uname, u.phone as uphone, u.telegram as utg FROM orders o JOIN users u ON o.user_id=u.id WHERE o.id=?');
+        $ord->execute([$orderId]);
+        $o = $ord->fetch();
+        if (!$o) jsonResponse(['ok' => false, 'error' => 'Заказ не найден'], 404);
+        $items = $db->prepare('SELECT product_name, price, qty FROM order_items WHERE order_id=?');
+        $items->execute([$orderId]);
+        $itemList = $items->fetchAll();
+
+        $shNum = 'SH-' . str_pad($orderId, 5, '0', STR_PAD_LEFT);
+        $sIco  = ['new'=>'🆕','confirmed'=>'✅','in_progress'=>'⚙️','shipped'=>'📦','completed'=>'✔️','cancelled'=>'❌'];
+        $sNames = ['new'=>'Новый','confirmed'=>'Подтверждён','in_progress'=>'В работе','shipped'=>'Отгружен','completed'=>'Выполнен','cancelled'=>'Отменён'];
+
+        $cfgFile = __DIR__ . '/../config.php';
+        if (file_exists($cfgFile)) require_once $cfgFile;
+
+        if ($channel === 'tg') {
+            $token  = defined('BOT_TOKEN') ? BOT_TOKEN : '';
+            $chatId = defined('TG_ADMIN_ID') ? TG_ADMIN_ID : (defined('CHAT_ID') ? CHAT_ID : '');
+            if (!$token || !$chatId) jsonResponse(['ok' => false, 'error' => 'Telegram не настроен'], 500);
+
+            $msg = ($sIco[$o['status']] ?? '•') . " *{$shNum}*\n";
+            $msg .= "━━━━━━━━━━━━━━\n";
+            $msg .= "👤 {$o['uname']} · +{$o['uphone']}\n";
+            if ($o['utg']) $msg .= "✈ @{$o['utg']}\n";
+            $msg .= "📅 {$o['created_at']}\n";
+            $msg .= "📊 " . ($sNames[$o['status']] ?? $o['status']) . "\n";
+            $msg .= "━━━━━━━━━━━━━━\n";
+            foreach ($itemList as $it) {
+                $msg .= "• {$it['product_name']} × {$it['qty']} — " . number_format($it['price'] * $it['qty'], 0, '.', ' ') . " ₽\n";
+            }
+            $msg .= "━━━━━━━━━━━━━━\n";
+            $msg .= "💰 Итого: *" . number_format($o['total'], 0, '.', ' ') . " ₽*\n";
+            if ($o['bonus_earned'] > 0) $msg .= "🎁 Бонусов начислено: +{$o['bonus_earned']}\n";
+            if ($o['bonus_spent']  > 0) $msg .= "🎁 Бонусов списано: -{$o['bonus_spent']}\n";
+            if ($o['comment'])    $msg .= "💬 {$o['comment']}\n";
+            if ($o['admin_note']) $msg .= "📝 {$o['admin_note']}\n";
+
+            $ch = curl_init("https://api.telegram.org/bot{$token}/sendMessage");
+            curl_setopt_array($ch, [CURLOPT_POST=>true, CURLOPT_RETURNTRANSFER=>true, CURLOPT_TIMEOUT=>10, CURLOPT_SSL_VERIFYPEER=>false,
+                CURLOPT_HTTPHEADER=>['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS=>json_encode(['chat_id'=>$chatId,'text'=>$msg,'parse_mode'=>'Markdown'])]);
+            $res = curl_exec($ch); curl_close($ch);
+            $ok2 = (bool)(json_decode($res, true)['ok'] ?? false);
+            jsonResponse(['ok' => $ok2, 'error' => $ok2 ? null : 'Ошибка Telegram']);
+        } else {
+            $to = defined('EMAIL_TO') ? EMAIL_TO : '';
+            if (!$to) jsonResponse(['ok' => false, 'error' => 'Email не настроен'], 500);
+            $subject = "Заказ {$shNum} — " . ($sNames[$o['status']] ?? $o['status']);
+            $body = "Заказ: {$shNum}\r\nКлиент: {$o['uname']} / +{$o['uphone']}\r\n";
+            $body .= "Статус: " . ($sNames[$o['status']] ?? $o['status']) . "\r\n";
+            $body .= "Дата: {$o['created_at']}\r\n\r\nТовары:\r\n";
+            foreach ($itemList as $it) {
+                $body .= "  {$it['product_name']} x{$it['qty']} — " . ($it['price'] * $it['qty']) . " ₽\r\n";
+            }
+            $body .= "\r\nИтого: {$o['total']} ₽";
+            if ($o['comment']) $body .= "\r\nКомментарий: {$o['comment']}";
+            $headers = "From: noreply@splithub.ru\r\nContent-Type: text/plain; charset=UTF-8";
+            $sent = mail($to, $subject, $body, $headers);
+            jsonResponse(['ok' => $sent, 'error' => $sent ? null : 'Ошибка mail()']);
+        }
+        break;
+
+    // ── Reset order counter ──
+    case 'reset_counter':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw  = json_decode(file_get_contents('php://input'), true);
+        $type = trim($raw['type'] ?? 'orders'); // 'orders' | 'guest_orders' | 'all'
+        $tables = [];
+        if ($type === 'orders' || $type === 'all') $tables[] = 'orders';
+        if ($type === 'guest_orders' || $type === 'all') $tables[] = 'guest_orders';
+        foreach ($tables as $tbl) {
+            try { $db->exec("DELETE FROM sqlite_sequence WHERE name='{$tbl}'"); } catch (Throwable $e) {}
+        }
+        jsonResponse(['ok' => true, 'reset' => $tables]);
+        break;
+
 
     default:
         jsonResponse(['ok' => false, 'error' => 'Unknown action'], 400);

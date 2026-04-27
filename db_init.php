@@ -41,6 +41,7 @@ function getDB() {
             description TEXT DEFAULT '',
             badge TEXT DEFAULT '',
             badge_label TEXT DEFAULT '',
+            active INTEGER DEFAULT 1,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )");
     } catch (Throwable $e) {}
@@ -70,6 +71,15 @@ function getDB() {
             if (!in_array($col, $ucNames)) {
                 $db->exec("ALTER TABLE users ADD COLUMN {$col} TEXT DEFAULT ''");
             }
+        }
+    } catch (Throwable $e) {}
+
+    // product_overrides.active column
+    try {
+        $poc = $db->query("PRAGMA table_info(product_overrides)")->fetchAll(PDO::FETCH_ASSOC);
+        $pocNames = array_column($poc, 'name');
+        if (!in_array('active', $pocNames)) {
+            $db->exec("ALTER TABLE product_overrides ADD COLUMN active INTEGER DEFAULT 1");
         }
     } catch (Throwable $e) {}
 

@@ -135,7 +135,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .bulk-toggle.active{background:var(--amber);color:#fff;border-color:var(--amber)}
 .ord-checkbox{width:18px;height:18px;cursor:pointer;accent-color:var(--amber);display:none;flex-shrink:0}
 .bulk-mode .ord-checkbox{display:block}
-.bulk-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+.bulk-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(300px);
   background:#1A1C22;color:#fff;border-radius:14px;padding:12px 20px;display:flex;align-items:center;
   gap:12px;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.28);transition:transform .3s;flex-wrap:wrap}
 .bulk-bar.show{transform:translateX(-50%) translateY(0)}
@@ -327,6 +327,45 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .bonus-status-on{color:var(--green);font-size:.72rem;font-weight:700}
 .bonus-status-off{color:#9298A8;font-size:.72rem;font-weight:700}
 
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:600px){
+  .adm-hdr-inner{flex-wrap:wrap;height:auto;padding:8px 0;gap:6px}
+  .adm-logo{width:100%;font-size:.85rem}
+  .tab-content{padding:0 10px}
+  .tab-bar{padding:0 10px}
+  .tab-btn{padding:8px 10px;font-size:.75rem}
+  .search-bar{gap:6px}
+  .search-inp,.search-sel,.search-date{min-width:100%;flex:none}
+  .export-btn,.bulk-toggle{width:calc(50% - 3px)}
+  .ord-head{padding:10px 12px;gap:6px}
+  .ord-num{font-size:.75rem}
+  .ord-total{font-size:.78rem}
+  .ord-date{display:none}
+  .bulk-bar{bottom:0;border-radius:14px 14px 0 0;width:100%;left:0;right:0;transform:translateY(300px);padding:12px 16px}
+  .bulk-bar.show{transform:translateY(0)}
+  .modal-box{padding:20px 14px;margin:8px}
+  .stats-bar{grid-template-columns:repeat(3,1fr);gap:6px;padding:0 10px;margin-top:12px}
+  .stat-val{font-size:1.1rem}
+  .analytics-grid{grid-template-columns:1fr}
+  .prod-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .settings-grid{grid-template-columns:1fr}
+  .usr-table th:nth-child(4),.usr-table td:nth-child(4),
+  .usr-table th:nth-child(5),.usr-table td:nth-child(5),
+  .usr-table th:nth-child(8),.usr-table td:nth-child(8){display:none}
+}
+@media(max-width:400px){
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .hdr-btn{font-size:.68rem;padding:5px 10px}
+}
+
+/* ── PRODUCT ACTIVE TOGGLE ── */
+.prod-card.inactive{opacity:.45;filter:grayscale(.5)}
+.prod-active-toggle{position:absolute;top:10px;left:10px;border:none;border-radius:20px;padding:3px 9px;
+  font-size:.62rem;font-weight:700;cursor:pointer;z-index:2;transition:all .18s}
+.prod-active-on{background:rgba(22,163,74,.18);color:#166534}
+.prod-active-off{background:rgba(239,68,68,.15);color:#991b1b}
+
 /* ── PRODUCT EDITOR ── */
 .prod-search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
@@ -422,6 +461,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
         <input class="search-date" id="ordDateFrom" type="date" title="Дата с" onchange="loadOrders(1)">
         <input class="search-date" id="ordDateTo"   type="date" title="Дата по" onchange="loadOrders(1)">
         <button class="export-btn" onclick="exportCSV()" title="Экспорт в CSV">&#128190; CSV</button>
+        <button class="bulk-toggle" id="bulkSelectAll" onclick="selectAllOrders()" style="display:none">&#9745; Все</button>
         <button class="bulk-toggle" id="bulkToggle" onclick="toggleBulkMode()">&#9776; Выбрать</button>
       </div>
       <div class="loading" id="ordLoading">Загрузка...</div>
@@ -528,7 +568,15 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
         <button class="form-btn" onclick="loadProducts()">Найти</button>
         <span id="prodTotal" style="font-size:.78rem;color:#9298A8"></span>
       </div>
-      <div class="loading" id="prodLoading" style="display:none">Загрузка...</div>
+<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center" id="prodBulkBar" style="display:none">
+        <label style="display:flex;align-items:center;gap:6px;font-size:.78rem;cursor:pointer">
+          <input type="checkbox" id="prodSelectAll" onchange="toggleSelectAllProds(this)"> Выбрать все
+        </label>
+        <button class="form-btn" style="background:rgba(22,163,74,.15);color:var(--green);font-size:.75rem;padding:6px 12px" onclick="bulkToggleProds(1)">✓ Включить выбранные</button>
+        <button class="form-btn" style="background:rgba(239,68,68,.12);color:var(--red);font-size:.75rem;padding:6px 12px" onclick="bulkToggleProds(0)">✗ Отключить выбранные</button>
+        <span id="prodSelCount" style="font-size:.75rem;color:#9298A8"></span>
+      </div>
+            <div class="loading" id="prodLoading" style="display:none">Загрузка...</div>
       <div class="prod-grid" id="prodGrid"></div>
     </div>
 
@@ -576,6 +624,31 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
         <button class="settings-save-btn" onclick="saveSettings()">&#10003; Сохранить настройки</button>
       </div>
     </div>
+      <div class="settings-section" style="margin-top:16px">
+        <h3>&#128274; Смена пароля</h3>
+        <div class="settings-desc">Смена пароля вашего аккаунта администратора</div>
+        <div class="settings-grid" style="max-width:400px">
+          <div class="settings-field" style="grid-column:1/-1">
+            <label>Новый пароль</label>
+            <input type="password" id="newPwd1" placeholder="Минимум 4 символа">
+          </div>
+          <div class="settings-field" style="grid-column:1/-1">
+            <label>Повторите пароль</label>
+            <input type="password" id="newPwd2" placeholder="Повторите пароль">
+          </div>
+        </div>
+        <button class="settings-save-btn" onclick="changeMyPassword()">&#10003; Сменить пароль</button>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;border:1px solid rgba(239,68,68,.25)">
+        <h3 style="color:var(--red)">&#9888; Опасная зона</h3>
+        <div class="settings-desc">Необратимые операции. Будьте внимательны.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          <button class="settings-save-btn" style="background:var(--red)" onclick="resetCounter('orders')">Сбросить счётчик заказов</button>
+          <button class="settings-save-btn" style="background:var(--red)" onclick="resetCounter('guest_orders')">Сбросить счётчик гостевых</button>
+          <button class="settings-save-btn" style="background:var(--red)" onclick="resetCounter('all')">Сбросить оба счётчика</button>
+        </div>
+      </div>
 
   </div>
 </div>
@@ -694,6 +767,10 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
         <input class="form-inp" id="euAddress" type="text" placeholder="г. Москва, ул. ..." style="width:100%"></div>
     </div>
     <div class="modal-btns" style="margin-top:16px">
+    <div style="border-top:1px solid var(--blo);padding-top:10px;margin-bottom:12px">
+      <label style="font-size:.68rem;font-weight:700;color:#9298A8;text-transform:uppercase;display:block;margin-bottom:4px">Новый пароль (оставьте пустым, если не меняете)</label>
+      <input class="form-inp" id="euNewPwd" type="password" placeholder="Минимум 4 символа" style="width:100%">
+    </div>
       <button class="modal-cancel" onclick="closeModal('editUserModal')">Отмена</button>
       <button class="modal-ok" onclick="saveEditUser()">Сохранить</button>
     </div>
@@ -899,7 +976,8 @@ function renderOrders(orders,total,page,listId,pagerId,loadFn,withExtras){
 
   orders.forEach(function(o){
     var card=document.createElement('div');
-    card.className='ord-card'+((_bulkSelected[o.id]&&_bulkMode)?' bulk-selected':'');
+    card.className='ord-card'+((_bulkSelected[o.id]&&_bulkMode)?' bulk-selected':'');
+    card.dataset.oid=oid;
     var shNum='SH-'+String(o.id||o.order_id||'?').padStart(5,'0');
     var tg=o.client_tg||o.client_telegram||'';
     var comment=o.comment||'';
@@ -950,6 +1028,10 @@ function renderOrders(orders,total,page,listId,pagerId,loadFn,withExtras){
 
     // feature 3: admin note
     if(withExtras){
+      bodyHtml+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'
+        +'<button class="act-btn" style="background:rgba(34,158,217,.1);color:#1a6fa0" onclick="sendOrder('+oid+',\'tg\')">&#128232; TG</button>'
+        +'<button class="act-btn" style="background:rgba(22,163,74,.1);color:var(--green)" onclick="sendOrder('+oid+',\'email\')">&#128140; Email</button>'
+        +'</div>';
       bodyHtml+='<span class="note-label">Заметка администратора</span>'
         +'<textarea class="note-area" id="note-'+oid+'">'+adminNote+'</textarea>'
         +'<button class="note-save-btn" onclick="saveNote('+oid+')">Сохранить заметку</button>';
@@ -1002,7 +1084,8 @@ function toggleBulkMode(){
   _bulkSelected={};
   var btn=document.getElementById('bulkToggle');
   var bar=document.getElementById('bulkBar');
-  btn.classList.toggle('active',_bulkMode);
+  btn.classList.toggle('active',_bulkMode);
+  var sab=document.getElementById('bulkSelectAll'); if(sab)sab.style.display=_bulkMode?'':'none';
   bar.classList.toggle('show',false);
   loadOrders(_ordPage);
 }
@@ -1404,14 +1487,17 @@ function loadProducts(search) {
       if(bv) badgeHtml = '<div class="prod-badge pb-'+bv+'">'+bl+'</div>';
       var descHtml = (ov.description) ? '<div class="prod-card-desc">'+ov.description+'</div>' : '';
       var skuAttr = p.sku.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      html += '<div class="prod-card" onclick="openProdEdit(\''+skuAttr+'\')">'+badgeHtml
-        +'<div class="prod-card-sku">'+p.sku+'</div>'
+      var isActive=(p._override&&p._override.active!==undefined)?p._override.active!==0:true;
+      html += '<div class="prod-card'+(isActive?'':' inactive')+'" data-sku="'+p.sku+'" onclick="openProdEdit(this.dataset.sku)">';
+      html += badgeHtml;
+      html += '<button class="prod-active-toggle '+(isActive?'prod-active-on':'prod-active-off')+'" data-sku="'+p.sku+'" data-active="'+(isActive?1:0)+'" onclick="event.stopPropagation();toggleProdActiveBtn(this)" title="'+(isActive?'Отключить':'Включить')+'">'+(isActive?'Вкл':'Откл')+'</button>';
+      html += '<label style="position:absolute;top:10px;right:10px;z-index:3;cursor:pointer" onclick="event.stopPropagation()"><input type="checkbox" data-sku="'+p.sku+'"'+(!!_prodSelected[p.sku]?' checked':'')+' onchange="toggleProdSelect(this.dataset.sku,this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--amber)"></label>';
+      html += '<div class="prod-card-sku">'+p.sku+'</div>'
         +'<div class="prod-card-name">'+p.model+'</div>'
         +'<div class="prod-card-brand">'+p.brand+'</div>'
         +'<div class="prod-card-price">'+parseInt(p.price||0).toLocaleString('ru-RU')+'&thinsp;₽</div>'
         +descHtml
         +'</div>';
-    });
     document.getElementById('prodGrid').innerHTML = html;
   }).catch(function(){
     document.getElementById('prodLoading').style.display = 'none';
@@ -1602,6 +1688,123 @@ function loadMonthReports(){
     el.innerHTML=html;
   }).catch(function(){});
 }
+
+// ── Change my password ───────────────────────────────────────────────────
+function changeMyPassword(){
+  var p1=document.getElementById('newPwd1').value;
+  var p2=document.getElementById('newPwd2').value;
+  if(!p1||p1.length<4){toast('Пароль минимум 4 символа',false);return;}
+  if(p1!==p2){toast('Пароли не совпадают',false);return;}
+  // Get current user id from profile
+  fetch(api('auth.php?action=profile'))
+  .then(function(r){return r.json();}).then(function(d){
+    if(!d.ok){toast('Ошибка профиля',false);return;}
+    fetch(api('admin.php?action=change_password'),{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:d.user.id,new_password:p1})})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){
+        document.getElementById('newPwd1').value='';
+        document.getElementById('newPwd2').value='';
+        toast('Пароль изменён');
+      }else toast(d.error||'Ошибка',false);
+    });
+  });
+}
+
+// ── Send order ────────────────────────────────────────────────────────────
+function sendOrder(orderId,channel){
+  fetch(api('admin.php?action=order_send'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({order_id:orderId,channel:channel})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok)toast(channel==='tg'?'Заказ отправлен в Telegram':'Заказ отправлен на email');
+    else toast(d.error||'Ошибка отправки',false);
+  });
+}
+
+// ── Select all orders ─────────────────────────────────────────────────────
+function selectAllOrders(){
+  document.querySelectorAll('.ord-checkbox').forEach(function(cb){
+    if(!cb.checked){cb.checked=true;
+      var oid=parseInt(cb.closest('.ord-card').dataset.oid||0);
+      if(oid)_bulkSelected[oid]=true;}
+  });
+  var cnt=Object.keys(_bulkSelected).length;
+  document.getElementById('bulkCnt').textContent='Выбрано: '+cnt;
+  document.getElementById('bulkBar').classList.toggle('show',cnt>0&&_bulkMode);
+}
+
+// ── Reset order counter ───────────────────────────────────────────────────
+function resetCounter(type){
+  var labels={'orders':'счётчик заказов','guest_orders':'счётчик гостевых','all':'оба счётчика'};
+  if(!confirm('Сбросить '+labels[type]+'?\nЭто НЕ удаляет существующие заказы, только сбрасывает нумерацию новых.\nДействие необратимо.'))return;
+  fetch(api('admin.php?action=reset_counter'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:type})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok)toast('Счётчик сброшен. Следующий заказ получит №1.');
+    else toast(d.error||'Ошибка',false);
+  });
+}
+
+// ── Product active toggle ─────────────────────────────────────────────────
+var _prodSelected={};
+
+function toggleProdActiveBtn(btn){
+  var sku=btn.dataset.sku;
+  var active=parseInt(btn.dataset.active)===1?0:1;
+  toggleProdActive(sku,active);
+}
+function toggleProdActive(sku,active){
+  fetch(api('admin.php?action=product_toggle_active'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sku:sku,active:active})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){toast(active?'Товар включён':'Товар отключён');loadProducts();}
+    else toast(d.error||'Ошибка',false);
+  });
+}
+
+function toggleSelectAllProds(cb){
+  _prodSelected={};
+  if(cb.checked){
+    document.querySelectorAll('.prod-card').forEach(function(c){
+      var sku=c.dataset.sku;
+      if(sku)_prodSelected[sku]=true;
+    });
+  }
+  updateProdSelCount();
+}
+
+function toggleProdSelect(sku,checked){
+  if(checked)_prodSelected[sku]=true;
+  else delete _prodSelected[sku];
+  updateProdSelCount();
+  var all=document.querySelectorAll('.prod-card');
+  var sel=Object.keys(_prodSelected).length;
+  var sa=document.getElementById('prodSelectAll');
+  if(sa)sa.indeterminate=(sel>0&&sel<all.length), sa.checked=(sel===all.length);
+}
+
+function updateProdSelCount(){
+  var cnt=Object.keys(_prodSelected).length;
+  var el=document.getElementById('prodSelCount');
+  if(el)el.textContent=cnt>0?'Выбрано: '+cnt:'';
+}
+
+function bulkToggleProds(active){
+  var skus=Object.keys(_prodSelected);
+  if(!skus.length){toast('Выберите товары',false);return;}
+  fetch(api('admin.php?action=product_bulk_toggle_active'),{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({skus:skus,active:active})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      _prodSelected={};
+      var sa=document.getElementById('prodSelectAll');
+      if(sa){sa.checked=false;sa.indeterminate=false;}
+      toast((active?'Включено ':'Отключено ')+d.updated+' товаров');
+      loadProducts();
+    }else toast(d.error||'Ошибка',false);
+  });
+}
+
 
 </script>
 </body>
