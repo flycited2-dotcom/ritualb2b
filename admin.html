@@ -1498,6 +1498,7 @@ function loadProducts(search) {
         +'<div class="prod-card-price">'+parseInt(p.price||0).toLocaleString('ru-RU')+'&thinsp;₽</div>'
         +descHtml
         +'</div>';
+    });
     document.getElementById('prodGrid').innerHTML = html;
   }).catch(function(){
     document.getElementById('prodLoading').style.display = 'none';
