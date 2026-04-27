@@ -760,6 +760,7 @@ function doLogin(){
     initApp();
   }).catch(function(){document.getElementById('lErr').textContent='Ошибка соединения';});
 }
+document.getElementById('lPhone').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 document.getElementById('lPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
 function doLogout(){
