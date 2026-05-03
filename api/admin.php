@@ -22,6 +22,27 @@ if ($action === 'products_overrides_public') {
     exit;
 }
 
+// Carousel get — public, no auth
+if ($action === 'carousel_get') {
+    $db = getDB();
+    try {
+        $row = $db->query("SELECT value FROM app_settings WHERE key = 'carousel_ids'")->fetch();
+        $ids = $row ? json_decode($row['value'], true) : null;
+    } catch (Throwable $e) { $ids = null; }
+    // Default: all products in carousel if not configured
+    if ($ids === null) {
+        $jsFile = __DIR__ . '/../products.js';
+        $ids = [];
+        if (file_exists($jsFile)) {
+            $js = file_get_contents($jsFile);
+            preg_match_all('/"id"\s*:\s*"([^"]+)"/', $js, $m);
+            $ids = $m[1] ?? [];
+        }
+    }
+    jsonResponse(['ok' => true, 'ids' => $ids]);
+    exit;
+}
+
 // CSV export — override Content-Type before auth check output
 if ($action === 'export_orders_csv') {
     adminRequire();
@@ -356,6 +377,19 @@ switch ($action) {
             } catch (Throwable $e) {}
         }
         jsonResponse(['ok' => true]);
+        break;
+
+    // ── Carousel save ──
+    case 'carousel_save':
+        $raw = json_decode(file_get_contents('php://input'), true);
+        $ids = array_values(array_filter((array)($raw['ids'] ?? []), 'is_string'));
+        $val = json_encode($ids);
+        try {
+            $db->prepare("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('carousel_ids', ?)")->execute([$val]);
+        } catch (Throwable $e) {
+            jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
+        jsonResponse(['ok' => true, 'saved' => count($ids)]);
         break;
 
     // ── List products + overrides ──

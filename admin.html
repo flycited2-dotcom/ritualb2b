@@ -395,6 +395,12 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
   padding:9px 12px;font-size:.82rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px}
 .custom-label-inp:focus{border-color:var(--amber)}
 .prod-count-badge{background:var(--amber);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:700;margin-left:6px}
+.carousel-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.7);border:1px solid var(--blo);border-radius:10px;padding:10px 14px;}
+.carousel-row:hover{border-color:var(--amber);}
+.carousel-row img{width:64px;height:48px;object-fit:contain;border-radius:6px;background:#f5f2ee;flex-shrink:0;}
+.carousel-row-info{flex:1;min-width:0;}
+.carousel-row-name{font-size:.82rem;font-weight:700;color:var(--text);}
+.carousel-row-sub{font-size:.7rem;color:#9298A8;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -442,6 +448,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
     <button class="tab-btn" onclick="switchTab('analytics')">&#128202; Аналитика</button>
     <button class="tab-btn" onclick="switchTab('catalog')">&#128230; Каталог</button>
     <button class="tab-btn" onclick="switchTab('products')">&#9998; Товары</button>
+    <button class="tab-btn" onclick="switchTab('carousel')">&#127914; Карусель</button>
     <button class="tab-btn" onclick="switchTab('settings')">&#9881; Настройки</button>
   </div>
 
@@ -597,6 +604,17 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
       </div>
             <div class="loading" id="prodLoading" style="display:none">Загрузка...</div>
       <div class="prod-grid" id="prodGrid"></div>
+    </div>
+
+    <!-- CAROUSEL -->
+    <div class="tab-pane" id="pane-carousel">
+      <div class="catalog-section">
+        <h3>&#127914; Управление каруселью</h3>
+        <p style="font-size:.8rem;color:#9298A8;margin-bottom:16px">Включите товары, которые будут показываться в карусели на главной странице. Порядок — как в списке ниже.</p>
+        <div id="carouselGrid" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+        <button class="form-btn" onclick="saveCarousel()" style="padding:12px 28px;font-size:.88rem">&#10003; Сохранить карусель</button>
+        <span id="carouselSaveMsg" style="font-size:.8rem;color:#16a34a;margin-left:12px;display:none">Сохранено!</span>
+      </div>
     </div>
 
     <!-- SETTINGS -->
@@ -820,7 +838,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 var _ordPage=1, _gstPage=1, _ordSearchTimer=null;
 var _bonusUserId=0;
 var _charts={};
-var _tabNames=['orders','guests','users','promo','analytics','catalog','products','settings'];
+var _tabNames=['orders','guests','users','promo','analytics','catalog','products','carousel','settings'];
 var _loaded={orders:false,guests:false,users:false,promo:false,analytics:false,catalog:false,products:false,settings:false};
 var _pollInterval=null, _lastNewCount=-1;
 var _bulkMode=false, _bulkSelected={};
@@ -965,7 +983,82 @@ function switchTab(name){
     if(name==='catalog')checkCatalogStatus();
     if(name==='products')loadProducts();
     if(name==='settings')loadSettings();
+    if(name==='carousel')loadCarouselAdmin();
   }
+}
+
+// ── Carousel admin ────────────────────────────────────────────────────────────
+var _carouselIds = [];
+
+function loadCarouselAdmin() {
+  var grid = document.getElementById('carouselGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="color:#9298A8;font-size:.8rem">Загрузка...</div>';
+
+  // Load products + current carousel ids in parallel
+  Promise.all([
+    fetch('api/admin.php?action=products_list').then(function(r){ return r.json(); }),
+    fetch('api/admin.php?action=carousel_get').then(function(r){ return r.json(); })
+  ]).then(function(results) {
+    var products = (results[0].products || []);
+    _carouselIds = results[1].ids || [];
+
+    if (!products.length) { grid.innerHTML = '<div style="color:#9298A8">Нет товаров</div>'; return; }
+
+    grid.innerHTML = '';
+    products.forEach(function(p) {
+      var isOn = _carouselIds.indexOf(p.id) !== -1;
+      var imgSrc = p.photo ? 'assets/img/products/' + p.photo : '';
+      var imgTag = imgSrc
+        ? '<img src="' + imgSrc + '" alt="" onerror="this.style.display=\'none\'">'
+        : '<div style="width:64px;height:48px;background:#f5f2ee;border-radius:6px;flex-shrink:0"></div>';
+
+      var row = document.createElement('div');
+      row.className = 'carousel-row';
+      row.dataset.id = p.id;
+      row.innerHTML =
+        imgTag +
+        '<div class="carousel-row-info">' +
+          '<div class="carousel-row-name">' + (p.model || p.id) + '</div>' +
+          '<div class="carousel-row-sub">' + (p.group === 'venki' ? 'Венки' : 'Корзинки') + ' · Размер ' + (p.size || '—') + ' · ' + (p.price || 0).toLocaleString('ru-RU') + ' ₽</div>' +
+        '</div>' +
+        '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;">' +
+          '<input type="checkbox" class="carousel-toggle" data-id="' + p.id + '"' + (isOn ? ' checked' : '') + ' style="width:18px;height:18px;cursor:pointer;">' +
+          '<span style="font-size:.78rem;font-weight:600;color:var(--amber-d)">' + (isOn ? 'В карусели' : 'Выкл') + '</span>' +
+        '</label>';
+
+      row.querySelector('input').addEventListener('change', function() {
+        this.nextElementSibling.textContent = this.checked ? 'В карусели' : 'Выкл';
+      });
+
+      grid.appendChild(row);
+    });
+  }).catch(function(e) {
+    grid.innerHTML = '<div style="color:#ef4444">Ошибка загрузки: ' + e.message + '</div>';
+  });
+}
+
+function saveCarousel() {
+  var ids = [];
+  document.querySelectorAll('.carousel-toggle:checked').forEach(function(cb) {
+    ids.push(cb.dataset.id);
+  });
+  fetch('api/admin.php?action=carousel_save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: ids })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    var msg = document.getElementById('carouselSaveMsg');
+    if (d.ok) {
+      msg.textContent = '✓ Сохранено (' + ids.length + ' товаров)';
+      msg.style.color = '#16a34a';
+    } else {
+      msg.textContent = 'Ошибка: ' + (d.error || '?');
+      msg.style.color = '#ef4444';
+    }
+    msg.style.display = 'inline';
+    setTimeout(function() { msg.style.display = 'none'; }, 3000);
+  });
 }
 
 // ── Orders (features 2,3,4,5,6) ──────────────────────────────────────────────

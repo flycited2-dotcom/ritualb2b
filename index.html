@@ -936,27 +936,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 </section>
 
 <!-- CAROUSEL -->
-<section class="carousel-section">
+<section class="carousel-section" id="carousel-section" style="display:none">
   <div class="carousel-inner">
-    <div class="carousel-track">
-      <div class="carousel-item carousel-link" onclick="openDetail('2001')" title="Венок «Элегия» S"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="Венок «Элегия» S" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2002')" title="Венок «Элегия» M"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="Венок «Элегия» M" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2003')" title="Венок «Элегия» L"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="Венок «Элегия» L" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2004')" title="Венок «Тихий сад» M"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="Венок «Тихий сад» M" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2006')" title="Корзинка «Весенняя» S"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="Корзинка «Весенняя» S" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2007')" title="Корзинка «Весенняя» M"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="Корзинка «Весенняя» M" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2008')" title="Корзинка «Весенняя» L"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="Корзинка «Весенняя» L" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2005')" title="Венок «Тихий сад» L"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="Венок «Тихий сад» L" loading="lazy"></div>
-      <!-- Дубль для бесшовного зацикливания -->
-      <div class="carousel-item carousel-link" onclick="openDetail('2001')" title="Венок «Элегия» S"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2002')" title="Венок «Элегия» M"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2003')" title="Венок «Элегия» L"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2004')" title="Венок «Тихий сад» M"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2006')" title="Корзинка «Весенняя» S"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2007')" title="Корзинка «Весенняя» M"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2008')" title="Корзинка «Весенняя» L"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item carousel-link" onclick="openDetail('2005')" title="Венок «Тихий сад» L"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
-    </div>
+    <div class="carousel-track" id="carousel-track"></div>
   </div>
 </section>
 
@@ -1996,6 +1978,38 @@ function renderDashTab(tab) {
 document.addEventListener('keydown', function(e) {
   if(e.key === 'Escape') { closeD(); closeDetail(); closeAuth(); closeDash(); }
 });
+
+// ── Carousel dynamic load ──────────────────────────────
+function buildCarousel(ids) {
+  var track = document.getElementById('carousel-track');
+  var section = document.getElementById('carousel-section');
+  if (!track || !ids.length) return;
+
+  var items = ids.map(function(id) {
+    var p = PRODUCTS.find(function(x){ return x.id === id; });
+    if (!p || !p.photo) return null;
+    return { id: id, photo: p.photo, model: p.model };
+  }).filter(Boolean);
+
+  if (!items.length) return;
+
+  // Build HTML: items + duplicate for seamless loop
+  var html = '';
+  [items, items].forEach(function(set) {
+    set.forEach(function(item) {
+      html += '<div class="carousel-item carousel-link" onclick="openDetail(\'' + item.id + '\')" title="' + item.model + '">'
+        + '<img src="assets/img/products/' + item.photo + '" alt="' + item.model + '" loading="lazy">'
+        + '</div>';
+    });
+  });
+  track.innerHTML = html;
+  section.style.display = '';
+}
+
+fetch('api/admin.php?action=carousel_get')
+  .then(function(r){ return r.json(); })
+  .then(function(d){ if(d.ok && d.ids) buildCarousel(d.ids); })
+  .catch(function(){ buildCarousel(PRODUCTS.map(function(p){ return p.id; })); });
 
 // ── Init ──────────────────────────────────────────────
 renderAll();
