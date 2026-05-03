@@ -84,16 +84,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 #hero{position:relative;z-index:1;height:100vh;min-height:500px;overflow:hidden;background:#1c1a18;}
 .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;}
 .hero-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.38);z-index:1;}
-.hero-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.hero-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;padding:20px 24px;}
 .hero-eyebrow{font-size:0.6rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:14px;}
 .hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,7vw,4rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:8px;}
-.hero-cursive{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.6rem);color:rgba(255,255,255,0.82);margin-bottom:28px;}
-.hero-icons{display:flex;gap:28px;margin-bottom:36px;justify-content:center;}
-.hero-icon-item{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.hero-icon-emoji{font-size:1.4rem;}
-.hero-icon-label{font-size:0.55rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);}
-.hero-cta{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;border-radius:999px;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;text-decoration:none;transition:all 0.22s;box-shadow:0 4px 20px rgba(109,138,109,0.5);}
-.hero-cta:hover{background:var(--amber-d);transform:translateY(-2px);}
+.hero-cursive{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.6rem);color:rgba(255,255,255,0.82);margin-bottom:32px;}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;border-radius:999px;background:rgba(255,255,255,0.18);color:#fff;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:700;text-decoration:none;transition:all 0.25s;border:2px solid rgba(255,255,255,0.55);backdrop-filter:blur(8px);letter-spacing:0.02em;}
+.hero-cta:hover{background:rgba(255,255,255,0.28);transform:translateY(-2px);border-color:rgba(255,255,255,0.8);}
+@media(min-width:640px){.hero-content{padding:60px 8%;max-width:55%;}}
 
 /* CAROUSEL */
 .carousel-section{overflow:hidden;background:#edeae4;padding:0;line-height:0;}
@@ -105,20 +102,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .carousel-item img{width:100%;height:100%;object-fit:cover;display:block;}
 @media(max-width:639px){.carousel-item{height:28vh;min-height:140px;}}
 
-/* CATALOG FILTER ROW */
-.quick-row{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0 4px;overflow:hidden;}
-.qbtn-full{width:100%;}
-.qbtn-filter{flex:1;min-width:calc(50% - 4px);max-width:calc(50% - 4px);}
+/* CATALOG FILTER PANEL */
+.cat-filter-panel{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg);padding:16px 16px 0;}
+.cat-col{display:flex;flex-direction:column;gap:3px;}
+.cat-hbtn{width:100%;padding:16px 12px;border:none;background:var(--amber);color:#fff;font-family:'Unbounded',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
+.cat-hbtn:hover,.cat-hbtn.active{background:var(--amber-d);}
+.size-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
+.size-btn{padding:10px 4px;border:none;background:#fff;color:var(--text2);font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;cursor:pointer;transition:background 0.18s,color 0.18s;border-radius:0 0 8px 8px;}
+.size-btn:hover{background:#f0ede8;color:var(--text);}
+.size-btn.active{background:var(--amber);color:#fff;}
+/* legacy qbtn used in drawer/other places */
 .qbtn{display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.84rem;font-weight:700;color:var(--text);text-decoration:none;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid var(--blo);box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.18s;}
 .qbtn:active{transform:scale(0.97);}
-.qbtn-cat{background:var(--amber);color:#fff;border-color:transparent;box-shadow:0 4px 18px rgba(245,158,11,0.45);}
-.qbtn-cat:hover{background:var(--amber-d);}
-.qbtn-filter{font-size:0.8rem;}
-.qbtn-filter.active{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber-d);font-weight:700;}
-.qbtn-filter:hover{transform:translateY(-1px);border-color:rgba(245,158,11,0.40);box-shadow:0 6px 22px rgba(0,0,0,0.10),0 0 0 1px rgba(245,158,11,0.12);}
-.qbtn-reset{background:var(--amber)!important;color:#fff!important;border-color:transparent!important;font-weight:700;box-shadow:0 4px 16px rgba(245,158,11,0.4);}
-.qbtn-reset:hover{background:var(--amber-d)!important;transform:translateY(-1px);box-shadow:0 6px 22px rgba(245,158,11,0.55)!important;}
-.qbtn-reset:active{background:var(--amber-d)!important;}
 /* Мягкий зелёный glassmorphism для кнопок Венки */
 .qbtn-venki{background:rgba(180,210,175,0.55)!important;border-color:rgba(100,160,100,0.38)!important;color:#2D5A2D!important;box-shadow:0 4px 16px rgba(100,160,100,0.18),inset 0 1px 0 rgba(255,255,255,0.40)!important;backdrop-filter:blur(16px) saturate(1.4)!important;-webkit-backdrop-filter:blur(16px) saturate(1.4)!important;}
 .qbtn-venki:hover{background:rgba(180,210,175,0.80)!important;border-color:rgba(100,160,100,0.58)!important;transform:translateY(-1px);box-shadow:0 6px 22px rgba(100,160,100,0.30)!important;}
@@ -507,19 +502,17 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   #hero { padding-top: 0 !important; }
 
   /* Каталог */
-  .pgrid { grid-template-columns: repeat(4,1fr); gap: 12px; }
-  .hero-head, .quick-row, .cat-tiles, .hero-phones { max-width: 960px; margin-left: auto; margin-right: auto; }
-  .hero-phones { padding: 10px 32px 16px; gap: 12px; justify-content: center; }
-  .hero-head { padding: 22px 32px 14px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
-  .hero-head-text { flex:1; }
-  .btn-price-dl--desktop { display:inline-flex; flex-shrink:0; }
-  .btn-price-dl--mobile  { display:none; }
-  .quick-row { padding: 12px 32px 0; }
-  .cat-tiles  { padding: 0 32px; gap: 12px; }
-  section#catalog, section#contacts, section#faq {
+  .pgrid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .cat-filter-panel { padding: 24px 24px 0; gap: 4px; }
+  .cat-col { gap: 4px; }
+  .size-row { gap: 4px; }
+  .cat-hbtn { padding: 20px 16px; font-size: 0.78rem; }
+  .size-btn { padding: 12px 4px; font-size: 0.68rem; }
+  section#contacts, section#faq {
     max-width: 960px; margin-left: auto; margin-right: auto;
     padding-left: 32px; padding-right: 32px;
   }
+  #catalog { padding: 0 24px 100px; }
   .di-qbtn { width: 48px; height: 48px; }
 
   /* FAB скрыт — Заявка в навбаре */
@@ -935,12 +928,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     <p class="hero-eyebrow">Авторское производство · Симферополь · Оптовый прайс для B2B</p>
     <h1 class="hero-h1">Авторская<br>мастерская</h1>
     <p class="hero-cursive">с заботой и уважением</p>
-    <div class="hero-icons">
-      <div class="hero-icon-item"><span class="hero-icon-emoji">🌿</span><span class="hero-icon-label">Венки</span></div>
-      <div class="hero-icon-item"><span class="hero-icon-emoji">🧺</span><span class="hero-icon-label">Корзинки</span></div>
-      <div class="hero-icon-item"><span class="hero-icon-emoji">✿</span><span class="hero-icon-label">Цветы оптом</span></div>
-    </div>
-    <a href="#catalog" class="hero-cta">Смотреть каталог</a>
+    <a href="#catalog" class="hero-cta">Смотреть каталог &#8594;</a>
   </div>
 </section>
 
@@ -948,51 +936,49 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <section class="carousel-section">
   <div class="carousel-inner">
     <div class="carousel-track">
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-09-04_001.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-10-53_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-52-18_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
       <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-23-24_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-36-09_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-37-36_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-02_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
       <!-- Дубль для бесшовного зацикливания -->
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-09-04_001.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-10-53_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-52-18_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
       <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-23-24_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-36-09_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-37-36_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-02_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
     </div>
   </div>
 </section>
 
 <!-- CATALOG -->
 <section id="catalog" style="position:relative;z-index:1;padding:0 16px 100px;">
-  <div style="max-width:960px;margin:0 auto;">
-    <div class="quick-row">
-      <a class="g qbtn qbtn-cat" href="#catalog" onclick="goFilter(null)">&#128203; Весь каталог</a>
-      <button class="g qbtn qbtn-filter qbtn-venki" data-filter="venki" onclick="goFilter('venki')">&#127807; Венки</button>
-      <button class="g qbtn qbtn-filter" data-filter="korzinki" onclick="goFilter('korzinki')">&#129531; Корзинки</button>
-      <button class="g qbtn qbtn-filter" data-filter="size-s" onclick="goFilter('size-s')">Размер S</button>
-      <button class="g qbtn qbtn-filter" data-filter="size-m" onclick="goFilter('size-m')">Размер M</button>
-      <button class="g qbtn qbtn-filter" data-filter="size-l" onclick="goFilter('size-l')">Размер L</button>
-      <button class="g qbtn qbtn-reset" id="btn-reset" style="display:none" onclick="goFilter(null)">&#10005; Сбросить фильтр</button>
-      <button class="g qbtn btn-price-dl" onclick="openPricelistModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Прайс
-      </button>
+  <!-- Фильтры: 2 категории × 3 размера -->
+  <div class="cat-filter-panel">
+    <div class="cat-col">
+      <button class="cat-hbtn" id="catbtn-korzinki" data-group="korzinki" onclick="setCatFilter('korzinki',null)">🧺 Авторские корзинки</button>
+      <div class="size-row">
+        <button class="size-btn" id="sizebtn-korzinki-s" data-group="korzinki" data-size="s" onclick="setCatFilter('korzinki','s')">S</button>
+        <button class="size-btn" id="sizebtn-korzinki-m" data-group="korzinki" data-size="m" onclick="setCatFilter('korzinki','m')">M</button>
+        <button class="size-btn" id="sizebtn-korzinki-l" data-group="korzinki" data-size="l" onclick="setCatFilter('korzinki','l')">L</button>
+      </div>
     </div>
-    <div id="filter-bar" style="display:none;padding:6px 0 0;">
-      <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.76rem;font-weight:600;color:var(--amber);background:#fff;border-radius:var(--r);border:1px solid var(--blo);">
-        <span id="filter-label"></span>
-        <button onclick="goFilter(null)" style="background:none;border:none;color:var(--amber-d);font-size:.73rem;cursor:pointer;font-weight:600;text-decoration:underline;">&#10005; Сбросить</button>
+    <div class="cat-col">
+      <button class="cat-hbtn" id="catbtn-venki" data-group="venki" onclick="setCatFilter('venki',null)">🌿 Авторские ритуальные венки</button>
+      <div class="size-row">
+        <button class="size-btn" id="sizebtn-venki-s" data-group="venki" data-size="s" onclick="setCatFilter('venki','s')">S</button>
+        <button class="size-btn" id="sizebtn-venki-m" data-group="venki" data-size="m" onclick="setCatFilter('venki','m')">M</button>
+        <button class="size-btn" id="sizebtn-venki-l" data-group="venki" data-size="l" onclick="setCatFilter('venki','l')">L</button>
       </div>
     </div>
   </div>
-  <div id="catalog-content" style="max-width:960px;margin:0 auto;"></div>
+  <div id="catalog-content" style="margin-top:16px;"></div>
 </section>
 
 <!-- CONTACTS -->
@@ -1251,7 +1237,11 @@ function cardHtml(p, delay) {
 // ── Render All ────────────────────────────────────────
 function renderAll() {
   var content = document.getElementById('catalog-content');
-  var list = currentFilter ? PRODUCTS.filter(FILTER_MAP[currentFilter].test) : PRODUCTS;
+  var list = PRODUCTS.filter(function(p){
+    if(catGroup && p.group !== catGroup) return false;
+    if(catSize && (p.size||'').toLowerCase() !== catSize) return false;
+    return true;
+  });
   if(!list.length) {
     content.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--text3)">Нет товаров в этой категории</div>';
     return;
@@ -1280,7 +1270,7 @@ function renderAll() {
   order.forEach(function(gid) {
     var brands = tree[gid]; if(!brands || !Object.keys(brands).length) return;
     html += '<div id="'+gid+'">';
-    if(!currentFilter) {
+    if(!catGroup) {
       html += '<div class="section-divider"><span>'+(GROUP_LABELS[gid]||gid.toUpperCase())+'</span><div class="sdl"></div></div>';
     }
     var allItems = [];
@@ -1298,23 +1288,37 @@ function renderAll() {
   observe();
 }
 
-function goFilter(fkey) {
-  currentFilter = fkey || null;
-  document.querySelectorAll('.qbtn-filter').forEach(function(b){ b.classList.remove('active'); });
-  var bar = document.getElementById('filter-bar');
-  var reset = document.getElementById('btn-reset');
-  if(fkey && FILTER_MAP[fkey]) {
-    var mb = document.querySelector('.qbtn-filter[data-filter="'+fkey+'"]');
-    if(mb) mb.classList.add('active');
-    bar.style.display = '';
-    document.getElementById('filter-label').textContent = 'Фильтр: '+FILTER_MAP[fkey].label;
-    if(reset) reset.style.display = '';
+var catGroup = null, catSize = null;
+
+function setCatFilter(group, size) {
+  if(catGroup === group && catSize === size) {
+    catGroup = null; catSize = null;
   } else {
-    bar.style.display = 'none';
-    if(reset) reset.style.display = 'none';
+    catGroup = group; catSize = size;
   }
+  updateCatUI();
   renderAll();
-  setTimeout(function(){ document.getElementById('catalog').scrollIntoView({behavior:'smooth'}); }, 50);
+}
+
+function updateCatUI() {
+  ['venki','korzinki'].forEach(function(g){
+    var hbtn = document.getElementById('catbtn-'+g);
+    if(hbtn) hbtn.classList.toggle('active', catGroup === g);
+    ['s','m','l'].forEach(function(sz){
+      var sbtn = document.getElementById('sizebtn-'+g+'-'+sz);
+      if(sbtn) sbtn.classList.toggle('active', catGroup === g && catSize === sz);
+    });
+  });
+}
+
+function goFilter(fkey) {
+  if(!fkey) { catGroup = null; catSize = null; }
+  else if(fkey === 'venki' || fkey === 'korzinki') { catGroup = fkey; catSize = null; }
+  else if(fkey === 'size-s') catSize = 's';
+  else if(fkey === 'size-m') catSize = 'm';
+  else if(fkey === 'size-l') catSize = 'l';
+  updateCatUI();
+  renderAll();
 }
 
 function observe() {
