@@ -100,18 +100,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 @keyframes carousel-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .carousel-item{flex-shrink:0;height:38vh;min-height:180px;max-height:340px;overflow:hidden;border-radius:8px;}
 .carousel-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.carousel-link{cursor:pointer;transition:opacity 0.2s,transform 0.2s;}
+.carousel-link:hover{opacity:0.88;transform:scale(1.02);}
 @media(max-width:639px){.carousel-item{height:28vh;min-height:140px;}}
 
 /* CATALOG FILTER PANEL */
 .cat-filter-panel{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg);padding:16px 16px 0;}
 .cat-col{display:flex;flex-direction:column;gap:3px;}
-.cat-hbtn{width:100%;padding:18px 16px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
+.cat-hbtn{width:100%;padding:20px 16px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
 .cat-hbtn:hover{background:var(--amber-d);}
 .cat-hbtn.active{background:var(--amber-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,0.15);}
 .size-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
-.size-btn{padding:11px 4px;border:none;background:#f5f2ee;color:var(--text2);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:background 0.18s,color 0.18s;border-radius:0 0 8px 8px;}
-.size-btn:hover{background:#e8e4de;color:var(--text);}
-.size-btn.active{background:var(--amber);color:#fff;}
+.size-btn{padding:12px 4px;border:none;border-top:2px solid rgba(0,0,0,0.08);background:#f0ece6;color:var(--text2);font-family:'Inter',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s;border-radius:0 0 8px 8px;line-height:1.3;}
+.size-btn:hover{background:#e4dfd8;color:var(--text);border-top-color:var(--amber);}
+.size-btn.active{background:var(--amber);color:#fff;border-top-color:transparent;}
 /* legacy qbtn used in drawer/other places */
 .qbtn{display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.84rem;font-weight:700;color:var(--text);text-decoration:none;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid var(--blo);box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.18s;}
 .qbtn:active{transform:scale(0.97);}
@@ -937,23 +939,23 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <section class="carousel-section">
   <div class="carousel-inner">
     <div class="carousel-track">
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2001')" title="Венок «Элегия» S"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="Венок «Элегия» S" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2002')" title="Венок «Элегия» M"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="Венок «Элегия» M" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2003')" title="Венок «Элегия» L"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="Венок «Элегия» L" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2004')" title="Венок «Тихий сад» M"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="Венок «Тихий сад» M" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2006')" title="Корзинка «Весенняя» S"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="Корзинка «Весенняя» S" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2007')" title="Корзинка «Весенняя» M"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="Корзинка «Весенняя» M" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2008')" title="Корзинка «Весенняя» L"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="Корзинка «Весенняя» L" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2005')" title="Венок «Тихий сад» L"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="Венок «Тихий сад» L" loading="lazy"></div>
       <!-- Дубль для бесшовного зацикливания -->
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
-      <div class="carousel-item"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2001')" title="Венок «Элегия» S"><img src="assets/img/products/venok_2026-05-03_011616.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2002')" title="Венок «Элегия» M"><img src="assets/img/products/venok_2026-05-03_015130.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2003')" title="Венок «Элегия» L"><img src="assets/img/products/venok_2026-05-03_120208.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2004')" title="Венок «Тихий сад» M"><img src="assets/img/products/venok_2026-05-03_142305.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2006')" title="Корзинка «Весенняя» S"><img src="assets/img/products/korzinka_2026-05-01_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2007')" title="Корзинка «Весенняя» M"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2008')" title="Корзинка «Весенняя» L"><img src="assets/img/products/ritual_2026-04-28_13-21-25_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item carousel-link" onclick="openDetail('2005')" title="Венок «Тихий сад» L"><img src="assets/img/products/venok_2026-05-02_195339.png" alt="" loading="lazy"></div>
     </div>
   </div>
 </section>
@@ -965,17 +967,17 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     <div class="cat-col">
       <button class="cat-hbtn" id="catbtn-korzinki" data-group="korzinki" onclick="setCatFilter('korzinki',null)">Авторские корзинки</button>
       <div class="size-row">
-        <button class="size-btn" id="sizebtn-korzinki-s" data-group="korzinki" data-size="s" onclick="setCatFilter('korzinki','s')">S</button>
-        <button class="size-btn" id="sizebtn-korzinki-m" data-group="korzinki" data-size="m" onclick="setCatFilter('korzinki','m')">M</button>
-        <button class="size-btn" id="sizebtn-korzinki-l" data-group="korzinki" data-size="l" onclick="setCatFilter('korzinki','l')">L</button>
+        <button class="size-btn" id="sizebtn-korzinki-s" data-group="korzinki" data-size="s" onclick="setCatFilter('korzinki','s')">Размер: S</button>
+        <button class="size-btn" id="sizebtn-korzinki-m" data-group="korzinki" data-size="m" onclick="setCatFilter('korzinki','m')">Размер: M</button>
+        <button class="size-btn" id="sizebtn-korzinki-l" data-group="korzinki" data-size="l" onclick="setCatFilter('korzinki','l')">Размер: L</button>
       </div>
     </div>
     <div class="cat-col">
       <button class="cat-hbtn" id="catbtn-venki" data-group="venki" onclick="setCatFilter('venki',null)">Авторские ритуальные венки</button>
       <div class="size-row">
-        <button class="size-btn" id="sizebtn-venki-s" data-group="venki" data-size="s" onclick="setCatFilter('venki','s')">S</button>
-        <button class="size-btn" id="sizebtn-venki-m" data-group="venki" data-size="m" onclick="setCatFilter('venki','m')">M</button>
-        <button class="size-btn" id="sizebtn-venki-l" data-group="venki" data-size="l" onclick="setCatFilter('venki','l')">L</button>
+        <button class="size-btn" id="sizebtn-venki-s" data-group="venki" data-size="s" onclick="setCatFilter('venki','s')">Размер: S</button>
+        <button class="size-btn" id="sizebtn-venki-m" data-group="venki" data-size="m" onclick="setCatFilter('venki','m')">Размер: M</button>
+        <button class="size-btn" id="sizebtn-venki-l" data-group="venki" data-size="l" onclick="setCatFilter('venki','l')">Размер: L</button>
       </div>
     </div>
   </div>
