@@ -14,7 +14,7 @@
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F3F1EE;--text:#1C1A18;--text2:#5C5850;--text3:#9A9590;
@@ -27,17 +27,8 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
-body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 900px 700px at 10% 10%,rgba(180,200,175,0.35) 0%,transparent 60%),
-  radial-gradient(ellipse 700px 500px at 90% 5%,rgba(220,215,205,0.30) 0%,transparent 55%),
-  radial-gradient(ellipse 800px 600px at 50% 110%,rgba(195,205,190,0.30) 0%,transparent 60%);}
-.g{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-  border:1px solid var(--blo);border-radius:var(--r);
-  box-shadow:0 6px 28px rgba(0,0,0,0.08),var(--depth);position:relative;overflow:hidden;}
-.g::before{content:'';pointer-events:none;position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.98) 40%,rgba(255,255,255,0.98) 60%,transparent 95%);z-index:2;}
-.g::after{content:'';pointer-events:none;position:absolute;top:0;left:0;right:0;height:42%;
-  background:linear-gradient(180deg,rgba(255,255,255,0.15) 0%,transparent 100%);border-radius:var(--r) var(--r) 0 0;z-index:2;}
+.g{background:#fff;border:1px solid var(--blo);border-radius:var(--r);
+  box-shadow:0 2px 12px rgba(0,0,0,0.07);position:relative;overflow:hidden;}
 
 /* NAV */
 
@@ -89,17 +80,36 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .hero-phones .nav-ph.call{color:var(--text);background:rgba(255,255,255,0.8);border:1px solid var(--blo);}
 .hero-phones .nav-ph.tg{color:var(--tg);background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.2);}
 
-/* HERO */
-#hero{position:relative;z-index:1;padding-top:92px;}
-.hero-head{padding:18px 16px 14px;}
-.hero-eyebrow{font-size:0.63rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;}
-.hero-h1{font-family:'Unbounded',sans-serif;font-size:1.9rem;font-weight:700;letter-spacing:-0.04em;line-height:1;}
-.hero-h1 em{font-style:normal;color:var(--amber);}
-.hero-sub{font-size:0.75rem;color:var(--text2);margin-top:6px;line-height:1.5;}
-.quick-row{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 0;overflow:hidden;}
+/* HERO — full screen */
+#hero{position:relative;z-index:1;height:100vh;min-height:500px;overflow:hidden;background:#1c1a18;}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;}
+.hero-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.38);z-index:1;}
+.hero-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.hero-eyebrow{font-size:0.6rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:14px;}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,7vw,4rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:8px;}
+.hero-cursive{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.6rem);color:rgba(255,255,255,0.82);margin-bottom:28px;}
+.hero-icons{display:flex;gap:28px;margin-bottom:36px;justify-content:center;}
+.hero-icon-item{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.hero-icon-emoji{font-size:1.4rem;}
+.hero-icon-label{font-size:0.55rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;border-radius:999px;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;text-decoration:none;transition:all 0.22s;box-shadow:0 4px 20px rgba(109,138,109,0.5);}
+.hero-cta:hover{background:var(--amber-d);transform:translateY(-2px);}
+
+/* CAROUSEL */
+.carousel-section{overflow:hidden;background:#edeae4;padding:0;line-height:0;}
+.carousel-inner{overflow:hidden;}
+.carousel-track{display:flex;gap:10px;animation:carousel-scroll 32s linear infinite;width:max-content;padding:10px;}
+.carousel-track:hover{animation-play-state:paused;}
+@keyframes carousel-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.carousel-item{flex-shrink:0;height:38vh;min-height:180px;max-height:340px;overflow:hidden;border-radius:8px;}
+.carousel-item img{width:100%;height:100%;object-fit:cover;display:block;}
+@media(max-width:639px){.carousel-item{height:28vh;min-height:140px;}}
+
+/* CATALOG FILTER ROW */
+.quick-row{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0 4px;overflow:hidden;}
 .qbtn-full{width:100%;}
 .qbtn-filter{flex:1;min-width:calc(50% - 4px);max-width:calc(50% - 4px);}
-.qbtn{display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.84rem;font-weight:700;color:var(--text);text-decoration:none;padding:13px 14px;border-radius:13px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--blo);box-shadow:0 4px 16px rgba(0,0,0,0.07),var(--depth);transition:all 0.22s cubic-bezier(0.34,1.4,0.64,1);}
+.qbtn{display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.84rem;font-weight:700;color:var(--text);text-decoration:none;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid var(--blo);box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.18s;}
 .qbtn:active{transform:scale(0.97);}
 .qbtn-cat{background:var(--amber);color:#fff;border-color:transparent;box-shadow:0 4px 18px rgba(245,158,11,0.45);}
 .qbtn-cat:hover{background:var(--amber-d);}
@@ -125,7 +135,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 
 /* CATALOG */
 #catalog{position:relative;z-index:1;padding:0 16px 100px;}
-.section-divider{font-family:'Unbounded',sans-serif;font-size:0.62rem;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;padding:16px 0 10px;display:flex;align-items:center;gap:10px;}
+.section-divider{font-family:'Unbounded',sans-serif;font-size:0.62rem;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;padding:16px 0 10px;display:flex;align-items:center;gap:10px;position:sticky;top:56px;background:var(--bg);z-index:10;}
 .sdl{flex:1;height:1px;background:var(--blo);}
 .brand-block{margin-bottom:1.6rem;}
 .brand-head{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
@@ -151,120 +161,51 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .pcard{
   display:flex;flex-direction:column;cursor:pointer;
   position:relative;
-  border-radius:22px;
+  border-radius:12px;
   overflow:hidden;
-  transition:all 0.3s cubic-bezier(0.34,1.2,0.64,1);
-  cursor:pointer;
-
-  /* Акриловое стекло — полупрозрачный серовато-синий фон */
-  background:linear-gradient(145deg,
-    rgba(220,228,245,0.65) 0%,
-    rgba(200,215,240,0.55) 50%,
-    rgba(215,225,245,0.60) 100%);
-  backdrop-filter:blur(24px) saturate(1.4);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);
-
-  /* Внешняя тень + цветное свечение по углам */
-  box-shadow:
-    /* синее свечение сверху-справа */
-    4px -4px 20px rgba(120,160,255,0.35),
-    /* красное/оранжевое свечение снизу-слева */
-    -4px 4px 20px rgba(255,100,80,0.30),
-    /* общая тень */
-    0 12px 40px rgba(80,100,160,0.18),
-    /* внутренняя белая обводка */
-    inset 0 1.5px 0 rgba(255,255,255,0.90),
-    inset 1.5px 0 0 rgba(255,255,255,0.60),
-    inset 0 -1.5px 0 rgba(160,180,220,0.40),
-    inset -1.5px 0 0 rgba(160,180,220,0.40);
-
-  /* Граница — чёткая белая снаружи */
-  border:1.5px solid rgba(255,255,255,0.80);
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.05);
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
+  transition:transform 0.25s ease,box-shadow 0.25s ease;
 }
-
-/* Псевдоэлемент — цветной градиент внутри для объёма */
-.pcard::before{
-  content:'';
-  position:absolute;inset:0;
-  border-radius:22px;
-  background:
-    radial-gradient(ellipse 80% 60% at 100% 0%,
-      rgba(140,170,255,0.30) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 0% 100%,
-      rgba(255,110,80,0.22) 0%, transparent 60%);
-  pointer-events:none;
-  z-index:1;
-}
-
-.pcard:hover{
-  transform:translateY(-5px) scale(1.02);
-  box-shadow:
-    6px -6px 30px rgba(120,160,255,0.50),
-    -6px 6px 30px rgba(255,100,80,0.40),
-    0 20px 50px rgba(80,100,160,0.22),
-    inset 0 1.5px 0 rgba(255,255,255,0.95),
-    inset 1.5px 0 0 rgba(255,255,255,0.70),
-    inset 0 -1.5px 0 rgba(160,180,220,0.50),
-    inset -1.5px 0 0 rgba(160,180,220,0.50);
-}
+.pcard::before{display:none;}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,0.12);}
 
 .pcard-img{
-  aspect-ratio:1/1;
+  aspect-ratio:4/3;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
-  position:relative;z-index:3;
-  border-radius:20px 20px 0 0;
-  border-bottom:1px solid rgba(180,200,240,0.35);
-  background:rgba(235,242,255,0.50);
+  background:#f5f3ef;
 }
 .pcard-img img{
   width:100%;height:100%;
-  object-fit:contain;
-  transition:transform 0.35s ease;
+  object-fit:cover;
+  transition:transform 0.4s ease;
 }
-
-.pcard:hover .pcard-img img{transform:scale(1.06);}
+.pcard:hover .pcard-img img{transform:scale(1.05);}
 
 .pcard-body{
-  padding:9px 11px 11px;
+  padding:10px 12px 12px;
   display:flex;flex-direction:column;flex:1;
-  position:relative;z-index:3;
-  /* Лёгкий глянец снизу */
-  background:linear-gradient(180deg,
-    rgba(255,255,255,0.08) 0%,
-    rgba(255,255,255,0.18) 100%);
+  background:#fff;
 }
-.pcard-name{font-size:0.74rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;}
-.pcard-desc{font-size:0.61rem;color:var(--text2);line-height:1.4;margin-bottom:8px;flex:1;}
+.pcard-name{font-size:0.76rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px;}
+.pcard-desc{font-size:0.62rem;color:var(--text2);line-height:1.4;margin-bottom:8px;flex:1;}
 .pcard-price{
-  display:inline-flex;flex-direction:column;
-  background:linear-gradient(135deg,rgba(186,210,235,0.38) 0%,rgba(90,106,130,0.20) 100%);
-  border:1.5px solid rgba(148,178,210,0.55);
-  border-radius:10px;
-  padding:6px 12px 7px;
-  margin-bottom:9px;
-  position:relative;z-index:3;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  box-shadow:0 2px 10px rgba(90,120,160,0.14),
-    inset 0 1px 0 rgba(255,255,255,0.92),
-    inset 0 -1px 0 rgba(90,110,150,0.10);
-}
-.pcard-price-val{
-  font-family:'Unbounded',sans-serif;font-size:0.84rem;font-weight:700;
-  color:#2563eb;line-height:1;
+  font-family:'Unbounded',sans-serif;font-size:0.88rem;font-weight:700;
+  color:var(--amber);margin-bottom:8px;
 }
 .pcard-price small{
-  display:block;font-family:'Inter',sans-serif;
-  font-size:0.52rem;font-weight:400;
-  color:var(--text3);margin-top:3px;
+  display:inline;font-family:'Inter',sans-serif;
+  font-size:0.55rem;font-weight:400;color:var(--text3);margin-left:4px;
 }
-.addbtn{width:100%;padding:9px 0;border-radius:9px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;transition:all 0.2s;box-shadow:0 3px 10px rgba(245,158,11,0.3);}
+.addbtn{width:100%;padding:9px 0;border-radius:8px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;transition:all 0.2s;}
 .addbtn:active{transform:scale(0.97);}
 .addbtn:hover{background:var(--amber-d);}
 /* кол-во на карточке после добавления */
-.qty-row{width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.7);border:1px solid var(--blo);border-radius:9px;overflow:hidden;}
+.qty-row{width:100%;display:flex;align-items:center;justify-content:space-between;background:#f5f3ef;border:1px solid var(--blo);border-radius:8px;overflow:hidden;}
 .qb{flex:1;height:34px;border:none;background:none;cursor:pointer;font-size:1.1rem;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.qb:active{background:var(--glass2);color:var(--amber);}
+.qb:active{background:rgba(109,138,109,0.12);color:var(--amber);}
 .qv{font-size:0.82rem;font-weight:700;color:var(--text);min-width:28px;text-align:center;}
 
 /* CONTACTS */
@@ -305,10 +246,9 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   left:0;right:0;bottom:0;
   z-index:301;
   height:75vh;
-  background:rgba(245,247,250,0.97);
-  backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);
+  background:#fff;
   border-radius:24px 24px 0 0;
-  border-top:1px solid var(--bhi);
+  border-top:1px solid var(--blo);
   box-shadow:0 -12px 60px rgba(0,0,0,0.18);
   transform:translateY(100%);
   transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);
@@ -424,10 +364,23 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
 /* Базовые стили навбара */
 #main-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(240,242,245,0.97);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--bhi);
+  background: #fff;
+  border-bottom: 1px solid var(--blo);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
+#main-nav.nav-transparent {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+}
+#main-nav.nav-transparent .logo { color: #fff !important; }
+#main-nav.nav-transparent .logo em { color: rgba(255,255,255,0.85) !important; }
+#main-nav.nav-transparent .nav-slogan { color: rgba(255,255,255,0.65) !important; border-left-color: rgba(255,255,255,0.25) !important; }
+#main-nav.nav-transparent .nav-order-btn { background: rgba(255,255,255,0.2) !important; border: 1px solid rgba(255,255,255,0.35) !important; }
+#main-nav.nav-transparent .nav-auth-btn,
+#main-nav.nav-transparent .nav-reg-btn { color: rgba(255,255,255,0.9) !important; background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.25) !important; }
+#main-nav.nav-transparent .nav-phones-mobile .nav-ph.call { color: #fff !important; background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.2) !important; }
+#main-nav.nav-transparent .nav-phones-mobile .nav-ph.tg { color: #fff !important; background: rgba(34,158,217,0.25) !important; border-color: rgba(34,158,217,0.35) !important; }
 
 /* ── Строка 1: лого + кнопка Заявка ── */
 .nav-top {
@@ -477,8 +430,8 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   border: 1px solid rgba(34,158,217,0.2);
 }
 
-/* Отступ контента под фиксированным навбаром (мобиль) */
-#hero { padding-top: 108px; }
+/* Hero — без отступа сверху (полноэкранный) */
+#hero { padding-top: 0 !important; }
 
 /* ── Каталог на мобиле ── */
 .pgrid { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -551,7 +504,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   /* На десктопе строка 2 телефонов скрыта */
   .nav-phones-mobile { display: none; }
 
-  #hero { padding-top: 74px; }
+  #hero { padding-top: 0 !important; }
 
   /* Каталог */
   .pgrid { grid-template-columns: repeat(4,1fr); gap: 12px; }
@@ -659,7 +612,7 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   }
 
   /* Контент */
-  #hero { padding-top: 116px !important; }
+  #hero { padding-top: 0 !important; }
   .pgrid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
   .quick-row { padding: 10px 12px 0 !important; }
   .qbtn { font-size: 0.76rem !important; padding: 10px 8px !important; }
@@ -777,7 +730,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* PRODUCT DETAIL BOTTOM SHEET */
 .pd-ov{position:fixed;inset:0;z-index:300;background:rgba(15,18,28,.45);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .28s}
 .pd-ov.on{opacity:1;pointer-events:auto}
-.pd{position:fixed;left:0;right:0;bottom:0;z-index:301;background:rgba(245,247,250,.97);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border-radius:24px 24px 0 0;border-top:1px solid var(--bhi);box-shadow:0 -12px 60px rgba(0,0,0,.2);max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.pd{position:fixed;left:0;right:0;bottom:0;z-index:301;background:#fff;border-radius:24px 24px 0 0;border-top:1px solid var(--blo);box-shadow:0 -12px 60px rgba(0,0,0,.2);max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);overflow:hidden}
 #pd-inner{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .pd.on{transform:translateY(0)}
 .pd-handle{width:100%;padding:12px 0 4px;display:flex;justify-content:center;flex-shrink:0;cursor:pointer}
@@ -844,7 +797,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* AUTH MODAL */
 .auth-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s}
 .auth-ov.on{opacity:1;pointer-events:auto}
-.auth-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:92%;max-width:380px;background:var(--glass2);backdrop-filter:var(--blur);border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:28px 22px 22px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
+.auth-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:92%;max-width:380px;background:#fff;border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:28px 22px 22px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
 .auth-modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 .auth-modal h3{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:16px}
 .auth-modal .inp{width:100%;padding:11px 14px;border:1px solid var(--blo);border-radius:10px;font-size:.85rem;font-family:'Inter',sans-serif;background:rgba(255,255,255,.7);margin-bottom:10px;outline:none}
@@ -877,7 +830,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* DASHBOARD MODAL */
 .dash-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s}
 .dash-ov.on{opacity:1;pointer-events:auto}
-.dash-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:96%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--glass2);backdrop-filter:var(--blur);border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:24px 18px 18px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
+.dash-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:801;width:96%;max-width:520px;max-height:92vh;overflow-y:auto;background:#fff;border:1px solid var(--blo);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);padding:24px 18px 18px;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.4,.64,1)}
 @media(min-width:640px){.dash-modal{max-width:980px;max-height:93vh;width:94%;padding:28px 32px 24px}}
 @media(min-width:1024px){.dash-modal{max-width:1280px;max-height:94vh;width:90%}}
 .dash-modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
@@ -926,7 +879,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* ── Unavailable items modal ── */
 .unavail-ov{position:fixed;inset:0;z-index:500;background:rgba(15,18,28,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
 .unavail-ov.on{opacity:1;pointer-events:auto}
-.unavail-box{background:rgba(248,250,252,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;padding:20px 18px;max-width:330px;width:100%;border:1px solid var(--blo);box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.unavail-box{background:#fff;border-radius:20px;padding:20px 18px;max-width:330px;width:100%;border:1px solid var(--blo);box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .unavail-title{font-weight:700;font-size:.88rem;margin-bottom:6px;color:var(--text)}
 .unavail-sub{font-size:.76rem;color:var(--text2);margin-bottom:10px;line-height:1.5}
 .unavail-list{margin-bottom:14px}
@@ -976,52 +929,67 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-head rv">
-    <div class="hero-head-text">
-      <div class="hero-eyebrow">Авторское производство · Симферополь · Оптовый прайс для B2B</div>
-      <h1 class="hero-h1">Ритуальная<em> мастерская</em></h1>
-      <p class="hero-sub">Венки &middot; Ритуальные корзинки &middot; Искусственные цветы &middot; Опт</p>
+  <img class="hero-bg" src="assets/img/etalon-hero-block.png" alt="Авторская ритуальная мастерская — венки и корзинки" loading="eager">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Авторское производство · Симферополь · Оптовый прайс для B2B</p>
+    <h1 class="hero-h1">Авторская<br>мастерская</h1>
+    <p class="hero-cursive">с заботой и уважением</p>
+    <div class="hero-icons">
+      <div class="hero-icon-item"><span class="hero-icon-emoji">🌿</span><span class="hero-icon-label">Венки</span></div>
+      <div class="hero-icon-item"><span class="hero-icon-emoji">🧺</span><span class="hero-icon-label">Корзинки</span></div>
+      <div class="hero-icon-item"><span class="hero-icon-emoji">✿</span><span class="hero-icon-label">Цветы оптом</span></div>
     </div>
-    <button class="btn-price-dl btn-price-dl--desktop" onclick="openPricelistModal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Загрузить прайс
-    </button>
+    <a href="#catalog" class="hero-cta">Смотреть каталог</a>
   </div>
-  <div class="quick-row rv" style="transition-delay:0.05s">
-    <button class="g qbtn qbtn-full btn-price-dl btn-price-dl--mobile" onclick="openPricelistModal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Загрузить прайс
-    </button>
-    <button class="g qbtn qbtn-reset qbtn-full" id="btn-reset" style="display:none" onclick="goFilter(null)">&#10005; Сбросить фильтр &mdash; показать всё</button>
-    <a class="g qbtn qbtn-cat qbtn-full" href="#catalog" onclick="goFilter(null)">&#128203; Весь каталог</a>
-    <button class="g qbtn qbtn-filter qbtn-venki" data-filter="venki" onclick="goFilter('venki')">&#127807; Венки</button>
-    <button class="g qbtn qbtn-filter" data-filter="korzinki" onclick="goFilter('korzinki')">&#129531; Корзинки</button>
-    <button class="g qbtn qbtn-filter" data-filter="size-s" onclick="goFilter('size-s')">Размер S</button>
-    <button class="g qbtn qbtn-filter" data-filter="size-m" onclick="goFilter('size-m')">Размер M</button>
-    <button class="g qbtn qbtn-filter" data-filter="size-l" onclick="goFilter('size-l')">Размер L</button>
-  </div>
-  <div class="cat-tiles rv" style="transition-delay:0.1s">
-    <a class="g ctile" href="#venki" onclick="go('venki')">
-      <div class="ctile-icon">&#127807;</div>
-      <div class="ctile-label">Венки</div>
-    </a>
-    <a class="g ctile" href="#korzinki" onclick="go('korzinki')">
-      <div class="ctile-icon">&#129531;</div>
-      <div class="ctile-label">Корзинки</div>
-    </a>
-    <a class="g ctile" href="https://t.me/example" target="_blank">
-      <div class="ctile-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg></div>
-      <div class="ctile-label">Написать в Telegram</div>
-    </a>
+</section>
+
+<!-- CAROUSEL -->
+<section class="carousel-section">
+  <div class="carousel-inner">
+    <div class="carousel-track">
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-09-04_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-10-53_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-52-18_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-23-24_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-36-09_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-37-36_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-02_001.png" alt="" loading="lazy"></div>
+      <!-- Дубль для бесшовного зацикливания -->
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-09-04_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-10-53_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_01-52-18_001.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_02-12-57_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-23-24_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-36-09_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/ritual_2026-04-28_13-37-36_002.png" alt="" loading="lazy"></div>
+      <div class="carousel-item"><img src="assets/img/products/korzinka_2026-05-02_001.png" alt="" loading="lazy"></div>
+    </div>
   </div>
 </section>
 
 <!-- CATALOG -->
 <section id="catalog" style="position:relative;z-index:1;padding:0 16px 100px;">
-  <div id="filter-bar" style="display:none;padding:10px 0 0;max-width:960px;margin:0 auto;">
-    <div class="g" style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.78rem;font-weight:600;color:var(--amber);">
-      <span id="filter-label"></span>
-      <button onclick="goFilter(null)" style="background:none;border:none;color:var(--amber-d);font-size:.75rem;cursor:pointer;font-weight:600;text-decoration:underline;">&#10005; Сбросить</button>
+  <div style="max-width:960px;margin:0 auto;">
+    <div class="quick-row">
+      <a class="g qbtn qbtn-cat" href="#catalog" onclick="goFilter(null)">&#128203; Весь каталог</a>
+      <button class="g qbtn qbtn-filter qbtn-venki" data-filter="venki" onclick="goFilter('venki')">&#127807; Венки</button>
+      <button class="g qbtn qbtn-filter" data-filter="korzinki" onclick="goFilter('korzinki')">&#129531; Корзинки</button>
+      <button class="g qbtn qbtn-filter" data-filter="size-s" onclick="goFilter('size-s')">Размер S</button>
+      <button class="g qbtn qbtn-filter" data-filter="size-m" onclick="goFilter('size-m')">Размер M</button>
+      <button class="g qbtn qbtn-filter" data-filter="size-l" onclick="goFilter('size-l')">Размер L</button>
+      <button class="g qbtn qbtn-reset" id="btn-reset" style="display:none" onclick="goFilter(null)">&#10005; Сбросить фильтр</button>
+      <button class="g qbtn btn-price-dl" onclick="openPricelistModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Прайс
+      </button>
+    </div>
+    <div id="filter-bar" style="display:none;padding:6px 0 0;">
+      <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.76rem;font-weight:600;color:var(--amber);background:#fff;border-radius:var(--r);border:1px solid var(--blo);">
+        <span id="filter-label"></span>
+        <button onclick="goFilter(null)" style="background:none;border:none;color:var(--amber-d);font-size:.73rem;cursor:pointer;font-weight:600;text-decoration:underline;">&#10005; Сбросить</button>
+      </div>
     </div>
   </div>
   <div id="catalog-content" style="max-width:960px;margin:0 auto;"></div>
@@ -1030,9 +998,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <!-- CONTACTS -->
 <section id="contacts" style="position:relative;z-index:1;padding:0 16px 80px;max-width:960px;margin:0 auto;">
   <div class="g contacts-card">
-    <div class="contacts-lbl">Авторская ритуальная мастерская · Симферополь</div>
+    <div class="contacts-lbl">ИП Гуриненко Н.Н. · Республика Крым, г. Симферополь, ул. Глинки 61А</div>
     <h2 class="contacts-h2">Связаться с нами</h2>
-    <p class="contacts-sub">Пн&ndash;Вс &middot; 9:00&ndash;20:00<br>Ответим в течение 15 минут</p>
+    <p class="contacts-sub">Ежедневно &middot; 6:00&ndash;23:00<br>Ответим в течение 15 минут</p>
     <div class="clinks">
       <a class="g clink phone" href="tel:+79152776688">&#128222; +7 915 277-66-88</a>
       <a class="g clink phone" href="tel:+79788394042">&#128222; +7 978 839-40-42</a>
@@ -1058,8 +1026,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 </section>
 
 <footer>
-  <div class="fl">Сплит<em>Хаб</em></div>
-  <div class="fc">&copy; 2026 &middot; Опт &middot; Симферополь</div>
+  <div class="fl">Ritual<em>B2B</em></div>
+  <div class="fc">&copy; 2026 &middot; ИП Гуриненко Н.Н. &middot; Симферополь, ул. Глинки 61А</div>
+  <div class="fc" style="margin-top:4px;font-size:.65rem;"><a href="#" onclick="openPd();return false;" style="color:var(--text3);text-decoration:underline;">Согласие на обработку персональных данных</a></div>
 </footer>
 
 <!-- FAB -->
@@ -1081,6 +1050,24 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   </div>
   <div class="dl" id="dl"></div>
   <div class="df" id="df"></div>
+</div>
+
+<!-- PERSONAL DATA MODAL -->
+<div class="pd-ov" id="pd-modal-ov" onclick="closePd()" style="display:none;"></div>
+<div id="pd-modal-box" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;border-radius:16px;padding:28px 24px;max-width:560px;width:calc(100% - 32px);max-height:80vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,.22);">
+  <button onclick="closePd()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;">&times;</button>
+  <h3 style="font-family:'Unbounded',sans-serif;font-size:.95rem;margin:0 0 16px;">Согласие на обработку персональных данных</h3>
+  <div style="font-size:.8rem;line-height:1.7;color:#444;">
+    <p>Настоящим я, пользователь сайта <strong>ritualb2b.ru</strong>, в соответствии с требованиями Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных», даю своё согласие <strong>индивидуальному предпринимателю Гуриненко Н.Н.</strong> (далее — Оператор) на обработку моих персональных данных.</p>
+    <p><strong>Оператор:</strong> ИП Гуриненко Н.Н., Республика Крым, г. Симферополь, ул. Глинки 61А.</p>
+    <p><strong>Перечень персональных данных:</strong> фамилия, имя, отчество; номер телефона; адрес электронной почты; имя пользователя Telegram.</p>
+    <p><strong>Цели обработки:</strong> обработка и исполнение заявок на приобретение товаров, обратная связь с клиентом, ведение учёта заказов.</p>
+    <p><strong>Способы обработки:</strong> сбор, запись, систематизация, накопление, хранение, уточнение, использование, передача (при необходимости для исполнения заказа), обезличивание, блокирование, удаление, уничтожение персональных данных.</p>
+    <p><strong>Срок хранения:</strong> в течение срока действия договорных отношений, а также в течение 3 (трёх) лет после их прекращения, если иное не предусмотрено законодательством РФ.</p>
+    <p>Согласие может быть отозвано путём направления письменного заявления на адрес электронной почты: <a href="mailto:zakaz@ritualb2b.ru" style="color:#6D8A6D;">zakaz@ritualb2b.ru</a>.</p>
+    <p style="color:#999;font-size:.73rem;">Отправляя заявку на сайте, вы подтверждаете своё согласие с настоящим документом.</p>
+  </div>
+  <button onclick="closePd()" style="margin-top:16px;width:100%;padding:12px;background:#6D8A6D;color:#fff;border:none;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;">Понятно</button>
 </div>
 
 <!-- TOAST -->
@@ -1240,22 +1227,23 @@ function cardHtml(p, delay) {
   var addBtn = qty > 0
     ? '<div class="qty-row"><button class="qb" onclick="chQty(\''+p.id+'\',-1);event.stopPropagation()">−</button><span class="qv">'+qty+'</span><button class="qb" onclick="chQty(\''+p.id+'\',1);event.stopPropagation()">+</button></div>'
     : (p.stock === 'out'
-      ? '<button class="addbtn" style="background:#9CA3AF;box-shadow:none;cursor:not-allowed" disabled>Нет в наличии</button>'
-      : '<button class="addbtn" onclick="addItem(\''+p.id+'\');event.stopPropagation()">Заказать</button>');
+      ? '<button class="addbtn" style="background:#9CA3AF;cursor:not-allowed" disabled>Нет в наличии</button>'
+      : '<button class="addbtn" onclick="addItem(\''+p.id+'\');event.stopPropagation()">+ В заявку</button>');
   var _ov = PRODUCT_OVERRIDES[p.sku] || {};
   var _bdg = _ov.badge || '';
   var _bdgLbl = _ov.badge_label || ({new:'Новинка',sale:'Акция',clearance:'Распродажа'}[_bdg]||'');
   var _badgeHtml = _bdg ? '<div class="pcard-badge pb-'+_bdg+'">'+_bdgLbl+'</div>' : '';
   var _descExtra = _ov.description ? '<div class="pcard-admin-desc">'+_ov.description+'</div>' : '';
-  return '<div class="pcard rv" role="button" tabindex="0" aria-label="Карточка '+p.model+'" style="transition-delay:'+(delay*0.04)+'s" onclick="openDetail(\''+p.id+'\')">'
+  var sizeTag = p.size && p.size !== '-' ? 'Размер '+p.size : '';
+  var descLine = [sizeTag, p.descShort].filter(Boolean).join(' · ');
+  return '<div class="pcard rv" role="button" tabindex="0" aria-label="'+p.model+'" style="transition-delay:'+(delay*0.08)+'s" onclick="openDetail(\''+p.id+'\')">'
     + _badgeHtml
-      + '<div class="pcard-img">'+imgHtml+'</div>'
+    + '<div class="pcard-img">'+imgHtml+'</div>'
     + '<div class="pcard-body">'
     + '<div class="pcard-name">'+p.model+'</div>'
-    + '<div class="pcard-desc">'+p.descShort+'</div>'
-      + _descExtra
-    + getStockHtml(p)
-    + '<div class="pcard-price"><span class="pcard-price-val">'+p.price.toLocaleString('ru-RU')+'&thinsp;₽</span><small>опт · комплект</small></div>'
+    + '<div class="pcard-desc">'+descLine+'</div>'
+    + _descExtra
+    + '<div class="pcard-price">'+p.price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
     + addBtn
     + '</div></div>';
 }
@@ -1295,39 +1283,15 @@ function renderAll() {
     if(!currentFilter) {
       html += '<div class="section-divider"><span>'+(GROUP_LABELS[gid]||gid.toUpperCase())+'</span><div class="sdl"></div></div>';
     }
+    var allItems = [];
     Object.keys(brands).forEach(function(bc) {
-      var bData = brands[bc];
-      var bImg = LEGACY[bc] || '';
-      html += '<div class="brand-block rv">';
-      html += '<div class="brand-head">';
-      // Brand photos removed per ТЗ п.4 — unified brand headers without icons
-      var factoryTag = bData.factory ? '<span class="brand-factory">Завод\u00a0'+bData.factory+'</span>' : '';
-      html += '<div class="brand-info"><div class="brand-title-row"><span class="brand-name">'+bData.brand+'</span>'+factoryTag+'</div><div class="brand-line"></div></div>';
-      html += '</div>';
-      // For accessories/pipes — flat grid without series sub-headings
-      var FLAT_GROUPS = {};
-      if (FLAT_GROUPS[gid]) {
-        html += '<div class="sub-block"><div class="pgrid">';
-        var flatIdx = 0;
-        Object.keys(bData.series).forEach(function(sName) {
-          bData.series[sName].items.forEach(function(p) { html += cardHtml(p, flatIdx++); });
-        });
-        html += '</div></div>';
-      } else {
-        Object.keys(bData.series).forEach(function(sName) {
-          var sData = bData.series[sName];
-          var suffix = '';
-          html += '<div class="sub-block">';
-          html += '<div class="series-badge g">'
-            + '<div><b>'+sName+suffix+'</b>'+sData.cardBenef+'</div>'
-            + '</div>';
-          html += '<div class="pgrid">';
-          sData.items.forEach(function(p,i){ html += cardHtml(p,i); });
-          html += '</div></div>';
-        });
-      }
-      html += '</div>';
+      Object.keys(brands[bc].series).forEach(function(sName) {
+        brands[bc].series[sName].items.forEach(function(p) { allItems.push(p); });
+      });
     });
+    html += '<div class="pgrid">';
+    allItems.forEach(function(p,i){ html += cardHtml(p,i); });
+    html += '</div>';
     html += '</div>';
   });
   content.innerHTML = html;
@@ -1416,6 +1380,17 @@ function openDetail(id) {
   document.getElementById('pd-ov').classList.add('on');
   document.getElementById('pd-modal').classList.add('on');
   document.body.style.overflow = 'hidden';
+}
+
+function openPd() {
+  document.getElementById('pd-modal-ov').style.display = 'block';
+  document.getElementById('pd-modal-box').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closePd() {
+  document.getElementById('pd-modal-ov').style.display = 'none';
+  document.getElementById('pd-modal-box').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function closeDetail() {
@@ -1596,11 +1571,18 @@ function sendOrder() {
 // ── Scroll & Share ────────────────────────────────────
 var _st = document.getElementById('scrollTop');
 var _sb = document.getElementById('shareBtn');
+var _nav = document.getElementById('main-nav');
+function updateNav() {
+  if(!_nav) return;
+  _nav.classList.toggle('nav-transparent', window.scrollY < 80);
+}
 window.addEventListener('scroll', function() {
   var show = window.scrollY > 200;
   if(_st) _st.classList.toggle('on', show);
   if(_sb) _sb.classList.toggle('on', show);
+  updateNav();
 }, {passive:true});
+updateNav();
 
 function shareSite() {
   var url = 'https://ritualb2b.ru/';
