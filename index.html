@@ -105,11 +105,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 /* CATALOG FILTER PANEL */
 .cat-filter-panel{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg);padding:16px 16px 0;}
 .cat-col{display:flex;flex-direction:column;gap:3px;}
-.cat-hbtn{width:100%;padding:16px 12px;border:none;background:var(--amber);color:#fff;font-family:'Unbounded',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
-.cat-hbtn:hover,.cat-hbtn.active{background:var(--amber-d);}
+.cat-hbtn{width:100%;padding:18px 16px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
+.cat-hbtn:hover{background:var(--amber-d);}
+.cat-hbtn.active{background:var(--amber-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,0.15);}
 .size-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
-.size-btn{padding:10px 4px;border:none;background:#fff;color:var(--text2);font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;cursor:pointer;transition:background 0.18s,color 0.18s;border-radius:0 0 8px 8px;}
-.size-btn:hover{background:#f0ede8;color:var(--text);}
+.size-btn{padding:11px 4px;border:none;background:#f5f2ee;color:var(--text2);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:background 0.18s,color 0.18s;border-radius:0 0 8px 8px;}
+.size-btn:hover{background:#e8e4de;color:var(--text);}
 .size-btn.active{background:var(--amber);color:#fff;}
 /* legacy qbtn used in drawer/other places */
 .qbtn{display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.84rem;font-weight:700;color:var(--text);text-decoration:none;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid var(--blo);box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.18s;}
@@ -174,10 +175,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 }
 .pcard-img img{
   width:100%;height:100%;
-  object-fit:cover;
+  object-fit:contain;
   transition:transform 0.4s ease;
 }
-.pcard:hover .pcard-img img{transform:scale(1.05);}
+.pcard:hover .pcard-img img{transform:scale(1.03);}
 
 .pcard-body{
   padding:10px 12px 12px;
@@ -962,7 +963,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   <!-- Фильтры: 2 категории × 3 размера -->
   <div class="cat-filter-panel">
     <div class="cat-col">
-      <button class="cat-hbtn" id="catbtn-korzinki" data-group="korzinki" onclick="setCatFilter('korzinki',null)">🧺 Авторские корзинки</button>
+      <button class="cat-hbtn" id="catbtn-korzinki" data-group="korzinki" onclick="setCatFilter('korzinki',null)">Авторские корзинки</button>
       <div class="size-row">
         <button class="size-btn" id="sizebtn-korzinki-s" data-group="korzinki" data-size="s" onclick="setCatFilter('korzinki','s')">S</button>
         <button class="size-btn" id="sizebtn-korzinki-m" data-group="korzinki" data-size="m" onclick="setCatFilter('korzinki','m')">M</button>
@@ -970,7 +971,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
       </div>
     </div>
     <div class="cat-col">
-      <button class="cat-hbtn" id="catbtn-venki" data-group="venki" onclick="setCatFilter('venki',null)">🌿 Авторские ритуальные венки</button>
+      <button class="cat-hbtn" id="catbtn-venki" data-group="venki" onclick="setCatFilter('venki',null)">Авторские ритуальные венки</button>
       <div class="size-row">
         <button class="size-btn" id="sizebtn-venki-s" data-group="venki" data-size="s" onclick="setCatFilter('venki','s')">S</button>
         <button class="size-btn" id="sizebtn-venki-m" data-group="venki" data-size="m" onclick="setCatFilter('venki','m')">M</button>
