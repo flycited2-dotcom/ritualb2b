@@ -1,6 +1,6 @@
 <?php
 /**
- * reports.php — Отчётность СплитХаб
+ * reports.php — Отчётность Ритуальная мастерская
  *
  * GET  ?action=weekly&secret=CRON_SECRET   — еженедельный отчёт на почту
  * GET  ?action=sheet&secret=CRON_SECRET    — синхронизация заказов в Google Sheets
@@ -8,7 +8,7 @@
  * POST (без action)                        — Telegram webhook: /report, /orders, /week
  *
  * Cron на Спринтхосте (раз в неделю, пн 09:00):
- *   0 9 * * 1  curl -s "https://splithub.ru/api/reports.php?action=weekly&secret=CRON_SECRET"
+ *   0 9 * * 1  curl -s "https://ritualb2b.ru/api/reports.php?action=weekly&secret=CRON_SECRET"
  */
 
 require_once __DIR__ . '/../db/init.php';
@@ -102,7 +102,7 @@ function handleTelegramWebhook($token, $defaultChat, $adminId) {
 
         case '/help':
             tgReply($token, $chatId,
-                "📊 *Команды отчётности СплитХаб:*\n"
+                "📊 *Команды отчётности Ритуальная мастерская:*\n"
                 . "/report — недельный отчёт\n"
                 . "/today  — статистика сегодня\n"
                 . "/month  — за 30 дней\n"
@@ -152,7 +152,7 @@ function buildWeeklyText($days = 7, $label = null) {
         $topItems = $top->fetchAll();
 
         $dt = date('d.m.Y');
-        $text  = "📊 *Отчёт СплитХаб — {$label}* (на {$dt})\n";
+        $text  = "📊 *Отчёт Ритуальная мастерская — {$label}* (на {$dt})\n";
         $text .= "━━━━━━━━━━━━━━━━━━\n";
         $text .= "📦 Заказов: *{$count}*\n";
         $text .= "💰 Выручка: *" . number_format($total, 0, '.', ' ') . " ₽*\n";
@@ -209,9 +209,9 @@ function doWeeklyReport($emailTo, $botToken, $chatId) {
     // Email
     $emailSent = false;
     if ($emailTo) {
-        $subject = 'Недельный отчёт СплитХаб — ' . date('d.m.Y');
+        $subject = 'Недельный отчёт Ритуальная мастерская — ' . date('d.m.Y');
         $body    = nl2br(htmlspecialchars(strip_tags($tgText, '<br>')));
-        $headers = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\nFrom: СплитХаб <noreply@splithub.ru>";
+        $headers = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\nFrom: Ритуальная мастерская <noreply@ritualb2b.ru>";
         $emailSent = mail($emailTo, $subject, "<html><body style='font-family:Arial,sans-serif'>{$body}</body></html>", $headers);
     }
 
@@ -250,7 +250,7 @@ function buildDailyText() {
         $clientCount = (int)$clients->fetch()['cnt'];
 
         $dt    = date('d.m.Y');
-        $text  = "📅 *Дайджест СплитХаб — {$dt}*\n";
+        $text  = "📅 *Дайджест Ритуальная мастерская — {$dt}*\n";
         $text .= "━━━━━━━━━━━━━━━━━━\n";
         $text .= "📦 Заказов за день: *{$orderCount}*\n";
         $text .= "💰 Выручка: *" . number_format($total, 0, '.', ' ') . " ₽*\n";
@@ -276,11 +276,11 @@ function doDailyReport($emailTo, $botToken, $chatId) {
 
     $emailSent = false;
     if ($emailTo) {
-        $subject = 'Дайджест СплитХаб — ' . date('d.m.Y');
+        $subject = 'Дайджест Ритуальная мастерская — ' . date('d.m.Y');
         $body    = str_replace(['*', '_'], '', $tgText);
         $body    = nl2br(htmlspecialchars($body));
         $headers = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\n"
-                 . "From: =?UTF-8?B?" . base64_encode('СплитХаб') . "?= <noreply@splithub.ru>";
+                 . "From: =?UTF-8?B?" . base64_encode('Ритуальная мастерская') . "?= <noreply@ritualb2b.ru>";
         $emailSent = mail($emailTo, '=?UTF-8?B?' . base64_encode($subject) . '?=',
             "<html><body style='font-family:Arial,sans-serif;line-height:1.8;padding:20px'>{$body}</body></html>",
             $headers);
@@ -413,8 +413,8 @@ function doStatus($sheetId, $saKeyPath, $emailTo) {
         'gsheet_id'     => $sheetId ?: '❌ не настроен (GSHEET_ID)',
         'gsheet_key'    => ($saKeyPath && file_exists($saKeyPath)) ? '✅ найден' : '❌ не найден (GSHEET_KEY_PATH)',
         'telegram_bot'  => defined('BOT_TOKEN') ? '✅ ' . substr(BOT_TOKEN, 0, 10) . '...' : '❌',
-        'webhook_url'   => 'https://splithub.ru/api/reports.php',
-        'cron_example'  => '0 9 * * 1 curl -s "https://splithub.ru/api/reports.php?action=weekly&secret=' . CRON_SECRET . '"',
+        'webhook_url'   => 'https://ritualb2b.ru/api/reports.php',
+        'cron_example'  => '0 9 * * 1 curl -s "https://ritualb2b.ru/api/reports.php?action=weekly&secret=' . CRON_SECRET . '"',
     ]);
 }
 

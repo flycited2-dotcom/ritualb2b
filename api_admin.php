@@ -96,7 +96,7 @@ switch ($action) {
                 $ch = curl_init("https://api.telegram.org/bot{$token}/sendDocument");
                 curl_setopt_array($ch, [
                     CURLOPT_POST        => true,
-                    CURLOPT_POSTFIELDS  => ['chat_id' => $chatId, 'document' => new CURLFile($tmpPath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $filename), 'caption' => 'Прайс-лист СплитХаб'],
+                    CURLOPT_POSTFIELDS  => ['chat_id' => $chatId, 'document' => new CURLFile($tmpPath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $filename), 'caption' => 'Прайс-лист Ритуальная мастерская'],
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT     => 30,
                     CURLOPT_SSL_VERIFYPEER => false,
@@ -113,12 +113,12 @@ switch ($action) {
                 $errors[] = 'Email не настроен';
             } else {
                 $boundary = md5(uniqid());
-                $headers  = "From: noreply@splithub.ru\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=\"{$boundary}\"";
-                $body  = "--{$boundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nПрайс-лист СплитХаб во вложении.\r\n";
+                $headers  = "From: noreply@ritualb2b.ru\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=\"{$boundary}\"";
+                $body  = "--{$boundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nПрайс-лист Ритуальная мастерская во вложении.\r\n";
                 $body .= "--{$boundary}\r\nContent-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\r\n";
                 $body .= "Content-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"{$filename}\"\r\n\r\n";
                 $body .= chunk_split($b64data) . "\r\n--{$boundary}--";
-                if (!mail($emailTo, 'Прайс-лист СплитХаб', $body, $headers)) $errors[] = 'Email: ошибка отправки';
+                if (!mail($emailTo, 'Прайс-лист Ритуальная мастерская', $body, $headers)) $errors[] = 'Email: ошибка отправки';
             }
         }
 
@@ -374,7 +374,7 @@ switch ($action) {
         $recent = $db->query("SELECT o.id,o.total,o.status,o.created_at,u.name FROM orders o JOIN users u ON o.user_id=u.id ORDER BY o.created_at DESC LIMIT 7")->fetchAll();
 
         $sIco = ['new'=>'🆕','confirmed'=>'✅','in_progress'=>'⚙️','shipped'=>'📦','completed'=>'✔️','cancelled'=>'❌'];
-        $msg  = "📊 *Отчёт СплитХаб* (по запросу)\n━━━━━━━━━━━━━━━━\n";
+        $msg  = "📊 *Отчёт Ритуальная мастерская* (по запросу)\n━━━━━━━━━━━━━━━━\n";
         $msg .= "📦 Всего: *{$cnt}*  |  🆕 Новых: *{$newCnt}*\n";
         $msg .= "📅 Сегодня: *{$today}*  |  👥 Гостевых: *{$guests}*\n";
         $msg .= "💰 Выручка: *".number_format($rev,0,'.',' ')." ₽*\n";
@@ -694,7 +694,7 @@ switch ($action) {
             }
             $body .= "\r\nИтого: {$o['total']} ₽";
             if ($o['comment']) $body .= "\r\nКомментарий: {$o['comment']}";
-            $headers = "From: noreply@splithub.ru\r\nContent-Type: text/plain; charset=UTF-8";
+            $headers = "From: noreply@ritualb2b.ru\r\nContent-Type: text/plain; charset=UTF-8";
             $sent = mail($to, $subject, $body, $headers);
             jsonResponse(['ok' => $sent, 'error' => $sent ? null : 'Ошибка mail()']);
         }

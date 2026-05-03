@@ -18,9 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-define('BOT_TOKEN', '8366074996:AAGe0oEpkQ4foTlcJ0zqNFxUv5w1i1Xay78');
-define('CHAT_ID',   '-1003727076862');
-define('EMAIL_TO',  'flycited@gmail.com');
+define('BOT_TOKEN', '8586894494:AAFCvimnoMDeWveTEvOmFMGBNKESed4CgsE');
+define('CHAT_ID',   '-5133636773');
+define('EMAIL_TO',  'zakaz@ritualb2b.ru');
 
 $raw  = file_get_contents('php://input');
 $data = json_decode($raw, true);
@@ -49,7 +49,7 @@ if ($method === 'tg') {
     $msg .= "📅 *Дата:* {$date}\n";
     $msg .= "📦 *Товаров в прайсе:* {$itemsCount} шт.\n";
     $msg .= "━━━━━━━━━━━━━━━━━━\n";
-    $msg .= "_Прайс-лист доступен на сайте СплитХаб_";
+    $msg .= "_Прайс-лист доступен на сайте Ритуальная мастерская_";
 
     $ch = curl_init("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage");
     curl_setopt_array($ch, [
@@ -85,10 +85,10 @@ elseif ($method === 'email') {
         exit;
     }
 
-    $headers   = "From: =?UTF-8?B?" . base64_encode("СплитХаб") . "?= <zakaz@splithub.ru>\r\n";
+    $headers   = "From: =?UTF-8?B?" . base64_encode("Ритуальная мастерская") . "?= <zakaz@ritualb2b.ru>\r\n";
     $headers  .= "MIME-Version: 1.0\r\n";
     $headers  .= "Content-Type: text/html; charset=UTF-8\r\n";
-    $subject   = "=?UTF-8?B?" . base64_encode("Прайс-лист СплитХаб") . "?=";
+    $subject   = "=?UTF-8?B?" . base64_encode("Прайс-лист Ритуальная мастерская") . "?=";
 
     $htmlBody = "<!DOCTYPE html><html lang=\"ru\"><head>"
         . "<meta charset=\"UTF-8\">"
@@ -99,14 +99,14 @@ elseif ($method === 'email') {
         . "a { color: #2563eb; text-decoration: none; }"
         . "</style></head><body>"
         . "<div class=\"wrap\">"
-        . "<h1 class=\"title\">📥 Прайс-лист СплитХаб</h1>"
+        . "<h1 class=\"title\">📥 Прайс-лист — Авторская ритуальная мастерская</h1>"
         . "<p class=\"text\">Здравствуйте!</p>"
         . "<p class=\"text\">Спасибо за интерес к нашему каталогу. Прайс-лист содержит <strong>{$itemsCount} товаров</strong> с актуальными ценами и статусом наличия на <strong>{$date}</strong>.</p>"
-        . "<p class=\"text\"><a href=\"https://splithub.ru\">Откройте полный прайс на сайте</a></p>"
-        . "<p class=\"text\">При возникновении вопросов свяжитесь с менеджерами:<br>"
-        . "📞 +7 978 599-13-69<br>"
-        . "💬 @Byttehnikaopt</p>"
-        . "<p class=\"text\" style=\"color: #999; font-size: 12px; margin-top: 20px;\">СплитХаб · splithub.ru · Симферополь</p>"
+        . "<p class=\"text\"><a href=\"https://ritualb2b.ru\">Откройте полный прайс на сайте</a></p>"
+        . "<p class=\"text\">При возникновении вопросов свяжитесь с менеджером:<br>"
+        . "📞 +7 915 277-66-88<br>"
+        . "💬 +7 978 839-40-42 (Telegram)</p>"
+        . "<p class=\"text\" style=\"color: #999; font-size: 12px; margin-top: 20px;\">Авторская ритуальная мастерская · ritualb2b.ru · Симферополь</p>"
         . "</div></body></html>";
 
     $mailOk = @mail($email, $subject, $htmlBody, $headers);

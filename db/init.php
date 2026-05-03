@@ -8,7 +8,7 @@ function getDB() {
     static $db = null;
     if ($db) return $db;
 
-    $dbPath = __DIR__ . '/splithub.sqlite';
+    $dbPath = __DIR__ . '/ritualb2b.sqlite';
     $isNew = !file_exists($dbPath);
 
     $db = new PDO('sqlite:' . $dbPath);
@@ -154,7 +154,7 @@ function jsonResponse($data, $code = 200) {
  */
 function authCheck() {
     if (session_status() === PHP_SESSION_NONE) {
-        $sessDir = sys_get_temp_dir() . '/splithub_sess';
+        $sessDir = sys_get_temp_dir() . '/ritualb2b_sess';
         if (is_dir($sessDir) && is_writable($sessDir)) session_save_path($sessDir);
         session_start();
     }

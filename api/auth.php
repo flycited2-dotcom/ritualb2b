@@ -23,7 +23,7 @@ register_shutdown_function(function() {
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json; charset=utf-8');
         http_response_code(500);
-        error_log('[SplitHub auth] Fatal: '.($err['message']??'').' in '.($err['file']??'?').':'.($err['line']??'0'));
+        error_log('[RitualB2B auth] Fatal: '.($err['message']??'').' in '.($err['file']??'?').':'.($err['line']??'0'));
         ob_clean();
         echo json_encode(['ok' => false, 'error' => 'Ошибка: '.($err['message'] ?? 'Fatal server error')], JSON_UNESCAPED_UNICODE);
         exit;
@@ -44,7 +44,7 @@ try {
 require __DIR__ . '/../db/init.php';
 
 if (session_status() === PHP_SESSION_NONE) {
-    $sessDir = sys_get_temp_dir() . '/splithub_sess';
+    $sessDir = sys_get_temp_dir() . '/ritualb2b_sess';
     if (!is_dir($sessDir)) @mkdir($sessDir, 0700, true);
     if (is_writable($sessDir)) session_save_path($sessDir);
     @session_start();

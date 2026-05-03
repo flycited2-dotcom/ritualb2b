@@ -1,11 +1,11 @@
 /**
- * pricelist.js — Генератор прайса СплитХаб
+ * pricelist.js — Генератор прайса Ритуальная мастерская
  * PDF: html2pdf.js on-page → blob → кнопка Сохранить
  * Excel: ExcelJS + батчевая загрузка фото → blob → кнопка Сохранить
  * Группировка: AC бренд→серия, Расходники→подгруппы
  */
 
-const PRICE_SITE = 'https://splithub.ru';
+const PRICE_SITE = 'https://ritualb2b.ru';
 
 /* ── Маппинг расходников → смысловые группы ── */
 const RASHOD_GROUP_MAP = {
@@ -193,7 +193,7 @@ async function downloadPricePDF() {
   }
 
   const date  = new Date().toLocaleDateString('ru-RU');
-  const fname = 'splithub-price-' + date.replace(/\./g, '-') + '.pdf';
+  const fname = 'ritualb2b-price-' + date.replace(/\./g, '-') + '.pdf';
   const ui    = _showProgressModal('📄 Генерируем PDF…');
 
   try {
@@ -336,8 +336,8 @@ function _buildPdfDocDef(date, photos) {
     defaultStyle: { font: 'Roboto', fontSize: 9 },
     images,
     content: [
-      { text: 'Прайс-лист СплитХаб', fontSize: 18, bold: true, alignment: 'center', margin: [0, 0, 0, 4] },
-      { text: `Оптовые кондиционеры · Симферополь · ${date} · Товаров: ${PRODUCTS.length}`,
+      { text: 'Прайс-лист Ритуальная мастерская', fontSize: 18, bold: true, alignment: 'center', margin: [0, 0, 0, 4] },
+      { text: `Венки и корзинки оптом · Симферополь · ${date} · Товаров: ${PRODUCTS.length}`,
         fontSize: 9, color: '#888888', alignment: 'center', margin: [0, 0, 0, 14] },
       {
         table: { headerRows: 1, dontBreakRows: true, widths: WIDTHS, body },
@@ -350,7 +350,7 @@ function _buildPdfDocDef(date, photos) {
       },
     ],
     footer: (page, count) => ({
-      text: `СплитХаб · Оптовые кондиционеры · Симферополь · Страница ${page} из ${count}`,
+      text: `Ритуальная мастерская · Венки и корзинки оптом · Симферополь · Страница ${page} из ${count}`,
       fontSize: 7, color: '#AAAAAA', alignment: 'center', margin: [0, 4, 0, 0],
     }),
   };
@@ -390,7 +390,7 @@ async function downloadPriceExcel() {
 
     const date = new Date().toLocaleDateString('ru-RU');
     const wb   = new ExcelJS.Workbook();
-    wb.creator  = 'СплитХаб';
+    wb.creator  = 'Ритуальная мастерская';
     wb.created  = new Date();
     const ws    = wb.addWorksheet('Прайс');
 
@@ -407,7 +407,7 @@ async function downloadPriceExcel() {
     /* Шапка книги */
     ws.mergeCells('A1:G1');
     Object.assign(ws.getCell('A1'), {
-      value:     'Прайс-лист СплитХаб',
+      value:     'Прайс-лист Ритуальная мастерская',
       font:      { name:'Arial', size:16, bold:true },
       alignment: { horizontal:'center', vertical:'middle' },
     });
@@ -415,7 +415,7 @@ async function downloadPriceExcel() {
 
     ws.mergeCells('A2:G2');
     Object.assign(ws.getCell('A2'), {
-      value:     `Оптовые кондиционеры · Симферополь · ${date} · Товаров: ${PRODUCTS.length}`,
+      value:     `Венки и корзинки оптом · Симферополь · ${date} · Товаров: ${PRODUCTS.length}`,
       font:      { name:'Arial', size:10, color:{argb:'FF888888'} },
       alignment: { horizontal:'center', vertical:'middle' },
     });
@@ -546,7 +546,7 @@ async function downloadPriceExcel() {
     const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     ui.update(100, `✅ Готово! Загружено фото: ${Object.keys(photos).length} из ${total}. Нажмите «Сохранить файл»`);
-    ui.enableSave(blob, `splithub-price-${date.replace(/\./g,'-')}.xlsx`);
+    ui.enableSave(blob, `ritualb2b-price-${date.replace(/\./g,'-')}.xlsx`);
 
   } catch(err) {
     console.error('Excel error:', err);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Админ — СплитХаб</title>
+<title>Админ — Ритуальная мастерская</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -629,7 +629,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
           </div>
           <div class="settings-field">
             <label>EMAIL_TO — Email для уведомлений</label>
-            <input type="email" id="cfg_EMAIL_TO" placeholder="zakaz@splithub.ru">
+            <input type="email" id="cfg_EMAIL_TO" placeholder="zakaz@ritualb2b.ru">
           </div>
           <div class="settings-field">
             <label>CRON_SECRET — Секрет для крон-задач</label>
@@ -637,7 +637,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
           </div>
           <div class="settings-field">
             <label>ALLOWED_ORIGIN — CORS домен</label>
-            <input type="text" id="cfg_ALLOWED_ORIGIN" placeholder="https://splithub.ru">
+            <input type="text" id="cfg_ALLOWED_ORIGIN" placeholder="https://ritualb2b.ru">
           </div>
         </div>
         <button class="settings-save-btn" onclick="saveSettings()">&#10003; Сохранить настройки</button>
@@ -886,7 +886,7 @@ function doLogout(){
     Object.keys(_loaded).forEach(function(k){_loaded[k]=false;});
     Object.keys(_charts).forEach(function(k){if(_charts[k])_charts[k].destroy();_charts[k]=null;});
     _lastNewCount=-1;
-    document.title='Админ — СплитХаб';
+    document.title='Админ — Ритуальная мастерская';
   });
 }
 
@@ -924,7 +924,7 @@ function startPolling(){
       document.getElementById('sRev').textContent=fmt(s.orders_revenue);
       document.getElementById('sUsers').textContent=s.users_count;
       document.getElementById('sGuests').textContent=s.guests_count;
-      var title='Админ — СплитХаб';
+      var title='Админ — Ритуальная мастерская';
       if(newCnt>0)title='('+newCnt+') '+title;
       document.title=title;
     }).catch(function(){});
@@ -944,7 +944,7 @@ function loadStats(){
     document.getElementById('sRev').textContent=fmt(s.orders_revenue);
     document.getElementById('sUsers').textContent=s.users_count;
     document.getElementById('sGuests').textContent=s.guests_count;
-    if(s.orders_new>0)document.title='('+s.orders_new+') Админ — СплитХаб';
+    if(s.orders_new>0)document.title='('+s.orders_new+') Админ — Ритуальная мастерская';
   }).catch(function(){});
 }
 

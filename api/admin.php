@@ -278,7 +278,7 @@ switch ($action) {
         $recent = $db->query("SELECT o.id,o.total,o.status,o.created_at,u.name FROM orders o JOIN users u ON o.user_id=u.id ORDER BY o.created_at DESC LIMIT 7")->fetchAll();
 
         $sIco = ['new'=>'🆕','confirmed'=>'✅','in_progress'=>'⚙️','shipped'=>'📦','completed'=>'✔️','cancelled'=>'❌'];
-        $msg  = "📊 *Отчёт СплитХаб* (по запросу)\n━━━━━━━━━━━━━━━━\n";
+        $msg  = "📊 *Отчёт Ритуальная мастерская* (по запросу)\n━━━━━━━━━━━━━━━━\n";
         $msg .= "📦 Всего: *{$cnt}*  |  🆕 Новых: *{$newCnt}*\n";
         $msg .= "📅 Сегодня: *{$today}*  |  👥 Гостевых: *{$guests}*\n";
         $msg .= "💰 Выручка: *".number_format($rev,0,'.',' ')." ₽*\n";

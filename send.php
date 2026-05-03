@@ -1,14 +1,12 @@
 <?php
 /**
- * send.php — СплитХаб
- * База: рабочий Desktop send.php (идентичная логика TG).
- * Вторичные функции (DB, email) изолированы в try/catch.
+ * send.php — Авторская ритуальная мастерская
  */
 
-// ── Credentials (идентично Desktop send.php) ──
-define('BOT_TOKEN', '8366074996:AAGe0oEpkQ4foTlcJ0zqNFxUv5w1i1Xay78');
-define('CHAT_ID',   '-1003727076862');
-define('EMAIL_TO',  'flycited@gmail.com');
+// ── Credentials ──
+define('BOT_TOKEN', '8586894494:AAFCvimnoMDeWveTEvOmFMGBNKESed4CgsE');
+define('CHAT_ID',   '-5133636773');
+define('EMAIL_TO',  'zakaz@ritualb2b.ru');
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
@@ -86,7 +84,7 @@ function sendTg($token, $chatId, $text) {
     return ['resp' => $resp, 'code' => $code, 'result' => json_decode($resp, true)];
 }
 
-$tgMsg  = "🛒 *Новая заявка — СплитХаб*\n";
+$tgMsg  = "🛒 *Новая заявка — Ритуальная мастерская*\n";
 $tgMsg .= "━━━━━━━━━━━━━━━━━━\n";
 $tgMsg .= "👤 *Имя:* {$name}\n";
 $tgMsg .= "📞 *Телефон:* {$phone}\n";
@@ -137,7 +135,7 @@ try {
         }
     }
 } catch (Throwable $e) {
-    error_log('[SplitHub DB] ' . $e->getMessage());
+    error_log('[RitualB2B DB] ' . $e->getMessage());
 }
 
 // ── Email (мобильно-адаптивная версия) ──
@@ -195,7 +193,7 @@ $emailHtml = '<!DOCTYPE html><html lang="ru"><head>'
     . '}'
     . '</style></head>'
     . '<body><div class="wrap">'
-    . '<div class="hdr"><h2>🛒 Новая заявка — СплитХаб</h2></div>'
+    . '<div class="hdr"><h2>🛒 Новая заявка — Ритуальная мастерская</h2></div>'
     . '<div class="meta"><table>'
     . '<tr><td class="lbl">Клиент</td><td class="val">' . htmlspecialchars($name) . '</td></tr>'
     . '<tr><td class="lbl">Телефон</td><td class="val">' . htmlspecialchars($phone) . '</td></tr>'
@@ -208,16 +206,16 @@ $emailHtml = '<!DOCTYPE html><html lang="ru"><head>'
     . '<tbody>' . $emailItems . $commentBlock . '</tbody>'
     . '<tfoot><tr class="tot"><td>Итого</td><td class="sum">' . $totalf . '&nbsp;₽</td></tr></tfoot>'
     . '</table></div>'
-    . '<div class="ftr">СплитХаб · splithub.ru · Симферополь</div>'
+    . '<div class="ftr">Авторская ритуальная мастерская · ritualb2b.ru · Симферополь</div>'
     . '</div></body></html>';
 
-$headers   = "From: =?UTF-8?B?" . base64_encode("СплитХаб") . "?= <zakaz@splithub.ru>\r\n";
+$headers   = "From: =?UTF-8?B?" . base64_encode("Ритуальная мастерская") . "?= <zakaz@ritualb2b.ru>\r\n";
 $headers  .= "MIME-Version: 1.0\r\n";
 $headers  .= "Content-Type: text/html; charset=UTF-8\r\n";
-$emailSubj = "=?UTF-8?B?" . base64_encode("Новая заявка СплитХаб — {$name} — {$totalf} руб") . "?=";
+$emailSubj = "=?UTF-8?B?" . base64_encode("Новая заявка Ритуальная мастерская — {$name} — {$totalf} руб") . "?=";
 $mailOk    = @mail(EMAIL_TO, $emailSubj, $emailHtml, $headers);
 
-error_log('[SplitHub] tg=' . ($tgOk?'ok':'FAIL:'.($tgResult['resp']??'')) . ' mail=' . ($mailOk?'ok':'fail') . ' order=' . ($orderId??'null') . ' guest=' . ($guestSaved?'yes':'no'));
+error_log('[RitualB2B] tg=' . ($tgOk?'ok':'FAIL:'.($tgResult['resp']??'')) . ' mail=' . ($mailOk?'ok':'fail') . ' order=' . ($orderId??'null') . ' guest=' . ($guestSaved?'yes':'no'));
 
 // ── Ответ ──
 if ($tgOk || $orderId || $guestSaved) {
@@ -225,7 +223,7 @@ if ($tgOk || $orderId || $guestSaved) {
     if ($orderId) $resp['order_id'] = $orderId;
     echo json_encode($resp);
 } else {
-    error_log('[SplitHub] TG error: ' . ($tgResult['resp'] ?? ''));
+    error_log('[RitualB2B] TG error: ' . ($tgResult['resp'] ?? ''));
     http_response_code(500);
     echo json_encode(['ok' => false, 'error' => 'Ошибка отправки. Позвоните: +7 978 599-13-69']);
 }
