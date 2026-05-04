@@ -739,6 +739,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd-brand{font-size:.62rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
 .pd-title{font-size:1rem;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-.02em}
 .pd-series{font-size:.7rem;color:var(--text2);margin-top:3px;line-height:1.4}
+.pd-desc-long{font-size:.84rem;color:var(--text);line-height:1.55;margin:0 0 14px;padding:12px 14px;background:rgba(255,255,255,.55);border:1px solid var(--blo);border-radius:12px}
 .pd-stock-inline{flex-shrink:0;font-size:.66rem;font-weight:700;padding:4px 10px;border-radius:20px;line-height:1.3;text-align:center;border:1px solid}
 .si-in {background:rgba(209,250,229,.65);color:#047857;border-color:rgba(16,185,129,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
 .si-12 {background:rgba(255,228,236,.60);color:#be185d;border-color:rgba(244,114,182,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
@@ -1386,6 +1387,7 @@ function openDetail(id) {
     + '</div>'
     + '<div class="pd-scroll">'
       + imgH
+      + (p.descLong ? '<div class="pd-desc-long">'+p.descLong+'</div>' : '')
       + '<div class="pd-action-row">'
         + '<div class="pd-price">'+p.price.toLocaleString('ru-RU')+' ₽<span class="pd-price-sub">опт · комплект</span></div>'
         + orderBtn
