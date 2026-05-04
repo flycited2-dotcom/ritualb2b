@@ -105,13 +105,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 @media(max-width:639px){.carousel-item{height:28vh;min-height:140px;}}
 
 /* CATALOG FILTER PANEL */
-.cat-filter-panel{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg);padding:16px 16px 0;}
+.cat-filter-panel{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg);padding:16px 16px 0;align-items:stretch;}
 .cat-col{display:flex;flex-direction:column;gap:3px;}
-.cat-hbtn{width:100%;padding:20px 16px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.3;}
+.cat-hbtn{width:100%;flex:1;min-height:84px;padding:14px 12px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;border-radius:10px 10px 0 0;transition:background 0.2s;text-align:center;line-height:1.25;display:flex;align-items:center;justify-content:center;}
 .cat-hbtn:hover{background:var(--amber-d);}
 .cat-hbtn.active{background:var(--amber-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,0.15);}
 .size-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
-.size-btn{padding:12px 4px;border:none;border-top:2px solid rgba(0,0,0,0.08);background:#f0ece6;color:var(--text2);font-family:'Inter',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s;border-radius:0 0 8px 8px;line-height:1.3;}
+.size-btn{min-height:42px;padding:10px 4px;border:none;border-top:2px solid rgba(0,0,0,0.08);background:#f0ece6;color:var(--text2);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s;border-radius:0 0 8px 8px;line-height:1.2;display:flex;align-items:center;justify-content:center;}
 .size-btn:hover{background:#e4dfd8;color:var(--text);border-top-color:var(--amber);}
 .size-btn.active{background:var(--amber);color:#fff;border-top-color:transparent;}
 /* legacy qbtn used in drawer/other places */
@@ -509,8 +509,8 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   .cat-filter-panel { padding: 24px 24px 0; gap: 4px; }
   .cat-col { gap: 4px; }
   .size-row { gap: 4px; }
-  .cat-hbtn { padding: 20px 16px; font-size: 0.78rem; }
-  .size-btn { padding: 12px 4px; font-size: 0.68rem; }
+  .cat-hbtn { padding: 16px 12px; font-size: 0.78rem; min-height: 76px; }
+  .size-btn { padding: 10px 4px; font-size: 0.72rem; min-height: 42px; }
   section#contacts, section#faq {
     max-width: 960px; margin-left: auto; margin-right: auto;
     padding-left: 32px; padding-right: 32px;
@@ -909,7 +909,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     <span class="nav-slogan">Венки и ритуальные корзинки оптом для B2B &middot; Симферополь</span>
     <div class="nav-phones">
       <a href="tel:+79152776688" class="nav-ph call">&#128222; <span>+7 915 277-66-88</span></a>
-      <a href="https://t.me/+79152776688" class="nav-ph tg" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> <span>+7 978 839-40-42</span></a>
+      <a href="https://t.me/+79788394043" class="nav-ph tg" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> <span>+7 978 839-40-43</span></a>
     </div>
     <button class="nav-reg-btn" id="navRegBtn" onclick="openRegister()">Регистрация</button>
     <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">Войти</button>
@@ -918,8 +918,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   </div>
   <div class="nav-phones-mobile">
     <a href="tel:+79152776688" class="nav-ph call">&#128222; +7 915 277-66-88</a>
-    <a href="tel:+79788394042" class="nav-ph call">&#128222; +7 978 839-40-42</a>
     <a href="https://t.me/+79152776688" class="nav-ph tg" target="_blank">&#9992; Telegram</a>
+    <a href="tel:+79788394043" class="nav-ph call">&#128222; +7 978 839-40-43</a>
+    <a href="https://t.me/+79788394043" class="nav-ph tg" target="_blank">&#9992; Telegram</a>
   </div>
 </nav>
 
@@ -974,9 +975,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     <p class="contacts-sub">Ежедневно &middot; 6:00&ndash;23:00<br>Ответим в течение 15 минут</p>
     <div class="clinks">
       <a class="g clink phone" href="tel:+79152776688">&#128222; +7 915 277-66-88</a>
-      <a class="g clink phone" href="tel:+79788394042">&#128222; +7 978 839-40-42</a>
+      <a class="g clink phone" href="tel:+79788394043">&#128222; +7 978 839-40-43</a>
       <a class="g clink tg" href="https://t.me/+79152776688" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> Telegram +7 915 277-66-88</a>
-      <a class="g clink tg" href="https://t.me/+79788394042" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> Telegram +7 978 839-40-42</a>
+      <a class="g clink tg" href="https://t.me/+79788394043" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.889z"/></svg> Telegram +7 978 839-40-43</a>
       <a class="g clink email" href="mailto:zakaz@ritualb2b.ru">&#128231; zakaz@ritualb2b.ru</a>
     </div>
   </div>

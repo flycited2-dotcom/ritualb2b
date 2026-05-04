@@ -105,7 +105,7 @@ elseif ($method === 'email') {
         . "<p class=\"text\"><a href=\"https://ritualb2b.ru\">Откройте полный прайс на сайте</a></p>"
         . "<p class=\"text\">При возникновении вопросов свяжитесь с менеджером:<br>"
         . "📞 +7 915 277-66-88<br>"
-        . "💬 +7 978 839-40-42 (Telegram)</p>"
+        . "💬 +7 978 839-40-43 (Telegram)</p>"
         . "<p class=\"text\" style=\"color: #999; font-size: 12px; margin-top: 20px;\">Авторская ритуальная мастерская · ritualb2b.ru · Симферополь</p>"
         . "</div></body></html>";
 
