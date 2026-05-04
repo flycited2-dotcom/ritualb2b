@@ -38,4 +38,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://splithub.ru/sitemap.xml
+Sitemap: https://ritualb2b.ru/sitemap.xml
