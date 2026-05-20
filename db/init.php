@@ -49,11 +49,16 @@ function getDB() {
     $poColsResult = $db->query("PRAGMA table_info(product_overrides)")->fetchAll(PDO::FETCH_ASSOC);
     $poCols = array_column($poColsResult, 'name');
     foreach ([
-        'active'          => "ALTER TABLE product_overrides ADD COLUMN active INTEGER DEFAULT NULL",
-        'price_override'  => "ALTER TABLE product_overrides ADD COLUMN price_override INTEGER DEFAULT NULL",
-        'stock_override'  => "ALTER TABLE product_overrides ADD COLUMN stock_override TEXT DEFAULT NULL",
-        'size_override'   => "ALTER TABLE product_overrides ADD COLUMN size_override TEXT DEFAULT NULL",
-        'desc_short'      => "ALTER TABLE product_overrides ADD COLUMN desc_short TEXT DEFAULT NULL",
+        'active'             => "ALTER TABLE product_overrides ADD COLUMN active INTEGER DEFAULT NULL",
+        'price_override'     => "ALTER TABLE product_overrides ADD COLUMN price_override INTEGER DEFAULT NULL",
+        'stock_override'     => "ALTER TABLE product_overrides ADD COLUMN stock_override TEXT DEFAULT NULL",
+        'size_override'      => "ALTER TABLE product_overrides ADD COLUMN size_override TEXT DEFAULT NULL",
+        'desc_short'         => "ALTER TABLE product_overrides ADD COLUMN desc_short TEXT DEFAULT NULL",
+        'model_override'     => "ALTER TABLE product_overrides ADD COLUMN model_override TEXT DEFAULT NULL",
+        'brand_override'     => "ALTER TABLE product_overrides ADD COLUMN brand_override TEXT DEFAULT NULL",
+        'dimensions'         => "ALTER TABLE product_overrides ADD COLUMN dimensions TEXT DEFAULT NULL",
+        'desc_long_override' => "ALTER TABLE product_overrides ADD COLUMN desc_long_override TEXT DEFAULT NULL",
+        'benefits_override'  => "ALTER TABLE product_overrides ADD COLUMN benefits_override TEXT DEFAULT NULL",
     ] as $col => $sql) {
         if (!in_array($col, $poCols)) {
             try { $db->exec($sql); } catch (Throwable $e) {}

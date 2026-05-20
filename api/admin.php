@@ -16,7 +16,7 @@ $action = $_GET['action'] ?? '';
 if ($action === 'products_overrides_public') {
     $db = getDB();
     // Return ALL overrides including active=0 (frontend filters hidden products)
-    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, active FROM product_overrides")->fetchAll();
+    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, active, model_override, brand_override, dimensions, desc_long_override, benefits_override FROM product_overrides")->fetchAll();
     $map = [];
     foreach ($rows as $r) { $map[$r['sku']] = $r; }
     // Custom products (manually added)
@@ -428,7 +428,7 @@ switch ($action) {
                 $products = json_decode($m[1], true) ?: [];
             }
         }
-        $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short FROM product_overrides")->fetchAll();
+        $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short, model_override, brand_override, dimensions, desc_long_override, benefits_override FROM product_overrides")->fetchAll();
         $ovMap = [];
         foreach ($ovRows as $r) { $ovMap[$r['sku']] = $r; }
         foreach ($products as &$p) {
@@ -461,18 +461,27 @@ switch ($action) {
     case 'product_save_override':
         if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
         $raw = json_decode(file_get_contents('php://input'), true);
-        $sku          = trim($raw['sku'] ?? '');
-        $desc         = trim($raw['description'] ?? '');
-        $badge        = trim($raw['badge'] ?? '');
-        $blabel       = trim($raw['badge_label'] ?? '');
-        $priceOv      = isset($raw['price_override']) && $raw['price_override'] !== '' ? (int)$raw['price_override'] : null;
-        $stockOv      = in_array($raw['stock_override'] ?? '', ['in_stock', 'out_of_stock', '']) ? (($raw['stock_override'] ?? '') ?: null) : null;
-        $sizeOv       = in_array($raw['size_override'] ?? '', ['S', 'M', 'L', 'XL', '']) ? (($raw['size_override'] ?? '') ?: null) : null;
-        $descShort    = trim($raw['desc_short'] ?? '') ?: null;
+        $sku             = trim($raw['sku'] ?? '');
+        $desc            = trim($raw['description'] ?? '');
+        $badge           = trim($raw['badge'] ?? '');
+        $blabel          = trim($raw['badge_label'] ?? '');
+        $priceOv         = isset($raw['price_override']) && $raw['price_override'] !== '' ? (int)$raw['price_override'] : null;
+        $stockOv         = in_array($raw['stock_override'] ?? '', ['in_stock', 'out_of_stock', '']) ? (($raw['stock_override'] ?? '') ?: null) : null;
+        $sizeOv          = trim($raw['size_override'] ?? '') ?: null;
+        $descShort       = trim($raw['desc_short'] ?? '') ?: null;
+        $modelOv         = trim($raw['model_override'] ?? '') ?: null;
+        $brandOv         = trim($raw['brand_override'] ?? '') ?: null;
+        $dimensions      = trim($raw['dimensions'] ?? '') ?: null;
+        $descLongOv      = trim($raw['desc_long_override'] ?? '') ?: null;
+        $benefitsOv      = trim($raw['benefits_override'] ?? '') ?: null;
         if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
         if (!in_array($badge, ['', 'new', 'sale', 'clearance'])) jsonResponse(['ok' => false, 'error' => 'Invalid badge'], 422);
-        $db->prepare("INSERT OR REPLACE INTO product_overrides (sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
-            ->execute([$sku, $desc, $badge, $blabel, $priceOv, $stockOv, $sizeOv, $descShort]);
+        $db->prepare("INSERT OR REPLACE INTO product_overrides
+            (sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short,
+             model_override, brand_override, dimensions, desc_long_override, benefits_override, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
+            ->execute([$sku, $desc, $badge, $blabel, $priceOv, $stockOv, $sizeOv, $descShort,
+                       $modelOv, $brandOv, $dimensions, $descLongOv, $benefitsOv]);
         jsonResponse(['ok' => true]);
         break;
 

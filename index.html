@@ -1235,10 +1235,11 @@ function cardHtml(p, delay) {
     ? '<img loading="lazy" decoding="async" src="'+src+'" alt="'+p.model+'" onerror="this.style.display=\'none\'">'
     : '<div style="font-size:2rem;display:flex;align-items:center;justify-content:center;height:100%">🌿</div>';
   var _ov = PRODUCT_OVERRIDES[p.sku] || {};
-  var _price = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
-  var _stock = _ov.stock_override || p.stock || 'in_stock';
-  var _size  = _ov.size_override  || p.size  || '';
-  var _descShort = _ov.desc_short || p.descShort || '';
+  var _price     = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
+  var _stock     = _ov.stock_override  || p.stock     || 'in_stock';
+  var _size      = _ov.size_override   || p.size      || '';
+  var _descShort = _ov.desc_short      || p.descShort || '';
+  var _model     = _ov.model_override  || p.model     || '';
   var addBtn = qty > 0
     ? '<div class="qty-row"><button class="qb" onclick="chQty(\''+p.id+'\',-1);event.stopPropagation()">−</button><span class="qv">'+qty+'</span><button class="qb" onclick="chQty(\''+p.id+'\',1);event.stopPropagation()">+</button></div>'
     : (_stock === 'out_of_stock' || _stock === 'out'
@@ -1254,7 +1255,7 @@ function cardHtml(p, delay) {
     + _badgeHtml
     + '<div class="pcard-img">'+imgHtml+'</div>'
     + '<div class="pcard-body">'
-    + '<div class="pcard-name">'+p.model+'</div>'
+    + '<div class="pcard-name">'+_model+'</div>'
     + '<div class="pcard-desc">'+descLine+'</div>'
     + _descExtra
     + '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
@@ -1373,21 +1374,27 @@ function openDetail(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   pdCurrentId = id; pdQty = 1;
   var _ov = PRODUCT_OVERRIDES[p.sku] || {};
-  var _price = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
-  var _stock = _ov.stock_override || p.stock || 'in_stock';
-  var _size  = _ov.size_override  || p.size  || '';
-  var _descShort = _ov.desc_short || p.descShort || '';
-  var _descLong  = _ov.description || p.descLong || '';
+  var _price     = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
+  var _stock     = _ov.stock_override  || p.stock     || 'in_stock';
+  var _size      = _ov.size_override   || p.size      || '';
+  var _descShort = _ov.desc_short      || p.descShort || '';
+  var _model     = _ov.model_override  || p.model     || '';
+  var _brand     = _ov.brand_override  || p.brand     || '';
+  var _descLong  = _ov.desc_long_override || p.descLong || '';
+  var _benefits  = _ov.benefits_override
+    ? (function(){ try{ return JSON.parse(_ov.benefits_override); }catch(e){ return (_ov.benefits_override||'').split('\n').filter(Boolean); } })()
+    : (p.benefits || []);
   var src = getImg(p);
   var imgH = src
-    ? '<div class="pd-img-wrap"><img class="pd-img" loading="lazy" src="'+src+'" alt="'+p.model+'" onerror="this.style.display=\'none\'"></div>'
+    ? '<div class="pd-img-wrap"><img class="pd-img" loading="lazy" src="'+src+'" alt="'+_model+'" onerror="this.style.display=\'none\'"></div>'
     : '';
   var specs = [];
   if(_size && _size!=='-') specs.push({ico:'📏',t:'Размер',v:_size});
+  if(_ov.dimensions) specs.push({ico:'📐',t:'Размеры',v:_ov.dimensions});
   var specsPills = specs.length
     ? '<div class="pd-specs-row">'+specs.map(function(s){ return '<div class="pd-spec-pill">'+s.ico+' '+s.t+': <span>'+s.v+'</span></div>'; }).join('')+'</div>'
     : '';
-  var benefits = p.benefits || [];
+  var benefits = _benefits;
   var featHtml = benefits.length
     ? '<div class="pd-features-block"><div class="pd-features-title">Преимущества</div><div class="pd-features-list">'
       + benefits.map(function(f){ return '<div class="pd-feat-item"><div class="pd-feat-check">✓</div><div>'+f+'</div></div>'; }).join('')
@@ -1404,8 +1411,8 @@ function openDetail(id) {
     '<div class="pd-handle" onclick="closeDetail()"><div class="pd-handle-bar"></div></div>'
     + '<div class="pd-head">'
       + '<div class="pd-head-info">'
-        + '<div class="pd-brand">'+p.brand+'</div>'
-        + '<div class="pd-title">'+p.model+'</div>'
+        + '<div class="pd-brand">'+_brand+'</div>'
+        + '<div class="pd-title">'+_model+'</div>'
         + '<div class="pd-series">'+_descShort+'</div>'
       + '</div>'
       + getStockInline(_p)

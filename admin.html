@@ -396,6 +396,9 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 .custom-label-inp{width:100%;border:1px solid var(--blo);background:rgba(255,255,255,.6);border-radius:9px;
   padding:9px 12px;font-size:.82rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px}
 .custom-label-inp:focus{border-color:var(--amber)}
+.pe-section-hdr{font-size:.68rem;font-weight:700;color:var(--amber-d);text-transform:uppercase;letter-spacing:.06em;
+  padding:6px 0 6px;margin:12px 0 8px;border-bottom:1px solid var(--blo)}
+.pe-lbl{font-size:.7rem;color:#9298A8;margin-bottom:4px}
 .prod-count-badge{background:var(--amber);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:700;margin-left:6px}
 .carousel-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.7);border:1px solid var(--blo);border-radius:10px;padding:10px 14px;}
 .carousel-row:hover{border-color:var(--amber);}
@@ -748,23 +751,41 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 
 <!-- PRODUCT EDIT MODAL -->
 <div class="modal-ov prod-edit-modal" id="prodEditModal">
-  <div class="modal-box" style="max-width:540px;max-height:90vh;overflow-y:auto">
-    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
-      <img id="peModalPhoto" src="" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;background:#e8e4de;flex-shrink:0;display:none">
-      <div>
-        <h3 id="peModalTitle" style="margin-bottom:4px">Редактировать товар</h3>
-        <div style="font-size:.72rem;color:#9298A8" id="peModalSku"></div>
+  <div class="modal-box" style="max-width:560px;max-height:92vh;overflow-y:auto">
+
+    <!-- Header -->
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
+      <img id="peModalPhoto" src="" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;background:#e8e4de;flex-shrink:0;display:none">
+      <div style="flex:1;min-width:0">
+        <h3 id="peModalTitle" style="margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Редактировать товар</h3>
+        <div style="font-size:.7rem;color:#9298A8" id="peModalSku"></div>
       </div>
     </div>
 
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Основные параметры</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+    <!-- ── Название и бренд ── -->
+    <div class="pe-section-hdr">Название и бренд</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div>
-        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Цена, ₽</div>
+        <div class="pe-lbl">Название <span style="color:#9298A8;font-weight:400">(переопределить)</span></div>
+        <div id="peModelHint" style="font-size:.67rem;color:#9298A8;margin-bottom:4px;display:none">Сейчас: <span id="peModelOrig" style="font-style:italic"></span></div>
+        <input class="l-inp" id="peModelOverride" type="text" placeholder="Оставьте пустым — без изменений" style="margin-bottom:0">
+      </div>
+      <div>
+        <div class="pe-lbl">Бренд / мастер <span style="color:#9298A8;font-weight:400">(переопределить)</span></div>
+        <div id="peBrandHint" style="font-size:.67rem;color:#9298A8;margin-bottom:4px;display:none">Сейчас: <span id="peBrandOrig" style="font-style:italic"></span></div>
+        <input class="l-inp" id="peBrandOverride" type="text" placeholder="Оставьте пустым — без изменений" style="margin-bottom:0">
+      </div>
+    </div>
+
+    <!-- ── Цена, наличие, размер ── -->
+    <div class="pe-section-hdr">Цена и наличие</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <div class="pe-lbl">Цена, ₽</div>
         <input class="l-inp" id="pePriceOverride" type="number" min="0" placeholder="Из каталога" style="margin-bottom:0">
       </div>
       <div>
-        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Наличие</div>
+        <div class="pe-lbl">Наличие</div>
         <select class="l-inp" id="peStockOverride" style="margin-bottom:0">
           <option value="">Из каталога</option>
           <option value="in_stock">В наличии</option>
@@ -772,36 +793,48 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
         </select>
       </div>
       <div>
-        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Размер</div>
-        <select class="l-inp" id="peSizeOverride" style="margin-bottom:0">
-          <option value="">Из каталога</option>
-          <option value="S">S</option>
-          <option value="M">M</option>
-          <option value="L">L</option>
-          <option value="XL">XL</option>
-        </select>
+        <div class="pe-lbl">Размер (S/M/L…)</div>
+        <input class="l-inp" id="peSizeOverride" type="text" placeholder="S / M / L / XL" style="margin-bottom:0">
       </div>
     </div>
 
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:4px;letter-spacing:.04em">Краткое описание (под названием)</div>
-    <div id="peDescShortHint" style="font-size:.68rem;color:#9298A8;margin-bottom:6px;display:none">Из каталога: <span id="peDescShortOrig" style="color:#6b7280;font-style:italic"></span></div>
+    <!-- ── Характеристики ── -->
+    <div class="pe-section-hdr">Характеристики изделия</div>
+    <div class="pe-lbl">Размеры изделия <span style="color:#9298A8;font-weight:400">(отображается в карточке)</span></div>
+    <input class="l-inp" id="peDimensions" type="text" placeholder="Диаметр 60 см, высота 80 см">
+
+    <!-- ── Описания ── -->
+    <div class="pe-section-hdr">Описания</div>
+    <div class="pe-lbl">Краткое описание <span style="color:#9298A8;font-weight:400">(под названием в каталоге)</span></div>
+    <div id="peDescShortHint" style="font-size:.67rem;color:#9298A8;margin-bottom:4px;display:none">Из каталога: <span id="peDescShortOrig" style="font-style:italic"></span></div>
     <input class="l-inp" id="peDescShort" type="text" placeholder="Авторская работа · Искусственные цветы">
 
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Бейдж</div>
+    <div class="pe-lbl">Полное описание <span style="color:#9298A8;font-weight:400">(в попапе товара)</span></div>
+    <div id="peDescLongHint" style="font-size:.67rem;color:#9298A8;margin-bottom:4px;display:none">Из каталога: <span id="peDescLongOrig" style="font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"></span></div>
+    <textarea class="note-area" id="peDescLongOverride" style="min-height:80px" placeholder="Оставьте пустым — используется текст из каталога"></textarea>
+
+    <div class="pe-lbl">Преимущества <span style="color:#9298A8;font-weight:400">(каждое с новой строки)</span></div>
+    <div id="peBenefitsHint" style="font-size:.67rem;color:#9298A8;margin-bottom:4px;display:none">Из каталога: <span id="peBenefitsOrig" style="font-style:italic"></span></div>
+    <textarea class="note-area" id="peBenefitsOverride" style="min-height:70px" placeholder="Оставьте пустым — список из каталога&#10;Ручная работа&#10;Живые цветы&#10;Размер L"></textarea>
+
+    <!-- ── Бейдж ── -->
+    <div class="pe-section-hdr">Бейдж / акция</div>
     <div class="badge-select-grid">
       <div class="badge-opt active" data-v="" onclick="selectBadge(this)">Нет</div>
       <div class="badge-opt" data-v="new" onclick="selectBadge(this)">🆕 Новинка</div>
       <div class="badge-opt" data-v="sale" onclick="selectBadge(this)">🔥 Акция</div>
       <div class="badge-opt" data-v="clearance" onclick="selectBadge(this)">🏷 Распродажа</div>
     </div>
-    <input class="custom-label-inp" id="peBadgeLabel" type="text" placeholder="Своя подпись бейджа (необязательно, переопределяет стандартную)">
+    <input class="custom-label-inp" id="peBadgeLabel" type="text" placeholder="Своя подпись бейджа (необязательно)">
 
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Полное описание (в карточке товара)</div>
-    <textarea class="note-area" id="peDescription" style="min-height:90px" placeholder="Дополнительное описание, характеристики, акционные условия..."></textarea>
+    <!-- ── Доп. информация (маркетинг) ── -->
+    <div class="pe-section-hdr">Дополнительная информация</div>
+    <div class="pe-lbl">Маркетинговый текст <span style="color:#9298A8;font-weight:400">(показывается в каталоге под описанием)</span></div>
+    <textarea class="note-area" id="peDescription" style="min-height:60px" placeholder="Акционные условия, состав, специальные предложения..."></textarea>
 
-    <div class="modal-btns" style="margin-top:14px">
+    <div class="modal-btns" style="margin-top:16px">
       <button class="modal-cancel" onclick="closeModal('prodEditModal')">Отмена</button>
-      <button class="modal-ok" onclick="saveProdOverride()">Сохранить</button>
+      <button class="modal-ok" onclick="saveProdOverride()">Сохранить изменения</button>
     </div>
   </div>
 </div>
@@ -1787,18 +1820,48 @@ function openProdEdit(sku) {
   var photoEl = document.getElementById('peModalPhoto');
   if (p.photo) { photoEl.src = 'assets/img/products/'+p.photo; photoEl.style.display='block'; }
   else { photoEl.style.display='none'; }
-  document.getElementById('peDescription').value = ov.description || '';
-  document.getElementById('peBadgeLabel').value = ov.badge_label || '';
+  // ── Название и бренд ──
+  document.getElementById('peModelOverride').value = ov.model_override || '';
+  var modelHint = document.getElementById('peModelHint');
+  var modelOrig = document.getElementById('peModelOrig');
+  if(p.model){ modelOrig.textContent = p.model; modelHint.style.display = 'block'; } else { modelHint.style.display = 'none'; }
+
+  document.getElementById('peBrandOverride').value = ov.brand_override || '';
+  var brandHint = document.getElementById('peBrandHint');
+  var brandOrig = document.getElementById('peBrandOrig');
+  if(p.brand){ brandOrig.textContent = p.brand; brandHint.style.display = 'block'; } else { brandHint.style.display = 'none'; }
+
+  // ── Цена и наличие ──
   document.getElementById('pePriceOverride').value = ov.price_override != null ? ov.price_override : '';
   document.getElementById('peStockOverride').value = ov.stock_override || '';
   document.getElementById('peSizeOverride').value = ov.size_override || '';
-  // Pre-fill with override if set, otherwise show original catalog value
+
+  // ── Характеристики ──
+  document.getElementById('peDimensions').value = ov.dimensions || '';
+
+  // ── Краткое описание ──
   document.getElementById('peDescShort').value = (ov.desc_short != null) ? ov.desc_short : (p.descShort || '');
-  var origDesc = p.descShort || '';
   var hintEl = document.getElementById('peDescShortHint');
   var origEl = document.getElementById('peDescShortOrig');
-  if (origDesc) { origEl.textContent = origDesc; hintEl.style.display = 'block'; }
-  else { hintEl.style.display = 'none'; }
+  if(p.descShort){ origEl.textContent = p.descShort; hintEl.style.display = 'block'; } else { hintEl.style.display = 'none'; }
+
+  // ── Полное описание ──
+  document.getElementById('peDescLongOverride').value = ov.desc_long_override || '';
+  var dlHint = document.getElementById('peDescLongHint');
+  var dlOrig = document.getElementById('peDescLongOrig');
+  if(p.descLong){ dlOrig.textContent = p.descLong.slice(0,120)+(p.descLong.length>120?'…':''); dlHint.style.display = 'block'; } else { dlHint.style.display = 'none'; }
+
+  // ── Преимущества ──
+  var benefOv = ov.benefits_override || '';
+  if(benefOv && benefOv.charAt(0) === '['){try{ benefOv = JSON.parse(benefOv).join('\n'); }catch(e){}}
+  document.getElementById('peBenefitsOverride').value = benefOv;
+  var bfHint = document.getElementById('peBenefitsHint');
+  var bfOrig = document.getElementById('peBenefitsOrig');
+  if(p.benefits && p.benefits.length){ bfOrig.textContent = p.benefits.slice(0,3).join(' · ')+(p.benefits.length>3?'…':''); bfHint.style.display = 'block'; } else { bfHint.style.display = 'none'; }
+
+  // ── Бейдж и доп. текст ──
+  document.getElementById('peBadgeLabel').value = ov.badge_label || '';
+  document.getElementById('peDescription').value = ov.description || '';
   document.querySelectorAll('.badge-opt').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-v') === _peBadge);
   });
@@ -1812,21 +1875,26 @@ function selectBadge(el) {
 }
 
 function saveProdOverride() {
-  var desc       = document.getElementById('peDescription').value;
-  var label      = document.getElementById('peBadgeLabel').value.trim();
-  var priceRaw   = document.getElementById('pePriceOverride').value;
-  var stockOv    = document.getElementById('peStockOverride').value;
-  var sizeOv     = document.getElementById('peSizeOverride').value;
-  var descShort  = document.getElementById('peDescShort').value.trim();
+  var priceRaw        = document.getElementById('pePriceOverride').value;
+  var benefitsRaw     = document.getElementById('peBenefitsOverride').value.trim();
+  // Store benefits as JSON array if provided
+  var benefitsVal     = benefitsRaw
+    ? JSON.stringify(benefitsRaw.split('\n').map(function(s){return s.trim();}).filter(Boolean))
+    : '';
   var payload = {
-    sku: _peCurrentSku,
-    description: desc,
-    badge: _peBadge,
-    badge_label: label,
-    price_override: priceRaw !== '' ? parseInt(priceRaw) : '',
-    stock_override: stockOv,
-    size_override: sizeOv,
-    desc_short: descShort
+    sku:               _peCurrentSku,
+    model_override:    document.getElementById('peModelOverride').value.trim(),
+    brand_override:    document.getElementById('peBrandOverride').value.trim(),
+    price_override:    priceRaw !== '' ? parseInt(priceRaw) : '',
+    stock_override:    document.getElementById('peStockOverride').value,
+    size_override:     document.getElementById('peSizeOverride').value.trim(),
+    dimensions:        document.getElementById('peDimensions').value.trim(),
+    desc_short:        document.getElementById('peDescShort').value.trim(),
+    desc_long_override:document.getElementById('peDescLongOverride').value.trim(),
+    benefits_override: benefitsVal,
+    badge:             _peBadge,
+    badge_label:       document.getElementById('peBadgeLabel').value.trim(),
+    description:       document.getElementById('peDescription').value.trim()
   };
   fetch(api('admin.php?action=product_save_override'), {method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)})
