@@ -440,6 +440,33 @@ switch ($action) {
         jsonResponse(['ok' => true]);
         break;
 
+    // ── Toggle single product active ──
+    case 'product_toggle_active':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true);
+        $sku    = trim($raw['sku'] ?? '');
+        $active = isset($raw['active']) ? intval($raw['active']) : 1;
+        if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at")
+            ->execute([$sku, $active]);
+        jsonResponse(['ok' => true]);
+        break;
+
+    // ── Bulk toggle products active ──
+    case 'bulk_toggle_prod_active':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw  = json_decode(file_get_contents('php://input'), true);
+        $skus = array_filter(array_map('trim', (array)($raw['skus'] ?? [])));
+        $active = isset($raw['active']) ? intval($raw['active']) : 1;
+        if (!$skus) jsonResponse(['ok' => false, 'error' => 'skus required'], 422);
+        $updated = 0;
+        $stmt = $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at");
+        foreach ($skus as $sku) { $stmt->execute([$sku, $active]); $updated++; }
+        jsonResponse(['ok' => true, 'updated' => $updated]);
+        break;
+
     default:
         jsonResponse(['ok' => false, 'error' => 'Unknown action'], 400);
 }
