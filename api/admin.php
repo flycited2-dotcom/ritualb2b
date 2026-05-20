@@ -398,9 +398,9 @@ switch ($action) {
         $products = [];
         if (file_exists($jsFile)) {
             $js = file_get_contents($jsFile);
-            $js = preg_replace('/^\s*var\s+PRODUCTS\s*=\s*/', '', trim($js));
-            $js = rtrim($js, ";\r\n ");
-            $products = json_decode($js, true) ?: [];
+            if (preg_match('/var\s+PRODUCTS\s*=\s*(\[[\s\S]*?\])\s*;/', $js, $m)) {
+                $products = json_decode($m[1], true) ?: [];
+            }
         }
         $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short FROM product_overrides")->fetchAll();
         $ovMap = [];
