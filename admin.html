@@ -783,7 +783,8 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
       </div>
     </div>
 
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Краткое описание (под названием)</div>
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:4px;letter-spacing:.04em">Краткое описание (под названием)</div>
+    <div id="peDescShortHint" style="font-size:.68rem;color:#9298A8;margin-bottom:6px;display:none">Из каталога: <span id="peDescShortOrig" style="color:#6b7280;font-style:italic"></span></div>
     <input class="l-inp" id="peDescShort" type="text" placeholder="Авторская работа · Искусственные цветы">
 
     <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Бейдж</div>
@@ -1791,7 +1792,13 @@ function openProdEdit(sku) {
   document.getElementById('pePriceOverride').value = ov.price_override != null ? ov.price_override : '';
   document.getElementById('peStockOverride').value = ov.stock_override || '';
   document.getElementById('peSizeOverride').value = ov.size_override || '';
-  document.getElementById('peDescShort').value = ov.desc_short || '';
+  // Pre-fill with override if set, otherwise show original catalog value
+  document.getElementById('peDescShort').value = (ov.desc_short != null) ? ov.desc_short : (p.descShort || '');
+  var origDesc = p.descShort || '';
+  var hintEl = document.getElementById('peDescShortHint');
+  var origEl = document.getElementById('peDescShortOrig');
+  if (origDesc) { origEl.textContent = origDesc; hintEl.style.display = 'block'; }
+  else { hintEl.style.display = 'none'; }
   document.querySelectorAll('.badge-opt').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-v') === _peBadge);
   });
