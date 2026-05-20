@@ -60,6 +60,18 @@ function getDB() {
         }
     }
 
+    // custom_products — manually added products
+    try {
+        $db->exec("CREATE TABLE IF NOT EXISTS custom_products (
+            id TEXT PRIMARY KEY,
+            sku TEXT NOT NULL UNIQUE,
+            data_json TEXT NOT NULL DEFAULT '{}',
+            active INTEGER DEFAULT 1,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )");
+    } catch (Throwable $e) {}
+
     // app_settings table
     try {
         $db->exec("CREATE TABLE IF NOT EXISTS app_settings (

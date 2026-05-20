@@ -1095,7 +1095,18 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 var PRODUCT_OVERRIDES = {};
 fetch("api/admin.php?action=products_overrides_public")
   .then(function(r){return r.json();})
-  .then(function(d){if(d.ok)PRODUCT_OVERRIDES=d.overrides||{};})
+  .then(function(d){
+    if(!d.ok) return;
+    PRODUCT_OVERRIDES = d.overrides || {};
+    // Merge manually added products into PRODUCTS array
+    var custom = d.custom_products || [];
+    custom.forEach(function(cp){
+      if(!PRODUCTS.find(function(p){ return p.sku === cp.sku; })){
+        PRODUCTS.push(cp);
+      }
+    });
+    renderAll(); // Re-render catalog with overrides + custom products applied
+  })
   .catch(function(){});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js" defer></script>
@@ -1223,18 +1234,22 @@ function cardHtml(p, delay) {
   var imgHtml = src
     ? '<img loading="lazy" decoding="async" src="'+src+'" alt="'+p.model+'" onerror="this.style.display=\'none\'">'
     : '<div style="font-size:2rem;display:flex;align-items:center;justify-content:center;height:100%">🌿</div>';
+  var _ov = PRODUCT_OVERRIDES[p.sku] || {};
+  var _price = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
+  var _stock = _ov.stock_override || p.stock || 'in_stock';
+  var _size  = _ov.size_override  || p.size  || '';
+  var _descShort = _ov.desc_short || p.descShort || '';
   var addBtn = qty > 0
     ? '<div class="qty-row"><button class="qb" onclick="chQty(\''+p.id+'\',-1);event.stopPropagation()">−</button><span class="qv">'+qty+'</span><button class="qb" onclick="chQty(\''+p.id+'\',1);event.stopPropagation()">+</button></div>'
-    : (p.stock === 'out'
+    : (_stock === 'out_of_stock' || _stock === 'out'
       ? '<button class="addbtn" style="background:#9CA3AF;cursor:not-allowed" disabled>Нет в наличии</button>'
       : '<button class="addbtn" onclick="addItem(\''+p.id+'\');event.stopPropagation()">+ В заявку</button>');
-  var _ov = PRODUCT_OVERRIDES[p.sku] || {};
   var _bdg = _ov.badge || '';
   var _bdgLbl = _ov.badge_label || ({new:'Новинка',sale:'Акция',clearance:'Распродажа'}[_bdg]||'');
   var _badgeHtml = _bdg ? '<div class="pcard-badge pb-'+_bdg+'">'+_bdgLbl+'</div>' : '';
   var _descExtra = _ov.description ? '<div class="pcard-admin-desc">'+_ov.description+'</div>' : '';
-  var sizeTag = p.size && p.size !== '-' ? 'Размер '+p.size : '';
-  var descLine = [sizeTag, p.descShort].filter(Boolean).join(' · ');
+  var sizeTag = _size && _size !== '-' ? 'Размер '+_size : '';
+  var descLine = [sizeTag, _descShort].filter(Boolean).join(' · ');
   return '<div class="pcard rv" role="button" tabindex="0" aria-label="'+p.model+'" style="transition-delay:'+(delay*0.08)+'s" onclick="openDetail(\''+p.id+'\')">'
     + _badgeHtml
     + '<div class="pcard-img">'+imgHtml+'</div>'
@@ -1242,7 +1257,7 @@ function cardHtml(p, delay) {
     + '<div class="pcard-name">'+p.model+'</div>'
     + '<div class="pcard-desc">'+descLine+'</div>'
     + _descExtra
-    + '<div class="pcard-price">'+p.price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
+    + '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
     + addBtn
     + '</div></div>';
 }
@@ -1251,6 +1266,8 @@ function cardHtml(p, delay) {
 function renderAll() {
   var content = document.getElementById('catalog-content');
   var list = PRODUCTS.filter(function(p){
+    var _ov = PRODUCT_OVERRIDES[p.sku] || {};
+    if (_ov.active !== undefined && _ov.active !== null && parseInt(_ov.active) === 0) return false;
     if(catGroup && p.group !== catGroup) return false;
     if(catSize && (p.size||'').toLowerCase() !== catSize) return false;
     return true;
@@ -1355,24 +1372,33 @@ var pdQty = 1, pdCurrentId = null;
 function openDetail(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   pdCurrentId = id; pdQty = 1;
+  var _ov = PRODUCT_OVERRIDES[p.sku] || {};
+  var _price = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
+  var _stock = _ov.stock_override || p.stock || 'in_stock';
+  var _size  = _ov.size_override  || p.size  || '';
+  var _descShort = _ov.desc_short || p.descShort || '';
+  var _descLong  = _ov.description || p.descLong || '';
   var src = getImg(p);
   var imgH = src
     ? '<div class="pd-img-wrap"><img class="pd-img" loading="lazy" src="'+src+'" alt="'+p.model+'" onerror="this.style.display=\'none\'"></div>'
     : '';
   var specs = [];
-  if(p.size && p.size!=='-')          specs.push({ico:'📏',t:'Размер',v:p.size});
+  if(_size && _size!=='-') specs.push({ico:'📏',t:'Размер',v:_size});
   var specsPills = specs.length
     ? '<div class="pd-specs-row">'+specs.map(function(s){ return '<div class="pd-spec-pill">'+s.ico+' '+s.t+': <span>'+s.v+'</span></div>'; }).join('')+'</div>'
     : '';
-  var featHtml = p.benefits.length
+  var benefits = p.benefits || [];
+  var featHtml = benefits.length
     ? '<div class="pd-features-block"><div class="pd-features-title">Преимущества</div><div class="pd-features-list">'
-      + p.benefits.map(function(f){ return '<div class="pd-feat-item"><div class="pd-feat-check">✓</div><div>'+f+'</div></div>'; }).join('')
+      + benefits.map(function(f){ return '<div class="pd-feat-item"><div class="pd-feat-check">✓</div><div>'+f+'</div></div>'; }).join('')
       + '</div></div>'
     : '';
-  var isOut = (p.stock === 'out');
+  var isOut = (_stock === 'out_of_stock' || _stock === 'out');
   var orderBtn = isOut
-    ? '<button class="pd-order" style="background:#9CA3AF;box-shadow:none;cursor:not-allowed" disabled>Нет</button>'
+    ? '<button class="pd-order" style="background:#9CA3AF;box-shadow:none;cursor:not-allowed" disabled>Нет в наличии</button>'
     : '<button class="pd-order" onclick="pdAddToCart()">🛒 В заявку</button>';
+  // Pseudo-product with overrides for getStockInline
+  var _p = Object.assign({}, p, {stock: _stock});
 
   document.getElementById('pd-inner').innerHTML =
     '<div class="pd-handle" onclick="closeDetail()"><div class="pd-handle-bar"></div></div>'
@@ -1380,16 +1406,16 @@ function openDetail(id) {
       + '<div class="pd-head-info">'
         + '<div class="pd-brand">'+p.brand+'</div>'
         + '<div class="pd-title">'+p.model+'</div>'
-        + '<div class="pd-series">'+p.descShort+'</div>'
+        + '<div class="pd-series">'+_descShort+'</div>'
       + '</div>'
-      + getStockInline(p)
+      + getStockInline(_p)
       + '<button class="pd-close" onclick="closeDetail()">✕</button>'
     + '</div>'
     + '<div class="pd-scroll">'
       + imgH
-      + (p.descLong ? '<div class="pd-desc-long">'+p.descLong+'</div>' : '')
+      + (_descLong ? '<div class="pd-desc-long">'+_descLong+'</div>' : '')
       + '<div class="pd-action-row">'
-        + '<div class="pd-price">'+p.price.toLocaleString('ru-RU')+' ₽<span class="pd-price-sub">опт · комплект</span></div>'
+        + '<div class="pd-price">'+_price.toLocaleString('ru-RU')+' ₽<span class="pd-price-sub">опт · комплект</span></div>'
         + orderBtn
       + '</div>'
       + specsPills + featHtml

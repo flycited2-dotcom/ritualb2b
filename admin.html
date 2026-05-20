@@ -594,6 +594,7 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
       <div class="prod-search-bar">
         <input class="search-inp" id="prodSearch" type="text" placeholder="Поиск по модели, бренду, артикулу..." style="max-width:400px">
         <button class="form-btn" onclick="loadProducts()">Найти</button>
+        <button class="form-btn" style="background:var(--amber);color:#fff;margin-left:auto" onclick="openAddProd()">+ Добавить товар</button>
         <span id="prodTotal" style="font-size:.78rem;color:#9298A8"></span>
       </div>
 <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center" id="prodBulkBar" style="display:none">
@@ -814,6 +815,89 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal('bonusModal')">Отмена</button>
       <button class="modal-ok" onclick="submitBonus()">Применить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT CUSTOM PRODUCT MODAL -->
+<div class="modal-ov" id="addProdModal">
+  <div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto">
+    <h3 id="addProdTitle">Добавить товар</h3>
+    <input type="hidden" id="apSku">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Название *</div>
+        <input class="l-inp" id="apModel" type="text" placeholder="Венок «Аврора»" style="margin-bottom:0">
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Артикул (SKU) *</div>
+        <input class="l-inp" id="apSkuInput" type="text" placeholder="venok-avrora-2" style="margin-bottom:0">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Категория</div>
+        <select class="l-inp" id="apGroup" style="margin-bottom:0">
+          <option value="venki">Венки</option>
+          <option value="korzinki">Корзинки</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Размер</div>
+        <select class="l-inp" id="apSize" style="margin-bottom:0">
+          <option value="-">—</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Наличие</div>
+        <select class="l-inp" id="apStock" style="margin-bottom:0">
+          <option value="in_stock">В наличии</option>
+          <option value="out_of_stock">Нет в наличии</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Цена, ₽ *</div>
+        <input class="l-inp" id="apPrice" type="number" min="0" placeholder="2500" style="margin-bottom:0">
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Бренд / мастер</div>
+        <input class="l-inp" id="apBrand" type="text" placeholder="Ручная работа" style="margin-bottom:0">
+      </div>
+    </div>
+
+    <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Краткое описание (под названием)</div>
+    <input class="l-inp" id="apDescShort" type="text" placeholder="Авторская работа · Живые цветы">
+
+    <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Полное описание (в карточке товара)</div>
+    <textarea class="note-area" id="apDescLong" style="min-height:70px" placeholder="Подробное описание..."></textarea>
+
+    <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Преимущества (каждое с новой строки)</div>
+    <textarea class="note-area" id="apBenefits" style="min-height:60px" placeholder="Живые цветы&#10;Ручная работа&#10;Размер L"></textarea>
+
+    <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Фото товара</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <input class="l-inp" id="apPhoto" type="text" placeholder="имя_файла.jpg (или загрузите →)" style="margin-bottom:0;flex:1">
+      <label style="cursor:pointer">
+        <input type="file" id="apPhotoFile" accept="image/*" style="display:none" onchange="uploadProdPhoto(this)">
+        <span class="form-btn" style="font-size:.75rem;padding:7px 12px" onclick="document.getElementById('apPhotoFile').click()">📷 Загрузить</span>
+      </label>
+    </div>
+    <div id="apPhotoPreview" style="margin-bottom:10px;display:none">
+      <img id="apPhotoImg" src="" style="max-width:120px;max-height:90px;border-radius:8px;object-fit:cover;border:1px solid var(--blo)">
+    </div>
+
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="modal-cancel" onclick="closeModal('addProdModal')">Отмена</button>
+      <button class="modal-ok" id="addProdSaveBtn" onclick="saveCustomProd()">Сохранить</button>
     </div>
   </div>
 </div>
@@ -1668,12 +1752,20 @@ function loadProducts(search) {
       html += badgeHtml;
       html += '<button class="prod-active-toggle '+(isActive?'prod-active-on':'prod-active-off')+'" data-sku="'+p.sku+'" data-active="'+(isActive?1:0)+'" onclick="event.stopPropagation();toggleProdActiveBtn(this)" title="'+(isActive?'Отключить':'Включить')+'">'+(isActive?'Вкл':'Откл')+'</button>';
       html += '<div class="prod-card-body">';
+      html += (p._custom ? '<div style="font-size:.6rem;background:rgba(109,138,109,.15);color:var(--amber-d);padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;font-weight:700">✦ Добавлен вручную</div>' : '');
       html += '<div class="prod-card-sku">'+p.sku+'</div>'
         +'<div class="prod-card-name">'+p.model+'</div>'
         +'<div class="prod-card-brand">'+p.brand+' · '+p.size+'</div>'
         +'<div class="prod-card-price">'+parseInt(ov.price_override||p.price||0).toLocaleString('ru-RU')+'&thinsp;₽'+(ov.price_override?'<span style="font-size:.65rem;color:#9298A8;font-weight:400;margin-left:4px">переопределена</span>':'')+'</div>'
         +descHtml;
-      html += '<label style="margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:6px;font-size:.7rem;color:#9298A8;cursor:pointer" onclick="event.stopPropagation()"><input type="checkbox" data-sku="'+p.sku+'"'+(!!_prodSelected[p.sku]?' checked':'')+' onchange="toggleProdSelect(this.dataset.sku,this.checked)" style="width:14px;height:14px;cursor:pointer;accent-color:var(--amber)"> выбрать</label>';
+      if (p._custom) {
+        html += '<div style="display:flex;gap:6px;margin-top:auto;padding-top:8px">'
+          +'<button class="form-btn" style="font-size:.7rem;padding:5px 10px;flex:1" onclick="event.stopPropagation();openEditCustomProd(\''+p.sku+'\')">✏ Изменить</button>'
+          +'<button class="form-btn" style="font-size:.7rem;padding:5px 10px;background:rgba(239,68,68,.12);color:var(--red)" onclick="event.stopPropagation();deleteCustomProd(\''+p.sku+'\')">✕</button>'
+          +'</div>';
+      } else {
+        html += '<label style="margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:6px;font-size:.7rem;color:#9298A8;cursor:pointer" onclick="event.stopPropagation()"><input type="checkbox" data-sku="'+p.sku+'"'+(!!_prodSelected[p.sku]?' checked':'')+' onchange="toggleProdSelect(this.dataset.sku,this.checked)" style="width:14px;height:14px;cursor:pointer;accent-color:var(--amber)"> выбрать</label>';
+      }
       html += '</div></div>';
     });
     document.getElementById('prodGrid').innerHTML = html;
@@ -1744,6 +1836,103 @@ function saveProdOverride() {
   var si = document.getElementById('prodSearch');
   if(si) si.addEventListener('keydown', function(e){ if(e.key==='Enter') loadProducts(); });
 })();
+
+// ── Custom product add/edit ───────────────────────────────────────────────────
+function openAddProd() {
+  document.getElementById('addProdTitle').textContent = 'Добавить товар';
+  document.getElementById('addProdSaveBtn').textContent = 'Сохранить';
+  document.getElementById('apSku').value = '';
+  document.getElementById('apSkuInput').value = '';
+  document.getElementById('apSkuInput').readOnly = false;
+  document.getElementById('apModel').value = '';
+  document.getElementById('apGroup').value = 'venki';
+  document.getElementById('apSize').value = '-';
+  document.getElementById('apStock').value = 'in_stock';
+  document.getElementById('apPrice').value = '';
+  document.getElementById('apBrand').value = '';
+  document.getElementById('apDescShort').value = '';
+  document.getElementById('apDescLong').value = '';
+  document.getElementById('apBenefits').value = '';
+  document.getElementById('apPhoto').value = '';
+  document.getElementById('apPhotoPreview').style.display = 'none';
+  document.getElementById('addProdModal').classList.add('show');
+}
+
+function openEditCustomProd(sku) {
+  var p = _prodMap[sku];
+  if(!p) return;
+  document.getElementById('addProdTitle').textContent = 'Редактировать товар';
+  document.getElementById('addProdSaveBtn').textContent = 'Сохранить изменения';
+  document.getElementById('apSku').value = sku;
+  document.getElementById('apSkuInput').value = sku;
+  document.getElementById('apSkuInput').readOnly = true;
+  document.getElementById('apModel').value = p.model || '';
+  document.getElementById('apGroup').value = p.group || 'venki';
+  document.getElementById('apSize').value = p.size || '-';
+  document.getElementById('apStock').value = p.stock || 'in_stock';
+  document.getElementById('apPrice').value = p.price || '';
+  document.getElementById('apBrand').value = p.brand || '';
+  document.getElementById('apDescShort').value = p.descShort || '';
+  document.getElementById('apDescLong').value = p.descLong || '';
+  document.getElementById('apBenefits').value = (p.benefits || []).join('\n');
+  document.getElementById('apPhoto').value = p.photo || '';
+  var prev = document.getElementById('apPhotoPreview');
+  var img  = document.getElementById('apPhotoImg');
+  if(p.photo){ img.src='assets/img/products/'+p.photo; prev.style.display='block'; }
+  else { prev.style.display='none'; }
+  document.getElementById('addProdModal').classList.add('show');
+}
+
+function uploadProdPhoto(input) {
+  if(!input.files||!input.files[0]) return;
+  var fd = new FormData();
+  fd.append('photo', input.files[0]);
+  toast('Загружаю фото...');
+  fetch(api('admin.php?action=upload_photo'), {method:'POST', body:fd})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      document.getElementById('apPhoto').value = d.filename;
+      var img = document.getElementById('apPhotoImg');
+      img.src = 'assets/img/products/'+d.filename;
+      document.getElementById('apPhotoPreview').style.display = 'block';
+      toast('Фото загружено');
+    } else toast(d.error||'Ошибка загрузки', false);
+  }).catch(function(){toast('Ошибка соединения',false);});
+}
+
+function saveCustomProd() {
+  var sku = document.getElementById('apSkuInput').value.trim();
+  var model = document.getElementById('apModel').value.trim();
+  if(!sku){toast('Укажите артикул',false);return;}
+  if(!model){toast('Укажите название',false);return;}
+  var payload = {
+    sku: sku,
+    model: model,
+    group: document.getElementById('apGroup').value,
+    size: document.getElementById('apSize').value,
+    stock: document.getElementById('apStock').value,
+    price: parseInt(document.getElementById('apPrice').value)||0,
+    brand: document.getElementById('apBrand').value.trim()||'Ручная работа',
+    descShort: document.getElementById('apDescShort').value.trim(),
+    descLong: document.getElementById('apDescLong').value.trim(),
+    benefits_text: document.getElementById('apBenefits').value.trim(),
+    photo: document.getElementById('apPhoto').value.trim()
+  };
+  fetch(api('admin.php?action=custom_product_save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){ closeModal('addProdModal'); toast('Товар сохранён'); loadProducts(); }
+    else toast(d.error||'Ошибка',false);
+  }).catch(function(){toast('Ошибка соединения',false);});
+}
+
+function deleteCustomProd(sku) {
+  if(!confirm('Удалить товар «'+sku+'»? Действие необратимо.')) return;
+  fetch(api('admin.php?action=custom_product_delete'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sku:sku})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){ toast('Товар удалён'); loadProducts(); }
+    else toast(d.error||'Ошибка',false);
+  }).catch(function(){toast('Ошибка соединения',false);});
+}
 
 // ── Report ────────────────────────────────────────────────────────────────────
 function sendReport(){

@@ -15,10 +15,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 $action = $_GET['action'] ?? '';
 if ($action === 'products_overrides_public') {
     $db = getDB();
-    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short FROM product_overrides WHERE COALESCE(active,1) = 1")->fetchAll();
+    // Return ALL overrides including active=0 (frontend filters hidden products)
+    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, active FROM product_overrides")->fetchAll();
     $map = [];
     foreach ($rows as $r) { $map[$r['sku']] = $r; }
-    jsonResponse(['ok' => true, 'overrides' => $map]);
+    // Custom products (manually added)
+    $customRows = $db->query("SELECT id, sku, data_json FROM custom_products WHERE active = 1")->fetchAll();
+    $custom = [];
+    foreach ($customRows as $cr) {
+        $d = json_decode($cr['data_json'], true) ?: [];
+        $d['id']  = $cr['id'];
+        $d['sku'] = $cr['sku'];
+        $d['_custom'] = true;
+        $custom[] = $d;
+    }
+    jsonResponse(['ok' => true, 'overrides' => $map, 'custom_products' => $custom]);
+    exit;
+}
+
+// Upload product photo — public (admin handles auth separately, but we protect with session check)
+if ($action === 'upload_photo') {
+    $db = getDB(); adminRequire();
+    if (empty($_FILES['photo'])) jsonResponse(['ok' => false, 'error' => 'Нет файла'], 400);
+    $f = $_FILES['photo'];
+    $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['jpg','jpeg','png','webp','gif'])) jsonResponse(['ok' => false, 'error' => 'Недопустимый тип файла'], 400);
+    $dir = __DIR__ . '/../assets/img/products/';
+    if (!is_dir($dir)) mkdir($dir, 0775, true);
+    $name = 'custom_' . date('Y-m-d') . '_' . substr(md5(uniqid()), 0, 6) . '.' . $ext;
+    if (!move_uploaded_file($f['tmp_name'], $dir . $name)) jsonResponse(['ok' => false, 'error' => 'Ошибка сохранения'], 500);
+    jsonResponse(['ok' => true, 'filename' => $name]);
     exit;
 }
 
@@ -408,6 +434,16 @@ switch ($action) {
         foreach ($products as &$p) {
             if (isset($ovMap[$p['sku']])) { $p['_override'] = $ovMap[$p['sku']]; }
         }
+        unset($p);
+        // Append custom products
+        $cpRows = $db->query("SELECT id, sku, data_json, active FROM custom_products")->fetchAll();
+        foreach ($cpRows as $cr) {
+            $d = json_decode($cr['data_json'], true) ?: [];
+            $d['id'] = $cr['id']; $d['sku'] = $cr['sku']; $d['_custom'] = true;
+            if (isset($ovMap[$cr['sku']])) { $d['_override'] = $ovMap[$cr['sku']]; }
+            else { $d['_override'] = ['active' => $cr['active']]; }
+            $products[] = $d;
+        }
         $search = trim($_GET['search'] ?? '');
         if ($search !== '') {
             $sl = mb_strtolower($search);
@@ -418,7 +454,7 @@ switch ($action) {
                     || mb_strpos(mb_strtolower($p['series'] ?? ''), $sl) !== false;
             }));
         }
-        jsonResponse(['ok' => true, 'products' => array_slice($products, 0, 200), 'total' => count($products)]);
+        jsonResponse(['ok' => true, 'products' => array_slice($products, 0, 300), 'total' => count($products)]);
         break;
 
     // ── Save product override ──
@@ -465,6 +501,53 @@ switch ($action) {
             ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at");
         foreach ($skus as $sku) { $stmt->execute([$sku, $active]); $updated++; }
         jsonResponse(['ok' => true, 'updated' => $updated]);
+        break;
+
+    // ── Save custom product ──
+    case 'custom_product_save':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
+        $sku = trim($raw['sku'] ?? '');
+        if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        // Generate ID if new
+        $existing = $db->prepare("SELECT id FROM custom_products WHERE sku = ?")->execute([$sku]);
+        $existRow = $db->prepare("SELECT id FROM custom_products WHERE sku = ?");
+        $existRow->execute([$sku]);
+        $existData = $existRow->fetch();
+        $id = $existData ? $existData['id'] : ('cp_' . substr(md5(uniqid()), 0, 8));
+        $data = [
+            'model'      => $raw['model'] ?? '',
+            'brand'      => $raw['brand'] ?? 'Ручная работа',
+            'brandCode'  => $raw['brandCode'] ?? 'custom',
+            'series'     => $raw['series'] ?? '',
+            'group'      => $raw['group'] ?? 'venki',
+            'size'       => $raw['size'] ?? '-',
+            'price'      => intval($raw['price'] ?? 0),
+            'stock'      => $raw['stock'] ?? 'in_stock',
+            'stockLabel' => $raw['stock'] === 'out_of_stock' ? 'Нет в наличии' : 'В наличии',
+            'descShort'  => $raw['descShort'] ?? '',
+            'cardBenef'  => $raw['cardBenef'] ?? '',
+            'benefits'   => array_values(array_filter(explode("\n", $raw['benefits_text'] ?? ''))),
+            'descLong'   => $raw['descLong'] ?? '',
+            'photo'      => $raw['photo'] ?? '',
+            'btu'        => '-',
+            'area'       => 0,
+        ];
+        $db->prepare("INSERT INTO custom_products (id, sku, data_json, active, updated_at)
+            VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP)
+            ON CONFLICT(sku) DO UPDATE SET data_json=excluded.data_json, active=1, updated_at=excluded.updated_at")
+            ->execute([$id, $sku, json_encode($data, JSON_UNESCAPED_UNICODE)]);
+        jsonResponse(['ok' => true, 'id' => $id, 'sku' => $sku]);
+        break;
+
+    // ── Delete custom product ──
+    case 'custom_product_delete':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
+        $sku = trim($raw['sku'] ?? '');
+        if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        $db->prepare("DELETE FROM custom_products WHERE sku = ?")->execute([$sku]);
+        jsonResponse(['ok' => true]);
         break;
 
     default:
