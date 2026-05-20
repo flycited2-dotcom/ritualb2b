@@ -45,6 +45,21 @@ function getDB() {
         )");
     } catch (Throwable $e) {}
 
+    // product_overrides — incremental columns
+    $poColsResult = $db->query("PRAGMA table_info(product_overrides)")->fetchAll(PDO::FETCH_ASSOC);
+    $poCols = array_column($poColsResult, 'name');
+    foreach ([
+        'active'          => "ALTER TABLE product_overrides ADD COLUMN active INTEGER DEFAULT NULL",
+        'price_override'  => "ALTER TABLE product_overrides ADD COLUMN price_override INTEGER DEFAULT NULL",
+        'stock_override'  => "ALTER TABLE product_overrides ADD COLUMN stock_override TEXT DEFAULT NULL",
+        'size_override'   => "ALTER TABLE product_overrides ADD COLUMN size_override TEXT DEFAULT NULL",
+        'desc_short'      => "ALTER TABLE product_overrides ADD COLUMN desc_short TEXT DEFAULT NULL",
+    ] as $col => $sql) {
+        if (!in_array($col, $poCols)) {
+            try { $db->exec($sql); } catch (Throwable $e) {}
+        }
+    }
+
     // app_settings table
     try {
         $db->exec("CREATE TABLE IF NOT EXISTS app_settings (

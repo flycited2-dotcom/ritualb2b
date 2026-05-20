@@ -13,11 +13,11 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:#F0F2F5;color:#1A1C22;min-height:100vh}
+body{font-family:'Inter',sans-serif;background:#F3F1EE;color:#1C1A18;min-height:100vh}
 body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 900px 700px at 10% 10%,rgba(200,218,255,0.45) 0%,transparent 60%),
-  radial-gradient(ellipse 700px 500px at 90% 5%,rgba(255,200,210,0.25) 0%,transparent 55%)}
-:root{--amber:#F59E0B;--amber-d:#D97706;--glass:rgba(255,255,255,0.75);--blo:rgba(180,188,205,0.4);--r:12px;
+  background:radial-gradient(ellipse 900px 700px at 10% 10%,rgba(109,138,109,0.10) 0%,transparent 60%),
+  radial-gradient(ellipse 700px 500px at 90% 5%,rgba(180,160,130,0.12) 0%,transparent 55%)}
+:root{--amber:#6D8A6D;--amber-d:#5A7A5A;--glass:rgba(255,253,250,0.80);--blo:rgba(160,148,130,0.35);--r:12px;
   --green:#16a34a;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4}
 
 /* ── LOGIN ── */
@@ -745,9 +745,39 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
 
 <!-- PRODUCT EDIT MODAL -->
 <div class="modal-ov prod-edit-modal" id="prodEditModal">
-  <div class="modal-box" style="max-width:500px">
+  <div class="modal-box" style="max-width:540px;max-height:90vh;overflow-y:auto">
     <h3 id="peModalTitle">Редактировать товар</h3>
-    <div style="font-size:.72rem;color:#9298A8;margin-bottom:12px" id="peModalSku"></div>
+    <div style="font-size:.72rem;color:#9298A8;margin-bottom:14px" id="peModalSku"></div>
+
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Основные параметры</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Цена, ₽</div>
+        <input class="l-inp" id="pePriceOverride" type="number" min="0" placeholder="Из каталога" style="margin-bottom:0">
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Наличие</div>
+        <select class="l-inp" id="peStockOverride" style="margin-bottom:0">
+          <option value="">Из каталога</option>
+          <option value="in_stock">В наличии</option>
+          <option value="out_of_stock">Нет в наличии</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#9298A8;margin-bottom:4px">Размер</div>
+        <select class="l-inp" id="peSizeOverride" style="margin-bottom:0">
+          <option value="">Из каталога</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Краткое описание (под названием)</div>
+    <input class="l-inp" id="peDescShort" type="text" placeholder="Авторская работа · Искусственные цветы">
+
     <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:8px;letter-spacing:.04em">Бейдж</div>
     <div class="badge-select-grid">
       <div class="badge-opt active" data-v="" onclick="selectBadge(this)">Нет</div>
@@ -756,8 +786,10 @@ body::before{content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
       <div class="badge-opt" data-v="clearance" onclick="selectBadge(this)">🏷 Распродажа</div>
     </div>
     <input class="custom-label-inp" id="peBadgeLabel" type="text" placeholder="Своя подпись бейджа (необязательно, переопределяет стандартную)">
-    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Описание / заметка к карточке</div>
-    <textarea class="note-area" id="peDescription" style="min-height:80px" placeholder="Дополнительное описание, характеристики, акционные условия..."></textarea>
+
+    <div style="font-size:.72rem;font-weight:700;color:#9298A8;text-transform:uppercase;margin-bottom:6px;letter-spacing:.04em">Полное описание (в карточке товара)</div>
+    <textarea class="note-area" id="peDescription" style="min-height:90px" placeholder="Дополнительное описание, характеристики, акционные условия..."></textarea>
+
     <div class="modal-btns" style="margin-top:14px">
       <button class="modal-cancel" onclick="closeModal('prodEditModal')">Отмена</button>
       <button class="modal-ok" onclick="saveProdOverride()">Сохранить</button>
@@ -1648,9 +1680,13 @@ function openProdEdit(sku) {
   var ov = p._override || {};
   _peBadge = ov.badge || '';
   document.getElementById('peModalTitle').textContent = p.model || sku;
-  document.getElementById('peModalSku').textContent = 'SKU: '+sku+' · '+p.brand;
+  document.getElementById('peModalSku').textContent = 'SKU: '+sku+' · '+p.brand+' · Базовая цена: '+fmt(p.price)+' ₽ · Размер: '+(p.size||'—')+' · '+(p.stockLabel||p.stock||'');
   document.getElementById('peDescription').value = ov.description || '';
   document.getElementById('peBadgeLabel').value = ov.badge_label || '';
+  document.getElementById('pePriceOverride').value = ov.price_override != null ? ov.price_override : '';
+  document.getElementById('peStockOverride').value = ov.stock_override || '';
+  document.getElementById('peSizeOverride').value = ov.size_override || '';
+  document.getElementById('peDescShort').value = ov.desc_short || '';
   document.querySelectorAll('.badge-opt').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-v') === _peBadge);
   });
@@ -1664,10 +1700,24 @@ function selectBadge(el) {
 }
 
 function saveProdOverride() {
-  var desc = document.getElementById('peDescription').value;
-  var label = document.getElementById('peBadgeLabel').value.trim();
+  var desc       = document.getElementById('peDescription').value;
+  var label      = document.getElementById('peBadgeLabel').value.trim();
+  var priceRaw   = document.getElementById('pePriceOverride').value;
+  var stockOv    = document.getElementById('peStockOverride').value;
+  var sizeOv     = document.getElementById('peSizeOverride').value;
+  var descShort  = document.getElementById('peDescShort').value.trim();
+  var payload = {
+    sku: _peCurrentSku,
+    description: desc,
+    badge: _peBadge,
+    badge_label: label,
+    price_override: priceRaw !== '' ? parseInt(priceRaw) : '',
+    stock_override: stockOv,
+    size_override: sizeOv,
+    desc_short: descShort
+  };
   fetch(api('admin.php?action=product_save_override'), {method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({sku:_peCurrentSku, description:desc, badge:_peBadge, badge_label:label})})
+    body:JSON.stringify(payload)})
   .then(function(r){return r.json();}).then(function(d){
     if(d.ok){
       closeModal('prodEditModal');
