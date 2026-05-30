@@ -481,17 +481,17 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
     max-width: 180px;
   }
   .nav-phones {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));  /* 4 равные колонки */
     align-items: center;
     gap: 6px;
-    flex: 1;
-    justify-content: flex-end;
-    overflow-x: auto;
-    scrollbar-width: none;
+    width: fit-content;       /* при наличии места = ширине самой широкой («Позвонить») */
+    max-width: 100%;
+    min-width: 0;             /* позволяет группе сжиматься, когда тесно (без обрезки) */
+    margin-left: auto;        /* прижать группу вправо, перед кнопками аккаунта */
   }
-  .nav-phones::-webkit-scrollbar { display: none; }
   .nav-ph {
-    display: flex; align-items: center; gap: 5px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
     font-size: 0.74rem; font-weight: 600;
     text-decoration: none; padding: 7px 10px;
     border-radius: 10px; white-space: nowrap; flex-shrink: 0;
@@ -545,6 +545,11 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   }
   .dr .dl { flex: 1; overflow-y: auto; min-height: 0; }
   .dr .df { flex-shrink: 0; overflow-y: auto; }
+}
+
+/* ══ Узкий десктоп: прячем декоративный слоган, чтобы контактные кнопки помещались целиком ══ */
+@media (min-width: 640px) and (max-width: 1365px) {
+  .nav-slogan { display: none; }
 }
 
 /* ══ МОБИЛЬ max-width:639px ══ */
