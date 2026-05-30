@@ -932,7 +932,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 
 <!-- HERO -->
 <section id="hero">
-  <img class="hero-bg" src="assets/img/etalon-hero-block.png" alt="Авторская ритуальная мастерская — венки и корзинки" loading="eager">
+  <img class="hero-bg" src="api/img.php?f=etalon-hero-block.png&dir=root&w=1920&q=88" alt="Авторская ритуальная мастерская — венки и корзинки" loading="eager">
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <p class="hero-eyebrow">Авторское производство · Симферополь · Оптовый прайс для B2B</p>
@@ -1150,9 +1150,13 @@ var LEGACY = {
   wr:  'assets/img/extracted/img_01_4642a8d790.jpg'
 };
 
-function getImg(p) {
+// Оптимизированный URL фото через api/img.php (ресайз + WebP/JPEG + кэш)
+function imgUrl(photo, w, q) {
+  return 'api/img.php?f=' + encodeURIComponent(photo) + '&w=' + w + (q ? '&q=' + q : '');
+}
+function getImg(p, w, q) {
   if(p.photo && p.photo !== 'undefined' && p.photo !== '')
-    return 'assets/img/products/' + p.photo;
+    return imgUrl(p.photo, w || 1100, q);
   return LEGACY[p.brandCode] || '';
 }
 
@@ -1230,7 +1234,7 @@ var GROUP_LABELS = {venki:'ВЕНКИ',korzinki:'КОРЗИНКИ'};
 // ── Card HTML ─────────────────────────────────────────
 function cardHtml(p, delay) {
   var qty = getQty(p.id);
-  var src = getImg(p);
+  var src = getImg(p, 600);
   var imgHtml = src
     ? '<img loading="lazy" decoding="async" src="'+src+'" alt="'+p.model+'" onerror="this.style.display=\'none\'">'
     : '<div style="font-size:2rem;display:flex;align-items:center;justify-content:center;height:100%">🌿</div>';
@@ -1384,7 +1388,7 @@ function openDetail(id) {
   var _benefits  = _ov.benefits_override
     ? (function(){ try{ return JSON.parse(_ov.benefits_override); }catch(e){ return (_ov.benefits_override||'').split('\n').filter(Boolean); } })()
     : (p.benefits || []);
-  var src = getImg(p);
+  var src = getImg(p, 1100);
   var imgH = src
     ? '<div class="pd-img-wrap"><img class="pd-img" loading="lazy" src="'+src+'" alt="'+_model+'" onerror="this.style.display=\'none\'"></div>'
     : '';
@@ -2086,7 +2090,7 @@ function buildCarousel(ids) {
   [items, items].forEach(function(set) {
     set.forEach(function(item) {
       html += '<div class="carousel-item carousel-link" onclick="openDetail(\'' + item.id + '\')" title="' + item.model + '">'
-        + '<img src="assets/img/products/' + item.photo + '" alt="' + item.model + '" loading="lazy">'
+        + '<img src="' + imgUrl(item.photo, 600) + '" alt="' + item.model + '" loading="lazy">'
         + '</div>';
     });
   });

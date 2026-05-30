@@ -14,3 +14,4 @@ db/*.sqlite-shm
 .superpowers/
 node_modules/
 *.zip
+assets/img/cache/
