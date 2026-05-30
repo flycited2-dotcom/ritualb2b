@@ -1229,7 +1229,6 @@ var FILTER_MAP = {
 };
 
 var GROUP_ORDER  = ['venki','korzinki'];
-var GROUP_LABELS = {venki:'ВЕНКИ',korzinki:'КОРЗИНКИ'};
 
 // ── Card HTML ─────────────────────────────────────────
 function cardHtml(p, delay) {
@@ -1255,7 +1254,7 @@ function cardHtml(p, delay) {
   var _descExtra = _ov.description ? '<div class="pcard-admin-desc">'+_ov.description+'</div>' : '';
   var sizeTag = _size && _size !== '-' ? 'Размер '+_size : '';
   var descLine = [sizeTag, _descShort].filter(Boolean).join(' · ');
-  return '<div class="pcard rv" role="button" tabindex="0" aria-label="'+p.model+'" style="transition-delay:'+(delay*0.08)+'s" onclick="openDetail(\''+p.id+'\')">'
+  return '<div class="pcard rv" role="button" tabindex="0" aria-label="'+p.model+'" style="transition-delay:'+((delay%10)*0.05)+'s" onclick="openDetail(\''+p.id+'\')">'
     + _badgeHtml
     + '<div class="pcard-img">'+imgHtml+'</div>'
     + '<div class="pcard-body">'
@@ -1300,25 +1299,38 @@ function renderAll() {
     tree[g][bc].series[s].items.push(p);
   });
 
-  var html = '';
-  var order = GROUP_ORDER.concat(Object.keys(tree).filter(function(g){ return GROUP_ORDER.indexOf(g)<0; }));
-  order.forEach(function(gid) {
-    var brands = tree[gid]; if(!brands || !Object.keys(brands).length) return;
-    html += '<div id="'+gid+'">';
-    if(!catGroup) {
-      html += '<div class="section-divider"><span>'+(GROUP_LABELS[gid]||gid.toUpperCase())+'</span><div class="sdl"></div></div>';
-    }
-    var allItems = [];
+  // Плоский список товаров группы (бренд → серия → товары) в порядке вставки
+  function groupItems(gid) {
+    var brands = tree[gid], items = [];
+    if(!brands) return items;
     Object.keys(brands).forEach(function(bc) {
       Object.keys(brands[bc].series).forEach(function(sName) {
-        brands[bc].series[sName].items.forEach(function(p) { allItems.push(p); });
+        brands[bc].series[sName].items.forEach(function(p) { items.push(p); });
       });
     });
+    return items;
+  }
+  var order = GROUP_ORDER.concat(Object.keys(tree).filter(function(g){ return GROUP_ORDER.indexOf(g)<0; }));
+  var html = '';
+
+  if(catGroup) {
+    // Выбран один раздел — обычная сетка
+    var items = groupItems(catGroup);
+    html += '<div id="'+catGroup+'"><div class="pgrid">';
+    items.forEach(function(p,i){ html += cardHtml(p,i); });
+    html += '</div></div>';
+  } else {
+    // Общий вид: товары всех групп вперемешку, чередованием «через одну»
+    var lists = order.map(groupItems).filter(function(l){ return l.length; });
+    var mixed = [];
+    for(var idx = 0, more = true; more; idx++) {
+      more = false;
+      lists.forEach(function(l){ if(idx < l.length){ mixed.push(l[idx]); more = true; } });
+    }
     html += '<div class="pgrid">';
-    allItems.forEach(function(p,i){ html += cardHtml(p,i); });
+    mixed.forEach(function(p,i){ html += cardHtml(p,i); });
     html += '</div>';
-    html += '</div>';
-  });
+  }
   content.innerHTML = html;
   observe();
 }
