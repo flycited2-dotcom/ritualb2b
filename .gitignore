@@ -9,6 +9,7 @@ converter/images/
 db/*.sqlite
 db/*.sqlite-wal
 db/*.sqlite-shm
+api/tg_poll.log
 .agents/
 .claude/
 .superpowers/
