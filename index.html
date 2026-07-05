@@ -753,6 +753,15 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .sb-7  {background:rgba(254,243,199,.65);color:#b45309;border-color:rgba(245,158,11,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 1px 6px rgba(245,158,11,.12)}
 .sb-out{background:rgba(241,245,249,.55);color:#6b7280;border-color:rgba(156,163,175,.25)}
 
+/* PHOTO ZOOM */
+.photozoom-ov{position:fixed;inset:0;z-index:850;background:rgba(10,10,10,.94);opacity:0;pointer-events:none;transition:opacity .25s}
+.photozoom-ov.on{opacity:1;pointer-events:auto}
+.photozoom-box{position:fixed;inset:0;z-index:851;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;overflow:auto;}
+.photozoom-box.on{opacity:1;pointer-events:auto}
+.photozoom-box img{max-width:100%;max-height:100%;object-fit:contain;touch-action:pinch-zoom;border-radius:6px;}
+.photozoom-close{position:fixed;top:16px;right:16px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:1.15rem;cursor:pointer;z-index:852;backdrop-filter:blur(8px);}
+.photozoom-close:hover{background:rgba(255,255,255,.24)}
+
 /* PRODUCT DETAIL BOTTOM SHEET */
 .pd-ov{position:fixed;inset:0;z-index:300;background:rgba(15,18,28,.45);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .28s}
 .pd-ov.on{opacity:1;pointer-events:auto}
@@ -761,7 +770,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd.on{transform:translateY(0)}
 .pd-handle{width:100%;padding:12px 0 4px;display:none;justify-content:center;flex-shrink:0;cursor:pointer}
 .pd-handle-bar{width:40px;height:4px;border-radius:2px;background:rgba(0,0,0,.12)}
-.pd-head{display:flex;align-items:flex-start;gap:10px;padding:6px 16px 10px;flex-shrink:0}
+.pd-head{display:flex;align-items:flex-start;gap:10px;padding:0 0 10px;flex-shrink:0}
 .pd-head-info{flex:1;min-width:0}
 .pd-brand{font-size:.62rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
 .pd-title{font-size:1rem;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-.02em}
@@ -822,10 +831,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   .pd-price{font-size:1.7rem}
   .pd-features-list{grid-template-columns:1fr 1fr;gap:9px 18px}
   .pd-share{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media(max-width:639px){
-  .pd-action-row{flex-direction:column;align-items:stretch}
-  .pd-order{width:100%;text-align:center}
 }
 
 /* SCROLL-TOP & SHARE */
@@ -1200,6 +1205,13 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <div class="pd-ov" id="pd-ov" onclick="closeDetail()"></div>
 <div class="pd" id="pd-modal">
   <div id="pd-inner"></div>
+</div>
+
+<!-- PHOTO ZOOM -->
+<div class="photozoom-ov" id="photozoom-ov" onclick="closePhotoZoom()"></div>
+<div class="photozoom-box" id="photozoom-box" onclick="closePhotoZoom()">
+  <button class="photozoom-close" onclick="closePhotoZoom();event.stopPropagation()">✕</button>
+  <img id="photozoom-img" src="" alt="" onclick="event.stopPropagation()">
 </div>
 
 <!-- AUTH MODAL -->
@@ -1664,16 +1676,21 @@ function openDetail(id) {
     + '<button class="pd-sh link" onclick="pdShare(\'copy\')">'+SVG_LINK+' Ссылка</button>'
     + '</div>';
 
+  var photoClick = src ? " onclick=\"openPhotoZoom('"+src+"')\" style=\"cursor:zoom-in\"" : "";
   document.getElementById('pd-inner').innerHTML =
     '<button class="pd-close" onclick="closeDetail()">✕</button>'
     + '<div class="pd-grid">'
-      + '<div class="pd-photo">' + photoH + '</div>'
+      + '<div class="pd-photo"'+photoClick+'>' + photoH + '</div>'
       + '<div class="pd-side">'
         + '<div class="pd-side-scroll">'
-          + '<div class="pd-brand">'+_brand+'</div>'
-          + '<div class="pd-title">'+_model+'</div>'
-          + '<div class="pd-series">'+_descShort+'</div>'
-          + '<div style="margin-top:10px">'+getStockInline(_p)+'</div>'
+          + '<div class="pd-head">'
+            + '<div class="pd-head-info">'
+              + '<div class="pd-brand">'+_brand+'</div>'
+              + '<div class="pd-title">'+_model+'</div>'
+              + '<div class="pd-series">'+_descShort+'</div>'
+            + '</div>'
+            + getStockInline(_p)
+          + '</div>'
           + '<div class="pd-action-row">'
             + '<div class="pd-price">'+_price.toLocaleString('ru-RU')+' ₽</div>'
             + orderBtn
@@ -1717,6 +1734,19 @@ function closeDetail() {
   document.getElementById('pd-modal').classList.remove('on');
   document.body.style.overflow = '';
   popOverlay('detail');
+}
+
+// ── Полноэкранный просмотр фото (тап по фото в карточке товара) ──
+function openPhotoZoom(src) {
+  document.getElementById('photozoom-img').src = src;
+  document.getElementById('photozoom-ov').classList.add('on');
+  document.getElementById('photozoom-box').classList.add('on');
+  pushOverlay('photozoom', closePhotoZoom);
+}
+function closePhotoZoom() {
+  document.getElementById('photozoom-ov').classList.remove('on');
+  document.getElementById('photozoom-box').classList.remove('on');
+  popOverlay('photozoom');
 }
 
 // ── Поделиться товаром ────────────────────────────────
