@@ -1,4 +1,29 @@
-# Запретить прямой доступ к config.php
+# ── Защита чувствительных файлов ──
 <Files "config.php">
     Require all denied
 </Files>
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|log)$">
+    Require all denied
+</FilesMatch>
+
+# ── GZIP-сжатие ──
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml \
+        application/javascript text/javascript application/json image/svg+xml application/xml
+</IfModule>
+
+# ── Кеш браузера ──
+# Картинки и шрифты кешируются надолго (имена файлов не меняются),
+# CSS/JS — коротко, чтобы обновления цен/каталога доходили быстро.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg       "access plus 1 year"
+    ExpiresByType image/png        "access plus 1 year"
+    ExpiresByType image/webp       "access plus 1 year"
+    ExpiresByType image/svg+xml    "access plus 1 year"
+    ExpiresByType image/x-icon     "access plus 1 year"
+    ExpiresByType font/woff2       "access plus 1 year"
+    ExpiresByType text/css         "access plus 1 hour"
+    ExpiresByType application/javascript "access plus 1 hour"
+    ExpiresByType text/javascript        "access plus 1 hour"
+</IfModule>

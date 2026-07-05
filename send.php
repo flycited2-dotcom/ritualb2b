@@ -32,6 +32,65 @@ if (!$name || !$phone || empty($items)) {
     exit;
 }
 
+// ── Достоверные цены: защита от подделки цены на клиенте ──────────────────
+// Сумму считаем ТОЛЬКО по ценам из products.js + custom_products (id всегда
+// 'cp_xxxxxxxx' — не пересекается с каталожными), с учётом price_override из
+// админки. Позиция с id, которого нет ни в каталоге, ни в кастомных товарах
+// (пустой/подделанный id), получает цену 0 — так подделка видна оператору
+// сразу в заявке, а не проходит незаметно. Исключение — полный отказ самого
+// источника цен (products.js не читается): тогда это инфраструктурный сбой,
+// а не подделка, и заявка проходит по цене клиента, как раньше, с логом.
+$trustedPrices = [];   // id => цена
+$catalogLoaded = false;
+try {
+    $skuById = [];
+    $js = @file_get_contents(__DIR__ . '/products.js');
+    if ($js !== false && preg_match('/var\s+PRODUCTS\s*=\s*(\[[\s\S]*\])\s*;/', $js, $mm)) {
+        $catalog = json_decode($mm[1], true);
+        if (is_array($catalog)) {
+            $catalogLoaded = true;
+            foreach ($catalog as $cp) {
+                if (isset($cp['id'])) {
+                    $cid = strval($cp['id']);
+                    $trustedPrices[$cid] = intval($cp['price'] ?? 0);
+                    $skuById[$cid]       = strval($cp['sku'] ?? '');
+                }
+            }
+        }
+    }
+    if (!$catalogLoaded) error_log('[RitualB2B price] products.js не прочитан/не распарсен — цены не проверяются');
+
+    $dbInit = __DIR__ . '/db/init.php';
+    if (file_exists($dbInit)) {
+        require_once $dbInit;
+        $db = getDB();
+        $cpRows = $db->query("SELECT id, sku, data_json FROM custom_products WHERE active = 1")->fetchAll();
+        foreach ($cpRows as $cr) {
+            $cd = json_decode($cr['data_json'], true) ?: [];
+            $trustedPrices[$cr['id']] = intval($cd['price'] ?? 0);
+            $skuById[$cr['id']]       = strval($cr['sku'] ?? '');
+        }
+        $ovr = $db->query('SELECT sku, price_override FROM product_overrides WHERE price_override IS NOT NULL AND price_override > 0')
+            ->fetchAll(PDO::FETCH_KEY_PAIR);
+        foreach ($skuById as $cid => $sku) {
+            if ($sku !== '' && isset($ovr[$sku])) $trustedPrices[$cid] = intval($ovr[$sku]);
+        }
+    }
+} catch (Throwable $e) {
+    error_log('[RitualB2B price] ' . $e->getMessage());
+}
+// Нормализуем цену каждой позиции к достоверной в одной точке — дальше её
+// используют и Telegram, и письмо, и запись в БД.
+foreach ($items as &$__it) {
+    $iid = strval($__it['id'] ?? '');
+    if ($iid !== '' && isset($trustedPrices[$iid])) {
+        $__it['price'] = $trustedPrices[$iid];
+    } elseif ($catalogLoaded) {
+        $__it['price'] = 0; // неизвестный id при рабочем каталоге — не доверяем цене клиента
+    }
+}
+unset($__it);
+
 $date  = date('d.m.Y H:i', time() + 3 * 3600);
 $total = 0;
 $num   = 1;
@@ -244,5 +303,5 @@ if ($tgOk || $orderId || $guestSaved) {
 } else {
     error_log('[RitualB2B] TG error: ' . ($tgResult['resp'] ?? ''));
     http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => 'Ошибка отправки. Позвоните: +7 978 599-13-69']);
+    echo json_encode(['ok' => false, 'error' => 'Ошибка отправки. Позвоните: +7 915 275-66-88']);
 }
