@@ -191,7 +191,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .pcard:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,0.12);}
 
 .pcard-img{
-  aspect-ratio:4/3;
+  aspect-ratio:1/1;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
   background:#f5f3ef;
@@ -210,23 +210,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 }
 .pcard-name{font-size:0.76rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px;}
 .pcard-desc{font-size:0.62rem;color:var(--text2);line-height:1.4;margin-bottom:8px;flex:1;}
-.pcard-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pcard-bottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;}
 .pcard-price{
-  font-family:'Unbounded',sans-serif;font-size:0.88rem;font-weight:700;
-  color:var(--text);
+  font-family:'Unbounded',sans-serif;font-size:0.8rem;font-weight:700;
+  color:var(--text);white-space:nowrap;
 }
-.pcard-price small{
-  display:inline;font-family:'Inter',sans-serif;
-  font-size:0.55rem;font-weight:400;color:var(--text3);margin-left:4px;
-}
-.addbtn{flex-shrink:0;white-space:nowrap;padding:9px 16px;border-radius:8px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;transition:all 0.2s;}
+.addbtn{flex-shrink:0;white-space:nowrap;padding:6px 8px;border-radius:7px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.64rem;font-weight:700;transition:all 0.2s;}
 .addbtn:active{transform:scale(0.97);}
 .addbtn:hover{background:var(--amber-d);}
 /* кол-во на карточке после добавления */
-.qty-row{width:112px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:#f5f3ef;border:1px solid var(--blo);border-radius:8px;overflow:hidden;}
-.qb{flex:1;height:34px;border:none;background:none;cursor:pointer;font-size:1.1rem;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.qty-row{width:88px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:#f5f3ef;border:1px solid var(--blo);border-radius:7px;overflow:hidden;}
+.qb{flex:1;height:28px;border:none;background:none;cursor:pointer;font-size:0.95rem;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .qb:active{background:rgba(109,138,109,0.12);color:var(--amber);}
-.qv{font-size:0.82rem;font-weight:700;color:var(--text);min-width:28px;text-align:center;}
+.qv{font-size:0.72rem;font-weight:700;color:var(--text);min-width:20px;text-align:center;}
 
 /* CONTACTS */
 #contacts{position:relative;z-index:1;padding:0 16px 80px;}
@@ -533,6 +529,13 @@ footer{position:relative;z-index:1;padding:1rem 16px;display:flex;align-items:ce
   .size-row { gap: 8px; }
   .cat-hbtn { padding: 16px 12px; font-size: 0.85rem; min-height: 64px; }
   .size-btn { padding: 10px 6px; font-size: 0.78rem; min-height: 44px; }
+  .pcard-name { font-size: 1rem; }
+  .pcard-desc { font-size: 0.74rem; }
+  .pcard-price { font-size: 1.25rem; }
+  .addbtn { padding: 10px 20px; font-size: 0.86rem; border-radius: 9px; }
+  .qty-row { width: 128px; }
+  .qb { height: 38px; font-size: 1.1rem; }
+  .qv { font-size: 0.85rem; min-width: 28px; }
   section#contacts, section#faq {
     max-width: 960px; margin-left: auto; margin-right: auto;
     padding-left: 32px; padding-right: 32px;
@@ -780,7 +783,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd-side-scroll{padding:16px 14px}
 .pd-action-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
 .pd-price{font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:700;color:#2563eb;letter-spacing:-.02em}
-.pd-price-sub{font-family:'Inter',sans-serif;font-size:.6rem;font-weight:400;color:var(--text3);margin-left:2px}
 .pd-order{background:var(--amber);color:#fff;border-radius:12px;padding:11px 18px;font-size:.84rem;font-weight:700;box-shadow:0 4px 14px rgba(245,158,11,.4);transition:all .2s;white-space:nowrap;border:none;cursor:pointer}
 .pd-order:hover{background:var(--amber-d)}
 .pd-order:active{transform:scale(.97)}
@@ -1420,7 +1422,7 @@ function cardHtml(p, delay) {
     + '<div class="pcard-desc">'+descLine+'</div>'
     + _descExtra
     + '<div class="pcard-bottom">'
-    +   '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
+    +   '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽</div>'
     +   addBtn
     + '</div>'
     + '</div></div>';
@@ -1673,7 +1675,7 @@ function openDetail(id) {
           + '<div class="pd-series">'+_descShort+'</div>'
           + '<div style="margin-top:10px">'+getStockInline(_p)+'</div>'
           + '<div class="pd-action-row">'
-            + '<div class="pd-price">'+_price.toLocaleString('ru-RU')+' ₽<span class="pd-price-sub">опт · комплект</span></div>'
+            + '<div class="pd-price">'+_price.toLocaleString('ru-RU')+' ₽</div>'
             + orderBtn
           + '</div>'
           + (_descLong ? '<div class="pd-desc-long">'+_descLong+'</div>' : '')
