@@ -28,6 +28,7 @@
 :root{
   --bg:#F3F1EE;--text:#1C1A18;--text2:#5C5850;--text3:#9A9590;
   --amber:#6D8A6D;--amber-d:#5A7A5A;--green:#6D8A6D;--tg:#229ED9;
+  --rose:#8C6570;--rose-d:#77565F;
   --bhi:rgba(255,255,255,0.92);--blo:rgba(195,188,178,0.4);
   --glass:rgba(255,255,255,0.48);--glass2:rgba(255,255,255,0.72);
   --blur:blur(22px);--r:14px;
@@ -118,11 +119,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .cat-col{display:flex;flex-direction:column;gap:8px;min-width:0;}
 .cat-hbtn{width:100%;flex:1;min-height:84px;padding:14px 12px;border:none;background:var(--amber);color:#fff;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;border-radius:10px;transition:background 0.2s,box-shadow 0.2s;text-align:center;line-height:1.25;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.10);box-sizing:border-box;}
 .cat-hbtn:hover{background:var(--amber-d);box-shadow:0 3px 10px rgba(0,0,0,0.15);}
-.cat-hbtn.active{background:var(--amber-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,0.18),0 3px 10px rgba(0,0,0,0.15);}
-.size-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.cat-hbtn.active{background:#fff;color:var(--amber-d);box-shadow:inset 0 0 0 2px var(--amber-d),0 3px 10px rgba(0,0,0,0.15);}
+.cat-hbtn.active::before{content:"✓ ";}
+.cat-col-venki .cat-hbtn{background:var(--rose);}
+.cat-col-venki .cat-hbtn:hover{background:var(--rose-d);}
+.cat-col-venki .cat-hbtn.active{background:#fff;color:var(--rose-d);box-shadow:inset 0 0 0 2px var(--rose-d),0 3px 10px rgba(0,0,0,0.15);}
+.size-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .size-btn{min-height:42px;padding:8px 2px;border:2px solid var(--amber);background:#fff;color:var(--amber);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.03em;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s,box-shadow 0.18s;border-radius:8px;line-height:1.15;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.06);box-sizing:border-box;text-align:center;overflow:hidden;}
 .size-btn:hover{background:var(--amber);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.12);}
 .size-btn.active{background:var(--amber);color:#fff;border-color:var(--amber-d);box-shadow:inset 0 -2px 0 rgba(0,0,0,0.18),0 2px 6px rgba(0,0,0,0.15);}
+.size-btn.active::before{content:"✓ ";}
+.cat-col-venki .size-btn{border-color:var(--rose);color:var(--rose);}
+.cat-col-venki .size-btn:hover{background:var(--rose);color:#fff;}
+.cat-col-venki .size-btn.active{background:var(--rose);color:#fff;border-color:var(--rose-d);}
 .cat-reset{display:none;margin:10px 16px 0;padding:8px 14px;background:rgba(245,158,11,0.08);color:var(--amber-d);border:1px solid rgba(245,158,11,0.35);border-radius:999px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;align-items:center;gap:6px;transition:background 0.18s,color 0.18s;}
 .cat-reset.on{display:inline-flex;}
 .cat-reset:hover{background:var(--amber);color:#fff;}
@@ -201,19 +210,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 }
 .pcard-name{font-size:0.76rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px;}
 .pcard-desc{font-size:0.62rem;color:var(--text2);line-height:1.4;margin-bottom:8px;flex:1;}
+.pcard-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .pcard-price{
   font-family:'Unbounded',sans-serif;font-size:0.88rem;font-weight:700;
-  color:var(--amber);margin-bottom:8px;
+  color:var(--text);
 }
 .pcard-price small{
   display:inline;font-family:'Inter',sans-serif;
   font-size:0.55rem;font-weight:400;color:var(--text3);margin-left:4px;
 }
-.addbtn{width:100%;padding:9px 0;border-radius:8px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;transition:all 0.2s;}
+.addbtn{flex-shrink:0;white-space:nowrap;padding:9px 16px;border-radius:8px;background:var(--amber);color:#fff;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;transition:all 0.2s;}
 .addbtn:active{transform:scale(0.97);}
 .addbtn:hover{background:var(--amber-d);}
 /* кол-во на карточке после добавления */
-.qty-row{width:100%;display:flex;align-items:center;justify-content:space-between;background:#f5f3ef;border:1px solid var(--blo);border-radius:8px;overflow:hidden;}
+.qty-row{width:112px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:#f5f3ef;border:1px solid var(--blo);border-radius:8px;overflow:hidden;}
 .qb{flex:1;height:34px;border:none;background:none;cursor:pointer;font-size:1.1rem;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .qb:active{background:rgba(109,138,109,0.12);color:var(--amber);}
 .qv{font-size:0.82rem;font-weight:700;color:var(--text);min-width:28px;text-align:center;}
@@ -1072,22 +1082,24 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 
 <!-- CATALOG -->
 <section id="catalog" style="position:relative;z-index:1;padding:0 16px 100px;">
-  <!-- Фильтры: 2 категории × 3 размера -->
+  <!-- Фильтры: 2 категории × 4 размера -->
   <div class="cat-filter-panel">
-    <div class="cat-col">
+    <div class="cat-col cat-col-korzinki">
       <button class="cat-hbtn" id="catbtn-korzinki" data-group="korzinki" onclick="setCatFilter('korzinki',null)">Авторские корзинки</button>
       <div class="size-row">
         <button class="size-btn" id="sizebtn-korzinki-s" data-group="korzinki" data-size="s" onclick="setCatFilter('korzinki','s')">Размер: S</button>
         <button class="size-btn" id="sizebtn-korzinki-m" data-group="korzinki" data-size="m" onclick="setCatFilter('korzinki','m')">Размер: M</button>
         <button class="size-btn" id="sizebtn-korzinki-l" data-group="korzinki" data-size="l" onclick="setCatFilter('korzinki','l')">Размер: L</button>
+        <button class="size-btn" id="sizebtn-korzinki-xl" data-group="korzinki" data-size="xl" onclick="setCatFilter('korzinki','xl')">Размер: XL</button>
       </div>
     </div>
-    <div class="cat-col">
+    <div class="cat-col cat-col-venki">
       <button class="cat-hbtn" id="catbtn-venki" data-group="venki" onclick="setCatFilter('venki',null)">Авторские ритуальные венки</button>
       <div class="size-row">
         <button class="size-btn" id="sizebtn-venki-s" data-group="venki" data-size="s" onclick="setCatFilter('venki','s')">Размер: S</button>
         <button class="size-btn" id="sizebtn-venki-m" data-group="venki" data-size="m" onclick="setCatFilter('venki','m')">Размер: M</button>
         <button class="size-btn" id="sizebtn-venki-l" data-group="venki" data-size="l" onclick="setCatFilter('venki','l')">Размер: L</button>
+        <button class="size-btn" id="sizebtn-venki-xl" data-group="venki" data-size="xl" onclick="setCatFilter('venki','xl')">Размер: XL</button>
       </div>
     </div>
   </div>
@@ -1407,8 +1419,10 @@ function cardHtml(p, delay) {
     + '<div class="pcard-name">'+_model+'</div>'
     + '<div class="pcard-desc">'+descLine+'</div>'
     + _descExtra
-    + '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
-    + addBtn
+    + '<div class="pcard-bottom">'
+    +   '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽<small>опт</small></div>'
+    +   addBtn
+    + '</div>'
     + '</div></div>';
 }
 
@@ -1524,7 +1538,7 @@ function restoreFiltersFromUrl() {
   var params = new URLSearchParams(location.search);
   var g = params.get('group'), s = params.get('size'), q = params.get('q'), so = params.get('sort');
   if (g === 'venki' || g === 'korzinki') catGroup = g;
-  if (s === 's' || s === 'm' || s === 'l') catSize = s;
+  if (s === 's' || s === 'm' || s === 'l' || s === 'xl') catSize = s;
   if (q) {
     searchQuery = q.toLowerCase();
     var sb = document.getElementById('searchBox'); if (sb) sb.value = q;
@@ -1562,7 +1576,7 @@ function updateCatUI() {
   ['venki','korzinki'].forEach(function(g){
     var hbtn = document.getElementById('catbtn-'+g);
     if(hbtn) hbtn.classList.toggle('active', catGroup === g);
-    ['s','m','l'].forEach(function(sz){
+    ['s','m','l','xl'].forEach(function(sz){
       var sbtn = document.getElementById('sizebtn-'+g+'-'+sz);
       if(sbtn) sbtn.classList.toggle('active', catGroup === g && catSize === sz);
     });
