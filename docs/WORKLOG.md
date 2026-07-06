@@ -3,7 +3,7 @@
 ## Current goal
 Deploy a separate SPA admin panel, multi-photo product management, public product galleries, and unique descriptions for every catalog item.
 
-## State (updated 2026-07-05 late)
+## State (updated 2026-07-06 late)
 - Done: User provided live URLs: https://ritualb2b.ru/ and https://ritualb2b.ru/admin.html.
 - Done: Local project identified at `C:\Users\user\Documents\GitHub\rituailb2b`.
 - Done: Initial tree shows likely touchpoints: `admin.html`, `api_admin.php`, `api/admin.php`, `products.js`, `assets/img/products`.
@@ -33,6 +33,10 @@ Deploy a separate SPA admin panel, multi-photo product management, public produc
 - Done: Live verification after deploy: `php -l api/admin.php`; `admin.html`, CSS, JS all HTTP 200; admin auth/API (`profile`, `stats`, `products_list`, `settings_get`) returned 200; `carousel_save` GET returned 405 and invalid POST returned 422; products live count is 55 with 55 unique descriptions.
 - Done: Headless Chrome final checks: desktop product list renders 55 visual cards, main card images load (`naturalWidth=180`), no product table wrapper, filters stay one row, no horizontal scroll, no JS exceptions/HTTP failures; product editor drawer has preview + photo input; mobile drawer is 390px wide with preview/photo input/save visible and no horizontal scroll.
 - Done: Public cart override verified in browser without creating an order: `venok-garmonia` base price 2700 uses override price 1290 in session cart.
+- Done: Reworked all 55 base product descriptions in `products.js` against the actual product photos/color palettes after the user rejected the previous generic copy; all `descShort` and `descLong` values are unique and non-empty.
+- Done: Bumped the public catalog script tag in `index.html` to `products.js?v=20260706a` because the connected Android phone still had the old unversioned catalog cached.
+- Done: Server backups before this copy/cache update: `/root/ritualb2b_products_before_photo_copy_20260706_231003.js` and `/root/ritualb2b_index_before_products_cache_bust_20260706_231309.html`.
+- Done: Live verification after copy/cache update: HTTPS `products.js` returned 55 products with 55 unique short/long descriptions; local and server SHA-256 for `products.js` matched; connected Android Chrome saw 55 products, expected new sample descriptions, visible updated text, 360px scroll width, and no horizontal scroll.
 - Next: Broader UX follow-ups remain: promo edit UI, richer guest order workflow, and deeper client/order detail views.
 
 ## System Map
@@ -68,6 +72,7 @@ graph TD
 - `curl.exe` JSON quoting under PowerShell can distort request bodies; use Node HTTPS or PowerShell hashtables/ConvertTo-Json for auth checks.
 - `scp` to this host can close unexpectedly while SSH still works; for temp byte transfer, `cmd /c` with OpenSSH stdin redirection worked.
 - Admin product main images should not use native lazy loading; in headless/live QA they could appear blank while miniatures loaded.
+- The public homepage previously loaded `products.js` without a version query; mobile Chrome kept stale product text until `index.html` was updated to `products.js?v=20260706a`.
 
 ## Open threads
 - Promo editing and richer order/client workflows are still broader UX follow-ups; this patch focuses on the raw admin product/photo experience and the blocker bugs found by QA agents.
