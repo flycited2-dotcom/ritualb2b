@@ -1,3 +1,15 @@
+## 2026-07-06 ASCII Memory Snapshot
+- Latest local production commits before this memory update: `12a800b Rewrite product descriptions from photos` and `8d7cd51 Correct product color descriptions`.
+- Public catalog script version is `products.js?v=20260706b`.
+- Catalog verified at 55 products: 31 `venki`, 24 `korzinki`; all 55 `descShort` and all 55 `descLong` values are unique.
+- Second color audit corrected 11 palette mismatches in `products.js` after reviewing large photo contact sheets.
+- Server SQLite cleanup cleared 48 generic `product_overrides.desc_short` placeholders so public cards/details use accurate base catalog color text.
+- Server data backup before that cleanup: `/root/ritualb2b_sqlite_before_color_desc_short_20260706_204626.sqlite`.
+- File backups before the color-audit deploy: `/root/ritualb2b_products_before_color_audit_20260706_234004.js` and `/root/ritualb2b_index_before_color_audit_20260706_234004.html`.
+- Live checks: `products.js?v=20260706b` returned 55 products; public overrides API reported zero non-empty `desc_short`; Android Chrome detail check for `venok-dafna` matched the expected short and long description prefix with no horizontal scroll.
+- Gotcha: keep `product_overrides.desc_short` null unless an intentional product-specific short override is needed; otherwise it masks `products.js`.
+- Next follow-ups: promo edit UI, richer guest order workflow, deeper client/order detail views.
+
 # Worklog: ritualb2b
 
 ## Current goal
