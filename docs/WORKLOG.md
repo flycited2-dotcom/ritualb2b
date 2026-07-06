@@ -37,6 +37,10 @@ Deploy a separate SPA admin panel, multi-photo product management, public produc
 - Done: Bumped the public catalog script tag in `index.html` to `products.js?v=20260706a` because the connected Android phone still had the old unversioned catalog cached.
 - Done: Server backups before this copy/cache update: `/root/ritualb2b_products_before_photo_copy_20260706_231003.js` and `/root/ritualb2b_index_before_products_cache_bust_20260706_231309.html`.
 - Done: Live verification after copy/cache update: HTTPS `products.js` returned 55 products with 55 unique short/long descriptions; local and server SHA-256 for `products.js` matched; connected Android Chrome saw 55 products, expected new sample descriptions, visible updated text, 360px scroll width, and no horizontal scroll.
+- Done: Second color audit correction in `products.js` after visual contact-sheet review: corrected 11 mismatched color palettes and bumped public catalog cache to `products.js?v=20260706b`.
+- Done: Cleared 48 server `product_overrides.desc_short` values that were the generic placeholder `Авторская работа · Искусственные цветы`; this lets public cards/details fall back to the accurate `products.js` color descriptions while preserving prices, dimensions, active flags, photos, and other overrides.
+- Done: Server backups for this color-audit pass: `/root/ritualb2b_products_before_color_audit_20260706_234004.js`, `/root/ritualb2b_index_before_color_audit_20260706_234004.html`, and `/root/ritualb2b_sqlite_before_color_desc_short_20260706_204626.sqlite`.
+- Done: Live/mobile verification after the second color audit: HTTPS `products.js?v=20260706b` returned 55 products with 55 unique short/long descriptions; public overrides API has `withDescShort=0`; connected Android Chrome loaded `products.js?v=20260706b`, opened `Венок «Дафна»`, matched the expected short and long description prefix, and had no horizontal scroll.
 - Next: Broader UX follow-ups remain: promo edit UI, richer guest order workflow, and deeper client/order detail views.
 
 ## System Map
@@ -73,6 +77,7 @@ graph TD
 - `scp` to this host can close unexpectedly while SSH still works; for temp byte transfer, `cmd /c` with OpenSSH stdin redirection worked.
 - Admin product main images should not use native lazy loading; in headless/live QA they could appear blank while miniatures loaded.
 - The public homepage previously loaded `products.js` without a version query; mobile Chrome kept stale product text until `index.html` was updated to `products.js?v=20260706a`.
+- Server `product_overrides.desc_short` can mask accurate base catalog text. On 2026-07-06, 48 rows had the generic placeholder `Авторская работа · Искусственные цветы`; clearing those values made the public site use `products.js` descriptions again.
 
 ## Open threads
 - Promo editing and richer order/client workflows are still broader UX follow-ups; this patch focuses on the raw admin product/photo experience and the blocker bugs found by QA agents.
