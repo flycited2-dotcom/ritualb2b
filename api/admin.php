@@ -16,7 +16,7 @@ $action = $_GET['action'] ?? '';
 if ($action === 'products_overrides_public') {
     $db = getDB();
     // Return ALL overrides including active=0 (frontend filters hidden products)
-    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, active, model_override, brand_override, dimensions, desc_long_override, benefits_override FROM product_overrides")->fetchAll();
+    $rows = $db->query("SELECT sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short, active, model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override FROM product_overrides")->fetchAll();
     $map = [];
     foreach ($rows as $r) { $map[$r['sku']] = $r; }
     // Custom products (manually added)
@@ -380,18 +380,39 @@ switch ($action) {
     // ── Settings save ──
     case 'settings_save':
         if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
-        $raw = json_decode(file_get_contents('php://input'), true);
-        $allowed_keys = ['BOT_TOKEN','CHAT_ID','TG_ADMIN_ID','EMAIL_TO','CRON_SECRET','ALLOWED_ORIGIN'];
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
+        $allowed_keys = ['BOT_TOKEN','CHAT_ID','TG_ADMIN_ID','EMAIL_TO','CRON_SECRET','ALLOWED_ORIGIN','WEBHOOK_SECRET'];
         $cfgFile = __DIR__ . '/../config.php';
 
-        $content = "<?php\n";
-        foreach ($allowed_keys as $key) {
-            if (isset($raw[$key])) {
-                $val = addslashes(trim($raw[$key]));
-                $content .= "define('{$key}', '{$val}');\n";
+        $existing = [];
+        if (file_exists($cfgFile)) {
+            $lines = file($cfgFile, FILE_IGNORE_NEW_LINES);
+            foreach ($lines as $line) {
+                if (preg_match("/define\('([^']+)',\s*'([^']*)'\)/", $line, $m)) {
+                    $existing[$m[1]] = $m[2];
+                } elseif (preg_match('/define\(\'([^\']+)\',\s*(\d+)\)/', $line, $m)) {
+                    $existing[$m[1]] = $m[2];
+                }
             }
         }
-        $content .= "define('RATE_LIMIT_SEC', 30);\n";
+        foreach ($allowed_keys as $key) {
+            if (array_key_exists($key, $raw)) {
+                $existing[$key] = trim((string)$raw[$key]);
+            }
+        }
+        if (!array_key_exists('RATE_LIMIT_SEC', $existing)) {
+            $existing['RATE_LIMIT_SEC'] = '30';
+        }
+
+        $content = "<?php\n";
+        foreach ($existing as $key => $val) {
+            if (!preg_match('/^[A-Z0-9_]+$/', $key)) continue;
+            if ($key === 'RATE_LIMIT_SEC' && ctype_digit((string)$val)) {
+                $content .= "define('{$key}', ".intval($val).");\n";
+            } else {
+                $content .= "define('{$key}', ".var_export((string)$val, true).");\n";
+            }
+        }
 
         file_put_contents($cfgFile, $content);
 
@@ -407,7 +428,11 @@ switch ($action) {
 
     // ── Carousel save ──
     case 'carousel_save':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
         $raw = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($raw) || !array_key_exists('ids', $raw) || !is_array($raw['ids'])) {
+            jsonResponse(['ok' => false, 'error' => 'ids required'], 422);
+        }
         $ids = array_values(array_filter((array)($raw['ids'] ?? []), 'is_string'));
         $val = json_encode($ids);
         try {
@@ -428,7 +453,7 @@ switch ($action) {
                 $products = json_decode($m[1], true) ?: [];
             }
         }
-        $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short, model_override, brand_override, dimensions, desc_long_override, benefits_override FROM product_overrides")->fetchAll();
+        $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short, model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override FROM product_overrides")->fetchAll();
         $ovMap = [];
         foreach ($ovRows as $r) { $ovMap[$r['sku']] = $r; }
         foreach ($products as &$p) {
@@ -474,14 +499,31 @@ switch ($action) {
         $dimensions      = trim($raw['dimensions'] ?? '') ?: null;
         $descLongOv      = trim($raw['desc_long_override'] ?? '') ?: null;
         $benefitsOv      = trim($raw['benefits_override'] ?? '') ?: null;
+        $photosOv        = normalizePhotoList($raw['photos_override'] ?? null);
+        $photosOvJson    = $photosOv ? json_encode($photosOv, JSON_UNESCAPED_UNICODE) : null;
         if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
         if (!in_array($badge, ['', 'new', 'sale', 'clearance'])) jsonResponse(['ok' => false, 'error' => 'Invalid badge'], 422);
-        $db->prepare("INSERT OR REPLACE INTO product_overrides
+        $db->prepare("INSERT INTO product_overrides
             (sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short,
-             model_override, brand_override, dimensions, desc_long_override, benefits_override, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
+             model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(sku) DO UPDATE SET
+                description=excluded.description,
+                badge=excluded.badge,
+                badge_label=excluded.badge_label,
+                price_override=excluded.price_override,
+                stock_override=excluded.stock_override,
+                size_override=excluded.size_override,
+                desc_short=excluded.desc_short,
+                model_override=excluded.model_override,
+                brand_override=excluded.brand_override,
+                dimensions=excluded.dimensions,
+                desc_long_override=excluded.desc_long_override,
+                benefits_override=excluded.benefits_override,
+                photos_override=excluded.photos_override,
+                updated_at=excluded.updated_at")
             ->execute([$sku, $desc, $badge, $blabel, $priceOv, $stockOv, $sizeOv, $descShort,
-                       $modelOv, $brandOv, $dimensions, $descLongOv, $benefitsOv]);
+                       $modelOv, $brandOv, $dimensions, $descLongOv, $benefitsOv, $photosOvJson]);
         jsonResponse(['ok' => true]);
         break;
 
@@ -495,6 +537,8 @@ switch ($action) {
         $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at")
             ->execute([$sku, $active]);
+        $db->prepare("UPDATE custom_products SET active = ?, updated_at = CURRENT_TIMESTAMP WHERE sku = ?")
+            ->execute([$active, $sku]);
         jsonResponse(['ok' => true]);
         break;
 
@@ -508,7 +552,8 @@ switch ($action) {
         $updated = 0;
         $stmt = $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at");
-        foreach ($skus as $sku) { $stmt->execute([$sku, $active]); $updated++; }
+        $customStmt = $db->prepare("UPDATE custom_products SET active = ?, updated_at = CURRENT_TIMESTAMP WHERE sku = ?");
+        foreach ($skus as $sku) { $stmt->execute([$sku, $active]); $customStmt->execute([$active, $sku]); $updated++; }
         jsonResponse(['ok' => true, 'updated' => $updated]);
         break;
 
@@ -524,6 +569,7 @@ switch ($action) {
         $existRow->execute([$sku]);
         $existData = $existRow->fetch();
         $id = $existData ? $existData['id'] : ('cp_' . substr(md5(uniqid()), 0, 8));
+        $photos = normalizePhotoList($raw['photos'] ?? ($raw['photo'] ?? ''));
         $data = [
             'model'      => $raw['model'] ?? '',
             'brand'      => $raw['brand'] ?? 'Ручная работа',
@@ -538,7 +584,8 @@ switch ($action) {
             'cardBenef'  => $raw['cardBenef'] ?? '',
             'benefits'   => array_values(array_filter(explode("\n", $raw['benefits_text'] ?? ''))),
             'descLong'   => $raw['descLong'] ?? '',
-            'photo'      => $raw['photo'] ?? '',
+            'photo'      => $photos[0] ?? '',
+            'photos'     => $photos,
             'btu'        => '-',
             'area'       => 0,
         ];
@@ -561,6 +608,26 @@ switch ($action) {
 
     default:
         jsonResponse(['ok' => false, 'error' => 'Unknown action'], 400);
+}
+
+function normalizePhotoList($value) {
+    if (is_string($value)) {
+        $trimmed = trim($value);
+        if ($trimmed === '') return [];
+        $decoded = json_decode($trimmed, true);
+        $value = is_array($decoded) ? $decoded : preg_split('/[\r\n,]+/', $trimmed);
+    }
+    if (!is_array($value)) return [];
+
+    $out = [];
+    foreach ($value as $name) {
+        $name = basename(trim((string)$name));
+        if ($name === '') continue;
+        if (!preg_match('/\.(jpe?g|png|webp|gif)$/i', $name)) continue;
+        if (!in_array($name, $out, true)) $out[] = $name;
+        if (count($out) >= 12) break;
+    }
+    return $out;
 }
 
 // ── Export CSV helper ──────────────────────────────────────────────────────

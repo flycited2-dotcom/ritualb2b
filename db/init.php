@@ -59,6 +59,7 @@ function getDB() {
         'dimensions'         => "ALTER TABLE product_overrides ADD COLUMN dimensions TEXT DEFAULT NULL",
         'desc_long_override' => "ALTER TABLE product_overrides ADD COLUMN desc_long_override TEXT DEFAULT NULL",
         'benefits_override'  => "ALTER TABLE product_overrides ADD COLUMN benefits_override TEXT DEFAULT NULL",
+        'photos_override'    => "ALTER TABLE product_overrides ADD COLUMN photos_override TEXT DEFAULT NULL",
     ] as $col => $sql) {
         if (!in_array($col, $poCols)) {
             try { $db->exec($sql); } catch (Throwable $e) {}

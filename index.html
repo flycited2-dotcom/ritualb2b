@@ -791,6 +791,12 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .pd-grid{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .pd-photo{flex:none;height:44vh;background:linear-gradient(150deg,#f3efe8,#e7ecf5);display:flex;align-items:center;justify-content:center;padding:14px}
 .pd-photo img{max-width:100%;max-height:100%;object-fit:contain;display:block;border-radius:10px}
+.pd-photo-wrap{flex:none;height:44vh;background:linear-gradient(150deg,#f3efe8,#e7ecf5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px}
+.pd-photo-wrap .pd-photo{height:auto;flex:1;width:100%;background:transparent;padding:0;min-height:0}
+.pd-thumbs{display:flex;gap:8px;max-width:100%;overflow-x:auto;padding:2px 0 4px}
+.pd-thumb{width:54px;height:54px;border-radius:9px;border:1px solid var(--blo);background:#fff;padding:3px;cursor:pointer;flex-shrink:0}
+.pd-thumb.active{border-color:var(--amber);box-shadow:0 0 0 2px rgba(109,138,109,.18)}
+.pd-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
 .pd-side{display:flex;flex-direction:column;min-width:0;flex:1}
 .pd-side-scroll{padding:16px 14px}
 .pd-action-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
@@ -828,6 +834,8 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   .pd.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;}
   .pd-grid{flex-direction:row;overflow:hidden}
   .pd-photo{flex:1.15;height:auto;padding:22px}
+  .pd-photo-wrap{flex:1.15;height:auto;padding:22px}
+  .pd-photo-wrap .pd-photo{height:auto;padding:0}
   .pd-side{border-left:1px solid var(--blo)}
   .pd-side-scroll{flex:1;overflow-y:auto;padding:28px 28px 16px}
   .pd-title{font-size:1.5rem}
@@ -1245,10 +1253,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 
 
 <script src="products.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" defer></script>
-<script src="pricelist.js"></script>
 <script>
 // Product overrides (badges + descriptions from admin)
 var PRODUCT_OVERRIDES = {};
@@ -1264,7 +1268,9 @@ fetch("api/admin.php?action=products_overrides_public")
         PRODUCTS.push(cp);
       }
     });
-    renderAll(); // Re-render catalog with overrides + custom products applied
+    if (typeof normalizeCartItems === 'function') normalizeCartItems();
+    if (typeof syncFab === 'function') syncFab();
+    if (typeof renderAll === 'function') renderAll(); // Re-render catalog with overrides + custom products applied
   })
   .catch(function(){});
 </script>
@@ -1313,9 +1319,40 @@ var LEGACY = {
 function imgUrl(photo, w, q) {
   return 'api/img.php?f=' + encodeURIComponent(photo) + '&w=' + w + (q ? '&q=' + q : '');
 }
+function parsePhotoList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    try {
+      var parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) return parsed;
+    } catch(e) {}
+    return value.split(/[\n,]+/);
+  }
+  return [];
+}
+function cleanPhotoList(list) {
+  var seen = {};
+  return list.map(function(x){ return (x || '').toString().trim(); })
+    .filter(function(x){
+      if (!x || x === 'undefined' || seen[x]) return false;
+      seen[x] = true;
+      return true;
+    });
+}
+function jsStr(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+function getProductPhotos(p) {
+  var ov = PRODUCT_OVERRIDES[p.sku] || {};
+  var photos = cleanPhotoList(parsePhotoList(ov.photos_override));
+  if (!photos.length) photos = cleanPhotoList(parsePhotoList(p.photos));
+  if (!photos.length && p.photo) photos = [p.photo];
+  return photos;
+}
 function getImg(p, w, q) {
-  if(p.photo && p.photo !== 'undefined' && p.photo !== '')
-    return imgUrl(p.photo, w || 1100, q);
+  var photos = getProductPhotos(p);
+  if(photos.length) return imgUrl(photos[0], w || 1100, q);
   return LEGACY[p.brandCode] || '';
 }
 
@@ -1331,6 +1368,26 @@ function saveCart() {
   try { sessionStorage.setItem('sh_cart', JSON.stringify(cart)); } catch(e) {}
 }
 function getQty(id) { var it = cart.find(function(c){ return c.id===id; }); return it ? it.qty : 0; }
+
+function cartProductData(p, qty) {
+  var ov = PRODUCT_OVERRIDES[p.sku] || {};
+  return {
+    id: p.id,
+    name: ov.model_override || p.model,
+    brand: ov.brand_override || p.brand,
+    price: effPrice(p),
+    brandCode: p.brandCode,
+    group: p.group,
+    qty: qty || 1
+  };
+}
+
+function normalizeCartItems() {
+  cart = cart.map(function(item){
+    var p = PRODUCTS.find(function(x){ return x.id === item.id; });
+    return p ? cartProductData(p, item.qty || 1) : item;
+  });
+}
 
 function syncFab() {
   saveCart();
@@ -1351,7 +1408,7 @@ function syncFab() {
 function addItem(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===id; });
-  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:1}); }
+  if(ex){ ex.qty++; } else { cart.push(cartProductData(p, 1)); }
   syncFab(); renderAll(); openD();
 }
 
@@ -1447,8 +1504,7 @@ function cardHtml(p, delay) {
 function renderAll() {
   var content = document.getElementById('catalog-content');
   var list = PRODUCTS.filter(function(p){
-    var _ov = PRODUCT_OVERRIDES[p.sku] || {};
-    if (_ov.active !== undefined && _ov.active !== null && parseInt(_ov.active) === 0) return false;
+    if (!isProductVisible(p)) return false;
     if(catGroup && p.group !== catGroup) return false;
     if(catSize && (p.size||'').toLowerCase() !== catSize) return false;
     if(searchQuery) {
@@ -1503,12 +1559,23 @@ function renderAll() {
     items.forEach(function(p,i){ html += cardHtml(p,i); });
     html += '</div></div>';
   } else {
-    // Общий вид: товары всех групп вперемешку, чередованием «через одну»
-    var lists = order.map(function(g){ return applySort(groupItems(g)); }).filter(function(l){ return l.length; });
-    var mixed = [];
-    for(var idx = 0, more = true; more; idx++) {
-      more = false;
-      lists.forEach(function(l){ if(idx < l.length){ mixed.push(l[idx]); more = true; } });
+    var mixed;
+    if (sortMode === 'default') {
+      // Общий вид без явной сортировки: товары всех групп вперемешку, чередованием «через одну»
+      var lists = order.map(groupItems).filter(function(l){ return l.length; });
+      mixed = [];
+      for(var idx = 0, more = true; more; idx++) {
+        more = false;
+        lists.forEach(function(l){ if(idx < l.length){ mixed.push(l[idx]); more = true; } });
+      }
+    } else {
+      // Выбрана сортировка (цена/алфавит) — сортируем общий список целиком.
+      // Сортировка отдельно по каждой группе с последующим чередованием
+      // ломала порядок (например, «сначала дешевле» скакало вверх-вниз,
+      // т.к. венки и корзинки сортировались каждые сами по себе).
+      var all = [];
+      order.forEach(function(g){ all = all.concat(groupItems(g)); });
+      mixed = applySort(all);
     }
     html += '<div class="pgrid">';
     mixed.forEach(function(p,i){ html += cardHtml(p,i); });
@@ -1529,6 +1596,11 @@ function escHtml(s) {
 function effPrice(p) {
   var _ov = PRODUCT_OVERRIDES[p.sku] || {};
   return (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
+}
+
+function isProductVisible(p) {
+  var _ov = PRODUCT_OVERRIDES[p.sku] || {};
+  return !(_ov.active !== undefined && _ov.active !== null && parseInt(_ov.active) === 0);
 }
 
 function applySort(items) {
@@ -1628,7 +1700,7 @@ function observe() {
 }
 
 // ── Product Detail ────────────────────────────────────
-var pdQty = 1, pdCurrentId = null;
+var pdQty = 1, pdCurrentId = null, pdCurrentPhotoSrc = '';
 
 function openDetail(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
@@ -1644,10 +1716,20 @@ function openDetail(id) {
   var _benefits  = _ov.benefits_override
     ? (function(){ try{ return JSON.parse(_ov.benefits_override); }catch(e){ return (_ov.benefits_override||'').split('\n').filter(Boolean); } })()
     : (p.benefits || []);
-  var src = getImg(p, 1400);
+  var photos = getProductPhotos(p);
+  var src = photos.length ? imgUrl(photos[0], 1400) : getImg(p, 1400);
+  pdCurrentPhotoSrc = src || '';
   var photoH = src
-    ? '<img loading="lazy" src="'+src+'" alt="'+_model+'" onerror="this.style.display=\'none\'">'
+    ? '<img id="pd-main-photo" loading="lazy" src="'+src+'" alt="'+_model+'" onerror="this.style.display=\'none\'">'
     : '<div style="font-size:4rem">🌿</div>';
+  var thumbsHtml = photos.length > 1
+    ? '<div class="pd-thumbs">' + photos.map(function(name, i){
+        var full = imgUrl(name, 1400);
+        return '<button class="pd-thumb'+(i===0?' active':'')+'" type="button" onclick="event.stopPropagation();pdSetPhoto(\''+jsStr(full)+'\',this)">'
+          + '<img src="'+imgUrl(name, 180)+'" alt="">'
+          + '</button>';
+      }).join('') + '</div>'
+    : '';
   var specs = [];
   if(_size && _size!=='-') specs.push({ico:'📏',t:'Размер',v:_size});
   if(_ov.dimensions) specs.push({ico:'📐',t:'Размеры',v:_ov.dimensions});
@@ -1679,11 +1761,14 @@ function openDetail(id) {
     + '<button class="pd-sh link" onclick="pdShare(\'copy\')">'+SVG_LINK+' Ссылка</button>'
     + '</div>';
 
-  var photoClick = src ? " onclick=\"openPhotoZoom('"+src+"')\" style=\"cursor:zoom-in\"" : "";
+  var photoClick = src ? ' onclick="pdZoomCurrentPhoto()" style="cursor:zoom-in"' : '';
   document.getElementById('pd-inner').innerHTML =
     '<button class="pd-close" onclick="closeDetail()">✕</button>'
     + '<div class="pd-grid">'
-      + '<div class="pd-photo"'+photoClick+'>' + photoH + '</div>'
+      + '<div class="pd-photo-wrap">'
+        + '<div class="pd-photo"'+photoClick+'>' + photoH + '</div>'
+        + thumbsHtml
+      + '</div>'
       + '<div class="pd-side">'
         + '<div class="pd-side-scroll">'
           + '<div class="pd-head">'
@@ -1717,6 +1802,18 @@ function openDetail(id) {
   document.getElementById('pd-modal').classList.add('on');
   document.body.style.overflow = 'hidden';
   pushOverlay('detail', closeDetail);
+}
+
+function pdSetPhoto(src, btn) {
+  pdCurrentPhotoSrc = src || '';
+  var img = document.getElementById('pd-main-photo');
+  if (img && src) img.src = src;
+  document.querySelectorAll('.pd-thumb').forEach(function(el){ el.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+}
+
+function pdZoomCurrentPhoto() {
+  if (pdCurrentPhotoSrc) openPhotoZoom(pdCurrentPhotoSrc);
 }
 
 function openPd() {
@@ -1792,7 +1889,7 @@ function pdAddToCart() {
   if(!pdCurrentId) return;
   var p = PRODUCTS.find(function(x){ return x.id===pdCurrentId; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===p.id; });
-  if(ex){ ex.qty += pdQty; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:pdQty}); }
+  if(ex){ ex.qty += pdQty; } else { cart.push(cartProductData(p, pdQty)); }
   closeDetail(); syncFab(); renderAll(); openD();
 }
 
@@ -2031,7 +2128,7 @@ function renderUpsell() {
     html += '<div class="upsell-item">'
       + '<div class="upsell-info">'
         + '<div class="upsell-name">' + p.model + '</div>'
-        + '<div class="upsell-price">' + p.price.toLocaleString('ru-RU') + ' ₽</div>'
+        + '<div class="upsell-price">' + effPrice(p).toLocaleString('ru-RU') + ' ₽</div>'
       + '</div>'
       + '<button class="upsell-add" onclick="addUpsell(\'' + p.id + '\')">+ Добавить</button>'
     + '</div>';
@@ -2043,7 +2140,7 @@ function renderUpsell() {
 function addUpsell(id) {
   var p = PRODUCTS.find(function(x){ return x.id===id; }); if(!p) return;
   var ex = cart.find(function(c){ return c.id===id; });
-  if(ex){ ex.qty++; } else { cart.push({id:p.id,name:p.model,brand:p.brand,price:p.price,brandCode:p.brandCode,group:p.group,qty:1}); }
+  if(ex){ ex.qty++; } else { cart.push(cartProductData(p, 1)); }
   syncFab(); renderAll(); renderD();
   showToast('✓ ' + p.model + ' добавлен');
 }
@@ -2240,7 +2337,7 @@ function repeatOrder(orderId,shNum,itemsEncoded){
     var prod=PRODUCTS.find(function(p){return p.model===(it.product_name||it.name);});
     if(prod&&prod.stock!=='out'){
       var ex=cart.find(function(c){return c.id===prod.id;});
-      if(ex){ex.qty+=(it.qty||1);}else{cart.push({id:prod.id,name:prod.model,brand:prod.brand,price:prod.price,brandCode:prod.brandCode,group:prod.group,qty:(it.qty||1)});}
+      if(ex){ex.qty+=(it.qty||1);}else{cart.push(cartProductData(prod, (it.qty||1)));}
       added.push(prod.model);
     }else{unavailable.push(it.product_name||it.name||'?');}
   });
@@ -2389,8 +2486,10 @@ function buildCarousel(ids) {
 
   var items = ids.map(function(id) {
     var p = PRODUCTS.find(function(x){ return x.id === id; });
-    if (!p || !p.photo) return null;
-    return { id: id, photo: p.photo, model: p.model };
+    if (!p || !isProductVisible(p)) return null;
+    var photos = getProductPhotos(p);
+    if (!photos.length) return null;
+    return { id: id, photo: photos[0], model: p.model };
   }).filter(Boolean);
 
   if (!items.length) return;
@@ -2430,7 +2529,7 @@ syncFab();
 (function(){
   try {
     var pid = new URLSearchParams(location.search).get('p');
-    if(pid && PRODUCTS.some(function(x){ return x.id === pid; })) openDetail(pid);
+    if(pid && PRODUCTS.some(function(x){ return x.id === pid && isProductVisible(x); })) openDetail(pid);
   } catch(e){}
 })();
 </script>
