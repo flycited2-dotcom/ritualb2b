@@ -76,7 +76,7 @@ if ($action === 'export_orders_csv') {
     exit;
 }
 
-adminRequire();
+$currentAdminId = adminRequire();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $db = getDB();
@@ -92,7 +92,7 @@ switch ($action) {
     // ── Create promo rule ──
     case 'promo_create':
         if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
-        $raw = json_decode(file_get_contents('php://input'), true);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
         $name     = trim($raw['name'] ?? '');
         $percent  = floatval($raw['bonus_percent'] ?? 3.0);
         $group    = isset($raw['product_group']) && $raw['product_group'] !== '' ? trim($raw['product_group']) : null;
@@ -107,7 +107,7 @@ switch ($action) {
     // ── Toggle promo rule ──
     case 'promo_toggle':
         if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
-        $raw = json_decode(file_get_contents('php://input'), true);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
         $id = intval($raw['id'] ?? 0); $active = intval($raw['active'] ?? 0);
         if (!$id) jsonResponse(['ok' => false, 'error' => 'id required'], 422);
         $db->prepare('UPDATE promo_rules SET active = ? WHERE id = ?')->execute([$active, $id]);
@@ -304,6 +304,16 @@ switch ($action) {
         $uid  = intval($raw['user_id'] ?? 0);
         $role = trim($raw['role'] ?? '');
         if (!$uid || !in_array($role, ['client','admin'])) jsonResponse(['ok' => false, 'error' => 'Некорректные данные'], 422);
+        if ($uid === $currentAdminId && $role !== 'admin') jsonResponse(['ok' => false, 'error' => 'Нельзя снять роль админа у текущего аккаунта'], 422);
+        if ($role !== 'admin') {
+            $target = $db->prepare('SELECT role FROM users WHERE id = ?');
+            $target->execute([$uid]);
+            $targetRow = $target->fetch();
+            $adminCount = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
+            if (($targetRow['role'] ?? '') === 'admin' && $adminCount <= 1) {
+                jsonResponse(['ok' => false, 'error' => 'Нельзя снять последнего администратора'], 422);
+            }
+        }
         $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$role, $uid]);
         jsonResponse(['ok' => true]);
         break;
@@ -338,9 +348,13 @@ switch ($action) {
         }
         $ch = curl_init("https://api.telegram.org/bot{$token}/sendMessage");
         curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>json_encode(['chat_id'=>$chatId,'text'=>$msg,'parse_mode'=>'Markdown']),CURLOPT_HTTPHEADER=>['Content-Type: application/json'],CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>10,CURLOPT_SSL_VERIFYPEER=>false]);
-        $res = curl_exec($ch); curl_close($ch);
-        $ok  = (bool)(json_decode($res,true)['ok'] ?? false);
-        jsonResponse(['ok' => $ok]);
+        $res = curl_exec($ch);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+        $tg = json_decode($res ?: '', true) ?: [];
+        $ok  = (bool)($tg['ok'] ?? false);
+        if (!$ok) jsonResponse(['ok' => false, 'error' => $tg['description'] ?? ($curlErr ?: 'Telegram не принял отчет')], 502);
+        jsonResponse(['ok' => true]);
         break;
 
     // ── Analytics ──
@@ -414,7 +428,9 @@ switch ($action) {
             }
         }
 
-        file_put_contents($cfgFile, $content);
+        if (file_put_contents($cfgFile, $content, LOCK_EX) === false) {
+            jsonResponse(['ok' => false, 'error' => 'Не удалось записать config.php'], 500);
+        }
 
         // Save app_settings (bonuses_enabled)
         if (isset($raw['bonuses_enabled'])) {
@@ -485,11 +501,12 @@ switch ($action) {
     // ── Save product override ──
     case 'product_save_override':
         if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
-        $raw = json_decode(file_get_contents('php://input'), true);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
         $sku             = trim($raw['sku'] ?? '');
         $desc            = trim($raw['description'] ?? '');
         $badge           = trim($raw['badge'] ?? '');
         $blabel          = trim($raw['badge_label'] ?? '');
+        $active          = array_key_exists('active', $raw) ? (intval($raw['active']) ? 1 : 0) : null;
         $priceOv         = isset($raw['price_override']) && $raw['price_override'] !== '' ? (int)$raw['price_override'] : null;
         $stockOv         = in_array($raw['stock_override'] ?? '', ['in_stock', 'out_of_stock', '']) ? (($raw['stock_override'] ?? '') ?: null) : null;
         $sizeOv          = trim($raw['size_override'] ?? '') ?: null;
@@ -505,8 +522,8 @@ switch ($action) {
         if (!in_array($badge, ['', 'new', 'sale', 'clearance'])) jsonResponse(['ok' => false, 'error' => 'Invalid badge'], 422);
         $db->prepare("INSERT INTO product_overrides
             (sku, description, badge, badge_label, price_override, stock_override, size_override, desc_short,
-             model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+             model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override, active, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(sku) DO UPDATE SET
                 description=excluded.description,
                 badge=excluded.badge,
@@ -521,9 +538,10 @@ switch ($action) {
                 desc_long_override=excluded.desc_long_override,
                 benefits_override=excluded.benefits_override,
                 photos_override=excluded.photos_override,
+                active=COALESCE(excluded.active, product_overrides.active),
                 updated_at=excluded.updated_at")
             ->execute([$sku, $desc, $badge, $blabel, $priceOv, $stockOv, $sizeOv, $descShort,
-                       $modelOv, $brandOv, $dimensions, $descLongOv, $benefitsOv, $photosOvJson]);
+                       $modelOv, $brandOv, $dimensions, $descLongOv, $benefitsOv, $photosOvJson, $active]);
         jsonResponse(['ok' => true]);
         break;
 
@@ -563,6 +581,7 @@ switch ($action) {
         $raw = json_decode(file_get_contents('php://input'), true) ?: [];
         $sku = trim($raw['sku'] ?? '');
         if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
+        $active = array_key_exists('active', $raw) ? (intval($raw['active']) ? 1 : 0) : 1;
         // Generate ID if new
         $existing = $db->prepare("SELECT id FROM custom_products WHERE sku = ?")->execute([$sku]);
         $existRow = $db->prepare("SELECT id FROM custom_products WHERE sku = ?");
@@ -589,10 +608,20 @@ switch ($action) {
             'btu'        => '-',
             'area'       => 0,
         ];
-        $db->prepare("INSERT INTO custom_products (id, sku, data_json, active, updated_at)
-            VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP)
-            ON CONFLICT(sku) DO UPDATE SET data_json=excluded.data_json, active=1, updated_at=excluded.updated_at")
-            ->execute([$id, $sku, json_encode($data, JSON_UNESCAPED_UNICODE)]);
+        $db->beginTransaction();
+        try {
+            $db->prepare("INSERT INTO custom_products (id, sku, data_json, active, updated_at)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(sku) DO UPDATE SET data_json=excluded.data_json, active=excluded.active, updated_at=excluded.updated_at")
+                ->execute([$id, $sku, json_encode($data, JSON_UNESCAPED_UNICODE), $active]);
+            $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at")
+                ->execute([$sku, $active]);
+            $db->commit();
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) $db->rollBack();
+            jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
         jsonResponse(['ok' => true, 'id' => $id, 'sku' => $sku]);
         break;
 
@@ -602,7 +631,15 @@ switch ($action) {
         $raw = json_decode(file_get_contents('php://input'), true) ?: [];
         $sku = trim($raw['sku'] ?? '');
         if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
-        $db->prepare("DELETE FROM custom_products WHERE sku = ?")->execute([$sku]);
+        $db->beginTransaction();
+        try {
+            $db->prepare("DELETE FROM custom_products WHERE sku = ?")->execute([$sku]);
+            $db->prepare("DELETE FROM product_overrides WHERE sku = ?")->execute([$sku]);
+            $db->commit();
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) $db->rollBack();
+            jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
         jsonResponse(['ok' => true]);
         break;
 

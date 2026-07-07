@@ -13,7 +13,23 @@
 # Worklog: ritualb2b
 
 ## Current goal
-Deploy a separate SPA admin panel, multi-photo product management, public product galleries, and unique descriptions for every catalog item.
+Finish the admin panel edit workflow so product editing scrolls correctly on mobile/desktop, size can be assigned with buttons, and key admin actions are verified live.
+
+## State (updated 2026-07-07)
+- Done: Reproduced the user's mobile editor bug on Android Chrome through CDP. Before the fix, `.drawer-body` had `clientHeight=2261` and `scrollHeight=2261`, so touch gestures moved `windowScrollY` while the fixed drawer visually stayed stuck.
+- Done: Fixed the root cause in `assets/css/admin-spa.css`: `.drawer-panel` now clips, the form is a flex column, `.drawer-body` has constrained height with `overflow-y:auto`, and `body.drawer-open` locks the page behind the drawer.
+- Done: Added S/M/L size buttons in `assets/js/admin-spa.js` next to the manual size input; manual text entry remains the saved source of truth and button state syncs with the field.
+- Done: Improved admin reliability: autosave selects/toggles disable while saving and roll back on API failure; settings save checks `config.php` write failure; current/last admin demotion is blocked; product save includes `active` in the same API request; custom product delete also clears matching overrides; Telegram report returns explicit errors.
+- Done: Bumped admin asset cache to `20260707a` in `admin.html`.
+- Done: Server backup before deploy: `/root/ritualb2b_admin_fix_20260707_133223`.
+- Done: SQLite backup before QA writes: `/root/ritualb2b_sqlite_before_admin_qa_20260707_133409.sqlite`.
+- Done: Deployed `admin.html`, `api/admin.php`, `assets/css/admin-spa.css`, and `assets/js/admin-spa.js`.
+- Done: Verification: `node --check assets/js/admin-spa.js`; `git diff --check` (CRLF warnings only); server `php -l` on temp and live `api/admin.php`; live asset version `20260707a`.
+- Done: Authenticated API QA passed for login/profile/products, self-demotion guard, temp product save/toggle/delete, temp override save/cleanup, promo create/toggle/delete, carousel save, settings save, CSV export, and Telegram report.
+- Done: Android Chrome verified editor drawer scrolls internally (`scrollTop` moved to `775`), background does not scroll, size chip updates the input, no horizontal scroll, and drawer close clears `drawer-open`.
+- Done: Desktop headless Chrome verified the same drawer/size behavior and UI Add Product -> Save -> Delete for a temporary custom product.
+- Done: DB cleanup check after QA returned zero temp rows in `custom_products`, `product_overrides`, and `promo_rules`.
+- Next: Commit and push the admin fix.
 
 ## State (updated 2026-07-06 late)
 - Done: User provided live URLs: https://ritualb2b.ru/ and https://ritualb2b.ru/admin.html.

@@ -89,7 +89,7 @@
     var data = null;
     try { data = await response.json(); } catch(e) {}
     if(!response.ok || (data && data.ok === false)) {
-      var message = (data && data.error) ? data.error : ('HTTP ' + response.status);
+      var message = (data && (data.error || data.description)) ? (data.error || data.description) : (data && data.ok === false ? 'Действие не выполнено' : ('HTTP ' + response.status));
       if(response.status === 401 || response.status === 403) {
         renderLogin('Сессия закончилась или у аккаунта нет доступа администратора.');
       }
@@ -119,6 +119,7 @@
 
   function renderLogin(message){
     destroyCharts();
+    document.body.classList.remove('drawer-open');
     root.innerHTML =
       '<div class="login-wrap">' +
         '<form class="login-card" id="login-form">' +
@@ -224,6 +225,7 @@
     if(action === 'product-edit') return openProductEditor(actionEl.getAttribute('data-sku'));
     if(action === 'product-delete') return deleteCustomProduct(actionEl.getAttribute('data-sku'));
     if(action === 'drawer-close') return closeDrawer();
+    if(action === 'size-pick') return pickEditorSize(actionEl);
     if(action === 'photo-remove') return removeEditorPhoto(Number(actionEl.getAttribute('data-index')));
     if(action === 'photo-up') return moveEditorPhoto(Number(actionEl.getAttribute('data-index')), -1);
     if(action === 'photo-down') return moveEditorPhoto(Number(actionEl.getAttribute('data-index')), 1);
@@ -269,21 +271,22 @@
   async function onRootChange(event){
     var target = event.target;
     if(target.matches('[data-order-status]')) {
-      return saveOrderStatus(target.getAttribute('data-id'), target.value);
+      return saveOrderStatus(target);
     }
     if(target.matches('[data-role-select]')) {
-      return saveRole(target.getAttribute('data-id'), target.value);
+      return saveRole(target);
     }
     if(target.matches('[data-promo-active]')) {
-      return togglePromo(target.getAttribute('data-id'), target.checked ? 1 : 0);
+      return togglePromo(target);
     }
     if(target.matches('[data-product-active]')) {
-      return toggleProduct(target.getAttribute('data-sku'), target.checked ? 1 : 0);
+      return toggleProduct(target);
     }
     if(target.id === 'editor-photo-input') {
       return uploadEditorPhotos(target);
     }
     if(state.editor && target.form && target.form.id === 'product-editor-form') {
+      if(target.name === 'size') refreshSizePicker(target.value);
       refreshEditorPreview(target.form);
     }
   }
@@ -291,6 +294,7 @@
   function onRootInput(event){
     var target = event.target;
     if(state.editor && target.form && target.form.id === 'product-editor-form') {
+      if(target.name === 'size') refreshSizePicker(target.value);
       refreshEditorPreview(target.form);
     }
   }
@@ -427,7 +431,7 @@
           '<td><b>' + esc(order.user_name || '') + '</b><div class="muted">' + esc(order.user_phone || '') + '</div></td>' +
           '<td>' + renderItems(order.items) + '</td>' +
           '<td class="price nowrap">' + money(order.total) + '</td>' +
-          '<td><select class="select" data-order-status data-id="' + order.id + '">' + statusOptions(order.status) + '</select></td>' +
+          '<td><select class="select" data-order-status data-id="' + order.id + '" data-current="' + esc(order.status) + '">' + statusOptions(order.status) + '</select></td>' +
           '<td><textarea class="textarea" id="note-' + order.id + '">' + esc(order.admin_note || '') + '</textarea><button class="btn ghost small" type="button" data-action="save-note" data-id="' + order.id + '">Сохранить</button></td>' +
         '</tr>';
       }).join('') +
@@ -473,20 +477,31 @@
     '</div>';
   }
 
-  async function saveOrderStatus(id, status){
+  async function saveOrderStatus(select){
+    var id = select.getAttribute('data-id');
+    var previous = select.getAttribute('data-current') || '';
+    var status = select.value;
+    select.disabled = true;
     try {
       await api('order_status', {method:'POST', body:{order_id:Number(id), status:status}});
+      select.setAttribute('data-current', status);
       toast('Статус заказа обновлен');
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      select.value = previous;
+      toast(e.message, true);
+    }
+    select.disabled = false;
   }
 
   async function saveOrderNote(button){
     var id = button.getAttribute('data-id');
     var area = document.getElementById('note-' + id);
+    button.disabled = true;
     try {
       await api('admin_note', {method:'POST', body:{order_id:Number(id), note:area ? area.value : ''}});
       toast('Заметка сохранена');
     } catch(e) { toast(e.message, true); }
+    button.disabled = false;
   }
 
   async function renderGuests(page){
@@ -531,7 +546,7 @@
       users.map(function(user){
         return '<tr><td><b>' + esc(user.name) + '</b><div class="muted">' + dateShort(user.created_at) + '</div></td>' +
           '<td>' + esc(user.phone) + '<div class="muted">' + esc(user.telegram || '') + '</div></td>' +
-          '<td><select class="select" data-role-select data-id="' + user.id + '">' +
+          '<td><select class="select" data-role-select data-id="' + user.id + '" data-current="' + esc(user.role || 'client') + '">' +
             '<option value="client"' + (user.role === 'client' ? ' selected' : '') + '>Клиент</option>' +
             '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>Админ</option>' +
           '</select></td>' +
@@ -541,11 +556,25 @@
       }).join('') + '</tbody></table></div>';
   }
 
-  async function saveRole(id, role){
+  async function saveRole(select){
+    var id = select.getAttribute('data-id');
+    var previous = select.getAttribute('data-current') || 'client';
+    var role = select.value;
+    if(state.user && Number(id) === Number(state.user.id) && role !== 'admin') {
+      select.value = previous;
+      toast('Нельзя снять роль админа у текущего аккаунта', true);
+      return;
+    }
+    select.disabled = true;
     try {
       await api('set_role', {method:'POST', body:{user_id:Number(id), role:role}});
+      select.setAttribute('data-current', role);
       toast('Роль обновлена');
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      select.value = previous;
+      toast(e.message, true);
+    }
+    select.disabled = false;
   }
 
   async function showUserDetail(id){
@@ -604,12 +633,14 @@
       rules.map(function(rule){
         return '<tr><td><b>' + esc(rule.name) + '</b><div class="muted">' + dateShort(rule.created_at) + '</div></td>' +
           '<td>' + esc(rule.bonus_percent) + '% · ' + esc(rule.product_group || 'все группы') + '<div class="muted">от ' + money(rule.min_order || 0) + '</div></td>' +
-          '<td><label class="switch"><input type="checkbox" data-promo-active data-id="' + rule.id + '"' + (Number(rule.active) ? ' checked' : '') + '><span></span></label></td>' +
+          '<td><label class="switch"><input type="checkbox" data-promo-active data-id="' + rule.id + '" data-current="' + (Number(rule.active) ? '1' : '0') + '"' + (Number(rule.active) ? ' checked' : '') + '><span></span></label></td>' +
           '<td><button class="btn ghost small" type="button" data-action="promo-delete" data-id="' + rule.id + '">Удалить</button></td></tr>';
       }).join('') + '</tbody></table></div>';
   }
 
   async function createPromo(form){
+    var submit = form.querySelector('button[type="submit"]');
+    if(submit) submit.disabled = true;
     try {
       await api('promo_create', {method:'POST', body:{
         name:form.name.value.trim(),
@@ -620,14 +651,26 @@
       }});
       toast('Правило создано');
       await renderPromo();
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      if(submit) submit.disabled = false;
+      toast(e.message, true);
+    }
   }
 
-  async function togglePromo(id, active){
+  async function togglePromo(input){
+    var id = input.getAttribute('data-id');
+    var previous = input.getAttribute('data-current') === '1';
+    var active = input.checked ? 1 : 0;
+    input.disabled = true;
     try {
       await api('promo_toggle', {method:'POST', body:{id:Number(id), active:active}});
+      input.setAttribute('data-current', String(active));
       toast(active ? 'Правило включено' : 'Правило выключено');
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      input.checked = previous;
+      toast(e.message, true);
+    }
+    input.disabled = false;
   }
 
   async function deletePromo(id){
@@ -757,7 +800,7 @@
           '<div class="product-side">' +
             '<div class="price">' + money(e.price) + '</div>' +
             '<div class="photo-count">' + photos.length + ' фото</div>' +
-            '<label class="visibility-toggle"><span>На сайте</span><span class="switch"><input type="checkbox" data-product-active data-sku="' + esc(product.sku) + '"' + (productActive(product) ? ' checked' : '') + '><span></span></span></label>' +
+            '<label class="visibility-toggle"><span>На сайте</span><span class="switch"><input type="checkbox" data-product-active data-sku="' + esc(product.sku) + '" data-current="' + (productActive(product) ? '1' : '0') + '"' + (productActive(product) ? ' checked' : '') + '><span></span></span></label>' +
             '<div class="product-actions"><button class="btn primary small" type="button" data-action="product-edit" data-sku="' + esc(product.sku) + '">Редактировать</button>' +
             (product._custom ? '<button class="btn ghost small" type="button" data-action="product-delete" data-sku="' + esc(product.sku) + '">Удалить</button>' : '') + '</div>' +
           '</div>' +
@@ -846,7 +889,11 @@
     return '<img class="prod-img" src="' + imgUrl(photo, 180) + '" alt="' + esc(alt || '') + '" decoding="async">';
   }
 
-  async function toggleProduct(sku, active){
+  async function toggleProduct(input){
+    var sku = input.getAttribute('data-sku');
+    var previous = input.getAttribute('data-current') === '1';
+    var active = input.checked ? 1 : 0;
+    input.disabled = true;
     try {
       await api('product_toggle_active', {method:'POST', body:{sku:sku, active:active}});
       var p = state.products.find(function(item){ return item.sku === sku; });
@@ -855,8 +902,13 @@
         p._override.active = active;
         if(!active) state.carouselIds = state.carouselIds.filter(function(id){ return id !== p.id; });
       }
+      input.setAttribute('data-current', String(active));
       toast(active ? 'Товар показан на сайте' : 'Товар скрыт с сайта');
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      input.checked = previous;
+      toast(e.message, true);
+    }
+    input.disabled = false;
   }
 
   function openProductEditor(sku){
@@ -906,7 +958,7 @@
               '<label class="field"><span>Бренд</span><input class="input" name="brand" value="' + esc(e.brand || 'Ручная работа') + '"></label>' +
               '<label class="field"><span>Цена</span><input class="input" name="price" type="number" min="0" value="' + esc(e.price) + '"></label>' +
               '<label class="field"><span>Наличие</span><select class="select" name="stock"><option value="in_stock"' + (e.stock === 'in_stock' ? ' selected' : '') + '>В наличии</option><option value="out_of_stock"' + (e.stock === 'out_of_stock' ? ' selected' : '') + '>Нет в наличии</option></select></label>' +
-              '<label class="field"><span>Размер</span><input class="input" name="size" value="' + esc(e.size) + '"></label>' +
+              '<div class="field"><span>Размер</span><input class="input" name="size" value="' + esc(e.size) + '">' + renderSizePicker(e.size) + '</div>' +
               (ed.isCustom ? customProductFields(product) : overrideProductFields(e)) +
               '<label class="field wide"><span>Краткое описание</span><input class="input" name="descShort" value="' + esc(e.descShort) + '"></label>' +
               '<label class="field wide"><span>Полное описание</span><textarea class="textarea" name="descLong">' + esc(e.descLong) + '</textarea></label>' +
@@ -921,6 +973,34 @@
         '</form>' +
       '</aside>';
     drawerEl().classList.add('show');
+    document.body.classList.add('drawer-open');
+  }
+
+  function renderSizePicker(value){
+    var current = String(value || '').trim().toUpperCase();
+    var sizes = ['S','M','L'];
+    return '<div class="size-picker" role="group" aria-label="Быстрый выбор размера">' + sizes.map(function(size){
+      var active = current === size;
+      return '<button class="size-chip' + (active ? ' active' : '') + '" type="button" data-action="size-pick" data-size="' + size + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + size + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function refreshSizePicker(value){
+    var current = String(value || '').trim().toUpperCase();
+    document.querySelectorAll('.size-chip[data-size]').forEach(function(button){
+      var active = button.getAttribute('data-size') === current;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function pickEditorSize(button){
+    var form = document.getElementById('product-editor-form');
+    if(!form || !form.size) return;
+    form.size.value = button.getAttribute('data-size') || '';
+    refreshSizePicker(form.size.value);
+    refreshEditorPreview(form);
+    form.size.focus();
   }
 
   function customProductFields(product){
@@ -1041,6 +1121,8 @@
     var sku = form.sku.value.trim();
     if(!sku) return toast('Укажите SKU', true);
     var benefits = form.benefits.value.trim();
+    var submit = form.querySelector('button[type="submit"]');
+    if(submit) submit.disabled = true;
     try {
       if(ed.isCustom) {
         await api('custom_product_save', {method:'POST', body:{
@@ -1057,7 +1139,8 @@
           cardBenef:form.cardBenef ? form.cardBenef.value.trim() : '',
           benefits_text:benefits,
           descLong:form.descLong.value.trim(),
-          photos:ed.photos
+          photos:ed.photos,
+          active:form.active.checked ? 1 : 0
         }});
       } else {
         await api('product_save_override', {method:'POST', body:{
@@ -1074,19 +1157,23 @@
           dimensions:form.dimensions ? form.dimensions.value.trim() : '',
           desc_long_override:form.descLong.value.trim(),
           benefits_override:benefits,
-          photos_override:ed.photos
+          photos_override:ed.photos,
+          active:form.active.checked ? 1 : 0
         }});
       }
-      await api('product_toggle_active', {method:'POST', body:{sku:sku, active:form.active.checked ? 1 : 0}});
       closeDrawer();
       toast('Товар сохранен');
       await renderProducts();
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      if(submit) submit.disabled = false;
+      toast(e.message, true);
+    }
   }
 
   function closeDrawer(){
     var drawer = drawerEl();
     if(drawer) { drawer.classList.remove('show'); drawer.innerHTML = ''; }
+    document.body.classList.remove('drawer-open');
     state.editor = null;
   }
 
@@ -1126,12 +1213,17 @@
     var ids = Array.prototype.slice.call(document.querySelectorAll('[data-carousel-id]:checked')).map(function(input){
       return input.getAttribute('data-carousel-id');
     }).filter(function(id){ return activeIds[id]; });
+    var button = document.querySelector('[data-action="carousel-save"]');
+    if(button) button.disabled = true;
     try {
       await api('carousel_save', {method:'POST', body:{ids:ids}});
       state.carouselIds = ids;
       toast('Карусель сохранена');
       await renderCarousel();
-    } catch(e) { toast(e.message, true); }
+    } catch(e) {
+      if(button) button.disabled = false;
+      toast(e.message, true);
+    }
   }
 
   async function renderSettings(){
@@ -1160,6 +1252,8 @@
   }
 
   async function saveSettings(form){
+    var submit = form.querySelector('button[type="submit"]');
+    if(submit) submit.disabled = true;
     var payload = {};
     ['BOT_TOKEN','CHAT_ID','TG_ADMIN_ID','EMAIL_TO','CRON_SECRET','WEBHOOK_SECRET','ALLOWED_ORIGIN'].forEach(function(key){
       payload[key] = form[key] ? form[key].value.trim() : '';
@@ -1169,6 +1263,7 @@
       await api('settings_save', {method:'POST', body:payload});
       toast('Настройки сохранены');
     } catch(e) { toast(e.message, true); }
+    if(submit) submit.disabled = false;
   }
 
   async function sendReport(button){
