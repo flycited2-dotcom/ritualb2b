@@ -978,7 +978,7 @@
 
   function renderSizePicker(value){
     var current = String(value || '').trim().toUpperCase();
-    var sizes = ['S','M','L'];
+    var sizes = ['S','M','L','XL'];
     return '<div class="size-picker" role="group" aria-label="Быстрый выбор размера">' + sizes.map(function(size){
       var active = current === size;
       return '<button class="size-chip' + (active ? ' active' : '') + '" type="button" data-action="size-pick" data-size="' + size + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + size + '</button>';
