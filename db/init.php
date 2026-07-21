@@ -105,7 +105,7 @@ function getDB() {
             'payment_terms'       => "ALTER TABLE users ADD COLUMN payment_terms TEXT DEFAULT ''",
             'tags'                => "ALTER TABLE users ADD COLUMN tags TEXT DEFAULT ''",
             'manager_note'        => "ALTER TABLE users ADD COLUMN manager_note TEXT DEFAULT ''",
-            'updated_at'          => "ALTER TABLE users ADD COLUMN updated_at TEXT DEFAULT CURRENT_TIMESTAMP",
+            'updated_at'          => "ALTER TABLE users ADD COLUMN updated_at TEXT DEFAULT ''",
         ] as $col => $sql) {
             if (!in_array($col, $userCols)) {
                 try { $db->exec($sql); } catch (Throwable $e) {}
