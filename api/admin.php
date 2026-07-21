@@ -596,6 +596,7 @@ switch ($action) {
             'series'     => $raw['series'] ?? '',
             'group'      => $raw['group'] ?? 'venki',
             'size'       => $raw['size'] ?? '-',
+            'dimensions' => $raw['dimensions'] ?? '',
             'price'      => intval($raw['price'] ?? 0),
             'stock'      => $raw['stock'] ?? 'in_stock',
             'stockLabel' => $raw['stock'] === 'out_of_stock' ? 'Нет в наличии' : 'В наличии',

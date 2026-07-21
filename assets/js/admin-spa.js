@@ -195,6 +195,7 @@
     if(listenersBound) return;
     listenersBound = true;
     root.addEventListener('click', onRootClick);
+    root.addEventListener('keydown', onRootKeydown);
     root.addEventListener('submit', onRootSubmit);
     root.addEventListener('change', onRootChange);
     root.addEventListener('input', onRootInput);
@@ -209,7 +210,13 @@
       return;
     }
     var actionEl = event.target.closest('[data-action]');
-    if(!actionEl) return;
+    if(!actionEl) {
+      var productCard = event.target.closest('[data-product-card]');
+      if(productCard && !event.target.closest('button,a,input,select,textarea,label')) {
+        return openProductEditor(productCard.getAttribute('data-sku'));
+      }
+      return;
+    }
     var action = actionEl.getAttribute('data-action');
     if(action === 'logout') return logout();
     if(action === 'mobile-menu') return document.getElementById('sidebar').classList.toggle('open');
@@ -231,6 +238,19 @@
     if(action === 'photo-down') return moveEditorPhoto(Number(actionEl.getAttribute('data-index')), 1);
     if(action === 'photo-manual') return addManualPhoto();
     if(action === 'carousel-save') return saveCarousel();
+  }
+
+  function onRootKeydown(event){
+    if(event.key === 'Escape' && drawerEl().classList.contains('show')) {
+      closeDrawer();
+      return;
+    }
+    if(event.key !== 'Enter' && event.key !== ' ') return;
+    var productCard = event.target.closest('[data-product-card]');
+    if(productCard && event.target === productCard) {
+      event.preventDefault();
+      openProductEditor(productCard.getAttribute('data-sku'));
+    }
   }
 
   async function onRootSubmit(event){
@@ -786,7 +806,8 @@
       products.map(function(product){
         var e = effectiveProduct(product);
         var photos = productPhotos(product);
-        return '<article class="product-card">' +
+        var meta = [(e.size && e.size !== '-' ? 'Размер ' + e.size : ''), e.dimensions].filter(Boolean).join(' · ');
+        return '<article class="product-card" data-product-card data-sku="' + esc(product.sku) + '" role="button" tabindex="0" aria-label="Редактировать ' + esc(e.model || product.sku) + '">' +
           '<div class="product-photo-col">' +
             productImage(photos[0], e.model) +
             renderProductThumbs(photos) +
@@ -795,6 +816,7 @@
             '<div class="product-topline"><span class="pill">' + esc(product._custom ? 'Ручной' : (product.group || '—')) + '</span>' + statusPill(e.stock) + '</div>' +
             '<div class="prod-name">' + esc(e.model) + '</div>' +
             '<div class="prod-sku mono">' + esc(product.sku) + '</div>' +
+            (meta ? '<div class="product-meta">' + esc(meta) + '</div>' : '') +
             '<div class="product-desc">' + esc(e.descShort || e.descLong || 'Описание не заполнено') + '</div>' +
           '</div>' +
           '<div class="product-side">' +
@@ -868,11 +890,19 @@
       size:ov.size_override || product.size || '',
       descShort:ov.desc_short || product.descShort || '',
       descLong:ov.desc_long_override || product.descLong || '',
-      dimensions:ov.dimensions || '',
+      dimensions:effectiveDimensions(product, ov),
       badge:ov.badge || '',
       badgeLabel:ov.badge_label || '',
       benefits:ov.benefits_override ? parseBenefits(ov.benefits_override) : parseBenefits(product.benefits)
     };
+  }
+
+  function effectiveDimensions(product, ov){
+    var base = String(product.dimensions || '').trim();
+    var custom = String((ov && ov.dimensions) || '').trim();
+    if(!custom) return base;
+    if(!base) return custom;
+    return /см/i.test(custom) ? custom : base;
   }
 
   function productActive(product){
@@ -959,6 +989,7 @@
               '<label class="field"><span>Цена</span><input class="input" name="price" type="number" min="0" value="' + esc(e.price) + '"></label>' +
               '<label class="field"><span>Наличие</span><select class="select" name="stock"><option value="in_stock"' + (e.stock === 'in_stock' ? ' selected' : '') + '>В наличии</option><option value="out_of_stock"' + (e.stock === 'out_of_stock' ? ' selected' : '') + '>Нет в наличии</option></select></label>' +
               '<div class="field"><span>Размер</span><input class="input" name="size" value="' + esc(e.size) + '">' + renderSizePicker(e.size) + '</div>' +
+              '<label class="field"><span>Габариты</span><input class="input" name="dimensions" value="' + esc(e.dimensions) + '" placeholder="50 см / 120 см"></label>' +
               (ed.isCustom ? customProductFields(product) : overrideProductFields(e)) +
               '<label class="field wide"><span>Краткое описание</span><input class="input" name="descShort" value="' + esc(e.descShort) + '"></label>' +
               '<label class="field wide"><span>Полное описание</span><textarea class="textarea" name="descLong">' + esc(e.descLong) + '</textarea></label>' +
@@ -1010,18 +1041,19 @@
   }
 
   function overrideProductFields(e){
-    return '<label class="field"><span>Габариты</span><input class="input" name="dimensions" value="' + esc(e.dimensions) + '"></label>' +
-      '<label class="field"><span>Бейдж</span><select class="select" name="badge"><option value="">Без бейджа</option><option value="new"' + (e.badge === 'new' ? ' selected' : '') + '>Новинка</option><option value="sale"' + (e.badge === 'sale' ? ' selected' : '') + '>Акция</option><option value="clearance"' + (e.badge === 'clearance' ? ' selected' : '') + '>Распродажа</option></select></label>' +
+    return '<label class="field"><span>Бейдж</span><select class="select" name="badge"><option value="">Без бейджа</option><option value="new"' + (e.badge === 'new' ? ' selected' : '') + '>Новинка</option><option value="sale"' + (e.badge === 'sale' ? ' selected' : '') + '>Акция</option><option value="clearance"' + (e.badge === 'clearance' ? ' selected' : '') + '>Распродажа</option></select></label>' +
       '<label class="field wide"><span>Текст бейджа</span><input class="input" name="badge_label" value="' + esc(e.badgeLabel) + '"></label>';
   }
 
   function renderEditorPreview(e, photos){
     var mainPhoto = photos && photos.length ? photos[0] : '';
+    var sizeMeta = [(e.size && e.size !== '-' ? 'Размер ' + e.size : ''), e.dimensions].filter(Boolean).join(' · ');
     return '<section class="editor-preview-card">' +
       '<div class="editor-preview-photo">' + (mainPhoto ? '<img src="' + imgUrl(mainPhoto, 520) + '" alt="' + esc(e.model) + '">' : '<div>Нет фото</div>') + '</div>' +
       '<div class="editor-preview-info">' +
         '<div class="panel-note">Предпросмотр на витрине</div>' +
         '<div class="editor-preview-title">' + esc(e.model || 'Новый товар') + '</div>' +
+        (sizeMeta ? '<div class="product-meta">' + esc(sizeMeta) + '</div>' : '') +
         '<div class="editor-preview-desc">' + esc(e.descShort || e.descLong || 'Краткое описание появится здесь') + '</div>' +
         '<div class="editor-preview-meta">' + statusPill(e.stock) + '<span class="price">' + money(e.price) + '</span><span class="pill">' + (photos.length || 0) + ' фото</span></div>' +
       '</div>' +
@@ -1060,6 +1092,7 @@
       e.price = form.price ? Number(form.price.value || 0) : e.price;
       e.stock = form.stock ? form.stock.value : e.stock;
       e.size = form.size ? form.size.value.trim() : e.size;
+      e.dimensions = form.dimensions ? form.dimensions.value.trim() : e.dimensions;
       e.descShort = form.descShort ? form.descShort.value.trim() : e.descShort;
       e.descLong = form.descLong ? form.descLong.value.trim() : e.descLong;
     }
@@ -1133,6 +1166,7 @@
           series:form.series ? form.series.value.trim() : '',
           group:form.group ? form.group.value : 'venki',
           size:form.size.value.trim() || '-',
+          dimensions:form.dimensions ? form.dimensions.value.trim() : '',
           price:Number(form.price.value || 0),
           stock:form.stock.value,
           descShort:form.descShort.value.trim(),

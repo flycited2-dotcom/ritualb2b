@@ -1457,10 +1457,19 @@ var FILTER_MAP = {
   'korzinki':{label:'Корзинки', test:function(p){ return p.group==='korzinki'; }},
   'size-s':  {label:'Размер S', test:function(p){ return p.size==='S'; }},
   'size-m':  {label:'Размер M', test:function(p){ return p.size==='M'; }},
-  'size-l':  {label:'Размер L', test:function(p){ return p.size==='L'; }}
+  'size-l':  {label:'Размер L', test:function(p){ return p.size==='L'; }},
+  'size-xl': {label:'Размер XL', test:function(p){ return p.size==='XL'; }}
 };
 
 var GROUP_ORDER  = ['venki','korzinki'];
+
+function effectiveDimensions(p, ov) {
+  var base = String(p.dimensions || '').trim();
+  var custom = String((ov && ov.dimensions) || '').trim();
+  if(!custom) return base;
+  if(!base) return custom;
+  return /см/i.test(custom) ? custom : base;
+}
 
 // ── Card HTML ─────────────────────────────────────────
 function cardHtml(p, delay) {
@@ -1473,6 +1482,7 @@ function cardHtml(p, delay) {
   var _price     = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
   var _stock     = _ov.stock_override  || p.stock     || 'in_stock';
   var _size      = _ov.size_override   || p.size      || '';
+  var _dimensions = effectiveDimensions(p, _ov);
   var _descShort = _ov.desc_short      || p.descShort || '';
   var _model     = _ov.model_override  || p.model     || '';
   var addBtn = qty > 0
@@ -1484,8 +1494,8 @@ function cardHtml(p, delay) {
   var _bdgLbl = _ov.badge_label || ({new:'Новинка',sale:'Акция',clearance:'Распродажа'}[_bdg]||'');
   var _badgeHtml = _bdg ? '<div class="pcard-badge pb-'+_bdg+'">'+_bdgLbl+'</div>' : '';
   var _descExtra = _ov.description ? '<div class="pcard-admin-desc">'+_ov.description+'</div>' : '';
-  var sizeTag = _size && _size !== '-' ? 'Размер '+_size : '';
-  var descLine = [sizeTag, _descShort].filter(Boolean).join(' · ');
+  var sizeTag = [_size && _size !== '-' ? 'Размер '+_size : '', _dimensions].filter(Boolean).join(' · ');
+  var descLine = _descShort || sizeTag;
   return '<div class="pcard rv" role="button" tabindex="0" aria-label="'+p.model+'" style="transition-delay:'+((delay%10)*0.05)+'s" onclick="openDetail(\''+p.id+'\')">'
     + _badgeHtml
     + '<div class="pcard-img">'+imgHtml+'</div>'
@@ -1710,6 +1720,7 @@ function openDetail(id) {
   var _price     = (_ov.price_override && parseInt(_ov.price_override) > 0) ? parseInt(_ov.price_override) : (p.price || 0);
   var _stock     = _ov.stock_override  || p.stock     || 'in_stock';
   var _size      = _ov.size_override   || p.size      || '';
+  var _dimensions = effectiveDimensions(p, _ov);
   var _descShort = _ov.desc_short      || p.descShort || '';
   var _model     = _ov.model_override  || p.model     || '';
   var _brand     = _ov.brand_override  || p.brand     || '';
@@ -1733,7 +1744,7 @@ function openDetail(id) {
     : '';
   var specs = [];
   if(_size && _size!=='-') specs.push({ico:'📏',t:'Размер',v:_size});
-  if(_ov.dimensions) specs.push({ico:'📐',t:'Размеры',v:_ov.dimensions});
+  if(_dimensions) specs.push({ico:'📐',t:'Размеры',v:_dimensions});
   var specsPills = specs.length
     ? '<div class="pd-specs-row">'+specs.map(function(s){ return '<div class="pd-spec-pill">'+s.ico+' '+s.t+': <span>'+s.v+'</span></div>'; }).join('')+'</div>'
     : '';
