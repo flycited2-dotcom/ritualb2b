@@ -78,6 +78,41 @@ function getDB() {
         )");
     } catch (Throwable $e) {}
 
+    // users — CRM/customer profile columns
+    try {
+        $userColsResult = $db->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+        $userCols = array_column($userColsResult, 'name');
+        foreach ([
+            'email'               => "ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''",
+            'company'             => "ALTER TABLE users ADD COLUMN company TEXT DEFAULT ''",
+            'contact_person'      => "ALTER TABLE users ADD COLUMN contact_person TEXT DEFAULT ''",
+            'position'            => "ALTER TABLE users ADD COLUMN position TEXT DEFAULT ''",
+            'client_type'         => "ALTER TABLE users ADD COLUMN client_type TEXT DEFAULT 'retail'",
+            'status'              => "ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'",
+            'legal_name'          => "ALTER TABLE users ADD COLUMN legal_name TEXT DEFAULT ''",
+            'inn'                 => "ALTER TABLE users ADD COLUMN inn TEXT DEFAULT ''",
+            'kpp'                 => "ALTER TABLE users ADD COLUMN kpp TEXT DEFAULT ''",
+            'ogrn'                => "ALTER TABLE users ADD COLUMN ogrn TEXT DEFAULT ''",
+            'legal_address'       => "ALTER TABLE users ADD COLUMN legal_address TEXT DEFAULT ''",
+            'delivery_address'    => "ALTER TABLE users ADD COLUMN delivery_address TEXT DEFAULT ''",
+            'preferred_channel'   => "ALTER TABLE users ADD COLUMN preferred_channel TEXT DEFAULT 'phone'",
+            'telegram_chat_id'    => "ALTER TABLE users ADD COLUMN telegram_chat_id TEXT DEFAULT ''",
+            'telegram_token'      => "ALTER TABLE users ADD COLUMN telegram_token TEXT DEFAULT ''",
+            'email_subscribed'    => "ALTER TABLE users ADD COLUMN email_subscribed INTEGER DEFAULT 1",
+            'telegram_subscribed' => "ALTER TABLE users ADD COLUMN telegram_subscribed INTEGER DEFAULT 1",
+            'sms_subscribed'      => "ALTER TABLE users ADD COLUMN sms_subscribed INTEGER DEFAULT 0",
+            'discount_percent'    => "ALTER TABLE users ADD COLUMN discount_percent REAL DEFAULT 0",
+            'payment_terms'       => "ALTER TABLE users ADD COLUMN payment_terms TEXT DEFAULT ''",
+            'tags'                => "ALTER TABLE users ADD COLUMN tags TEXT DEFAULT ''",
+            'manager_note'        => "ALTER TABLE users ADD COLUMN manager_note TEXT DEFAULT ''",
+            'updated_at'          => "ALTER TABLE users ADD COLUMN updated_at TEXT DEFAULT CURRENT_TIMESTAMP",
+        ] as $col => $sql) {
+            if (!in_array($col, $userCols)) {
+                try { $db->exec($sql); } catch (Throwable $e) {}
+            }
+        }
+    } catch (Throwable $e) {}
+
     // app_settings table
     try {
         $db->exec("CREATE TABLE IF NOT EXISTS app_settings (

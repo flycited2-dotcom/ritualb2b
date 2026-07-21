@@ -166,10 +166,12 @@ switch ($action) {
     // ── List users ──
     case 'users':
         $users = $db->query('
-            SELECT u.id, u.name, u.phone, u.telegram, u.role, u.created_at,
+            SELECT u.id, u.name, u.phone, u.telegram, u.email, u.company, u.client_type, u.status, u.role, u.created_at,
+                   u.preferred_channel, u.email_subscribed, u.telegram_subscribed, u.sms_subscribed,
                    COALESCE((SELECT SUM(amount) FROM bonus_log WHERE user_id = u.id), 0) as bonus_balance,
                    (SELECT COUNT(*) FROM orders WHERE user_id = u.id) as order_count,
-                   (SELECT COALESCE(SUM(total), 0) FROM orders WHERE user_id = u.id) as total_spent
+                   (SELECT COALESCE(SUM(total), 0) FROM orders WHERE user_id = u.id) as total_spent,
+                   (SELECT MAX(created_at) FROM orders WHERE user_id = u.id) as last_order_at
             FROM users u ORDER BY u.created_at DESC
         ')->fetchAll();
         jsonResponse(['ok' => true, 'users' => $users]);
@@ -180,14 +182,31 @@ switch ($action) {
         $uid = intval($_GET['user_id'] ?? 0);
         if (!$uid) jsonResponse(['ok' => false, 'error' => 'user_id required'], 422);
 
-        $user = $db->prepare('SELECT id, name, phone, telegram, role, created_at FROM users WHERE id = ?');
+        $user = $db->prepare('
+            SELECT id, name, phone, telegram, email, company, contact_person, position, client_type, status,
+                   role, legal_name, inn, kpp, ogrn, legal_address, delivery_address, preferred_channel,
+                   telegram_chat_id, telegram_token, email_subscribed, telegram_subscribed, sms_subscribed,
+                   discount_percent, payment_terms, tags, manager_note, created_at, updated_at
+            FROM users WHERE id = ?
+        ');
         $user->execute([$uid]);
         $u = $user->fetch();
         if (!$u) jsonResponse(['ok' => false, 'error' => 'Пользователь не найден'], 404);
+        $totals = $db->prepare('SELECT COUNT(*) as order_count, COALESCE(SUM(total), 0) as total_spent FROM orders WHERE user_id = ?');
+        $totals->execute([$uid]);
+        $totalRow = $totals->fetch() ?: ['order_count' => 0, 'total_spent' => 0];
+        $u['order_count'] = (int)$totalRow['order_count'];
+        $u['total_spent'] = (int)$totalRow['total_spent'];
 
         $orders = $db->prepare('SELECT id, total, status, bonus_earned, bonus_spent, comment, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 20');
         $orders->execute([$uid]);
         $orderList = $orders->fetchAll();
+        foreach ($orderList as &$order) {
+            $items = $db->prepare('SELECT product_name, price, qty FROM order_items WHERE order_id = ?');
+            $items->execute([$order['id']]);
+            $order['items'] = $items->fetchAll();
+        }
+        unset($order);
 
         $bonus = $db->prepare('SELECT amount, type, description, created_at FROM bonus_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 30');
         $bonus->execute([$uid]);
@@ -198,6 +217,86 @@ switch ($action) {
         $balance = (int)$bal->fetch()['b'];
 
         jsonResponse(['ok' => true, 'user' => $u, 'orders' => $orderList, 'bonus_log' => $bonusLog, 'bonus_balance' => $balance]);
+        break;
+
+    // ── Save customer profile ──
+    case 'client_save':
+        if ($method !== 'POST') jsonResponse(['ok' => false, 'error' => 'POST only'], 405);
+        $raw = json_decode(file_get_contents('php://input'), true) ?: [];
+        $uid = intval($raw['user_id'] ?? 0);
+        if (!$uid) jsonResponse(['ok' => false, 'error' => 'user_id required'], 422);
+
+        $name = trim($raw['name'] ?? '');
+        $phone = trim($raw['phone'] ?? '');
+        $email = trim($raw['email'] ?? '');
+        $telegram = trim($raw['telegram'] ?? '');
+        $role = trim($raw['role'] ?? 'client');
+        $clientType = trim($raw['client_type'] ?? 'retail');
+        $status = trim($raw['status'] ?? 'active');
+        $preferred = trim($raw['preferred_channel'] ?? 'phone');
+
+        if ($name === '' || $phone === '') jsonResponse(['ok' => false, 'error' => 'Имя и телефон обязательны'], 422);
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) jsonResponse(['ok' => false, 'error' => 'Некорректная почта'], 422);
+        if (!in_array($role, ['client','admin'])) jsonResponse(['ok' => false, 'error' => 'Некорректная роль'], 422);
+        if (!in_array($clientType, ['retail','company','partner','vip'])) $clientType = 'retail';
+        if (!in_array($status, ['active','on_hold','blocked'])) $status = 'active';
+        if (!in_array($preferred, ['phone','telegram','email','none'])) $preferred = 'phone';
+        if ($uid === $currentAdminId && $role !== 'admin') jsonResponse(['ok' => false, 'error' => 'Нельзя снять роль админа у текущего аккаунта'], 422);
+        if ($role !== 'admin') {
+            $target = $db->prepare('SELECT role FROM users WHERE id = ?');
+            $target->execute([$uid]);
+            $targetRow = $target->fetch();
+            if (!$targetRow) jsonResponse(['ok' => false, 'error' => 'Пользователь не найден'], 404);
+            $adminCount = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
+            if (($targetRow['role'] ?? '') === 'admin' && $adminCount <= 1) {
+                jsonResponse(['ok' => false, 'error' => 'Нельзя снять последнего администратора'], 422);
+            }
+        }
+
+        $dupe = $db->prepare('SELECT id FROM users WHERE phone = ? AND id <> ?');
+        $dupe->execute([$phone, $uid]);
+        if ($dupe->fetch()) jsonResponse(['ok' => false, 'error' => 'Такой телефон уже есть у другого клиента'], 422);
+
+        $discount = isset($raw['discount_percent']) ? max(0, min(100, (float)$raw['discount_percent'])) : 0;
+        $stmt = $db->prepare('
+            UPDATE users SET
+                name = ?, phone = ?, telegram = ?, email = ?, company = ?, contact_person = ?, position = ?,
+                client_type = ?, status = ?, role = ?, legal_name = ?, inn = ?, kpp = ?, ogrn = ?,
+                legal_address = ?, delivery_address = ?, preferred_channel = ?, telegram_chat_id = ?,
+                telegram_token = ?, email_subscribed = ?, telegram_subscribed = ?, sms_subscribed = ?,
+                discount_percent = ?, payment_terms = ?, tags = ?, manager_note = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ');
+        $stmt->execute([
+            $name,
+            $phone,
+            $telegram,
+            $email,
+            trim($raw['company'] ?? ''),
+            trim($raw['contact_person'] ?? ''),
+            trim($raw['position'] ?? ''),
+            $clientType,
+            $status,
+            $role,
+            trim($raw['legal_name'] ?? ''),
+            trim($raw['inn'] ?? ''),
+            trim($raw['kpp'] ?? ''),
+            trim($raw['ogrn'] ?? ''),
+            trim($raw['legal_address'] ?? ''),
+            trim($raw['delivery_address'] ?? ''),
+            $preferred,
+            trim($raw['telegram_chat_id'] ?? ''),
+            trim($raw['telegram_token'] ?? ''),
+            !empty($raw['email_subscribed']) ? 1 : 0,
+            !empty($raw['telegram_subscribed']) ? 1 : 0,
+            !empty($raw['sms_subscribed']) ? 1 : 0,
+            $discount,
+            trim($raw['payment_terms'] ?? ''),
+            trim($raw['tags'] ?? ''),
+            trim($raw['manager_note'] ?? ''),
+            $uid
+        ]);
+        jsonResponse(['ok' => true]);
         break;
 
     // ── List orders (all) with filters ──

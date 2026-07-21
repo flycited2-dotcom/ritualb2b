@@ -45,7 +45,8 @@
     productStatus:'',
     carouselIds:[],
     settings:{},
-    editor:null
+    editor:null,
+    clientDetail:null
   };
 
   function esc(value){
@@ -215,6 +216,10 @@
       if(productCard && !event.target.closest('button,a,input,select,textarea,label')) {
         return openProductEditor(productCard.getAttribute('data-sku'));
       }
+      var userCard = event.target.closest('[data-user-card]');
+      if(userCard && !event.target.closest('button,a,input,select,textarea,label')) {
+        return showUserDetail(userCard.getAttribute('data-id'));
+      }
       return;
     }
     var action = actionEl.getAttribute('data-action');
@@ -226,6 +231,7 @@
     if(action === 'guest-page') return renderGuests(Number(actionEl.getAttribute('data-page') || 1));
     if(action === 'save-note') return saveOrderNote(actionEl);
     if(action === 'user-detail') return showUserDetail(actionEl.getAttribute('data-id'));
+    if(action === 'client-bonus-adjust') return adjustClientBonus(actionEl);
     if(action === 'modal-close') return closeModal();
     if(action === 'promo-delete') return deletePromo(actionEl.getAttribute('data-id'));
     if(action === 'product-add') return openProductEditor(null);
@@ -250,6 +256,11 @@
     if(productCard && event.target === productCard) {
       event.preventDefault();
       openProductEditor(productCard.getAttribute('data-sku'));
+    }
+    var userCard = event.target.closest('[data-user-card]');
+    if(userCard && event.target === userCard) {
+      event.preventDefault();
+      showUserDetail(userCard.getAttribute('data-id'));
     }
   }
 
@@ -285,6 +296,10 @@
     if(form.id === 'product-editor-form') {
       event.preventDefault();
       return saveProductEditor(form);
+    }
+    if(form.id === 'client-editor-form') {
+      event.preventDefault();
+      return saveClientEditor(form);
     }
   }
 
@@ -553,27 +568,54 @@
   async function renderClients(){
     var data = await api('users');
     state.users = data.users || [];
+    var activeCount = state.users.filter(function(user){ return (user.status || 'active') === 'active'; }).length;
+    var totalSpent = state.users.reduce(function(sum, user){ return sum + Number(user.total_spent || 0); }, 0);
     viewEl().innerHTML =
       '<section class="panel">' +
-        '<div class="panel-head"><div><div class="panel-title">Клиенты</div><div class="panel-note">Всего аккаунтов: ' + state.users.length + '</div></div></div>' +
+        '<div class="panel-head"><div><div class="panel-title">Клиенты</div><div class="panel-note">Аккаунтов: ' + state.users.length + ' · активных: ' + activeCount + ' · оборот: ' + money(totalSpent) + '</div></div></div>' +
         renderUsersTable(state.users) +
       '</section>';
   }
 
   function renderUsersTable(users){
     if(!users.length) return '<div class="empty">Клиентов пока нет</div>';
-    return '<div class="table-wrap"><table class="data-table"><thead><tr><th>Клиент</th><th>Контакты</th><th>Роль</th><th>Бонусы</th><th>Заказы</th><th></th></tr></thead><tbody>' +
-      users.map(function(user){
-        return '<tr><td><b>' + esc(user.name) + '</b><div class="muted">' + dateShort(user.created_at) + '</div></td>' +
-          '<td>' + esc(user.phone) + '<div class="muted">' + esc(user.telegram || '') + '</div></td>' +
-          '<td><select class="select" data-role-select data-id="' + user.id + '" data-current="' + esc(user.role || 'client') + '">' +
-            '<option value="client"' + (user.role === 'client' ? ' selected' : '') + '>Клиент</option>' +
-            '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>Админ</option>' +
-          '</select></td>' +
-          '<td class="price nowrap">' + money(user.bonus_balance) + '</td>' +
-          '<td>' + esc(user.order_count || 0) + '<div class="muted">' + money(user.total_spent) + '</div></td>' +
-          '<td><button class="btn ghost small" type="button" data-action="user-detail" data-id="' + user.id + '">Открыть</button></td></tr>';
-      }).join('') + '</tbody></table></div>';
+    return '<div class="client-list">' + users.map(function(user){
+      var contact = [user.phone, user.email, user.telegram].filter(Boolean).join(' · ');
+      return '<article class="client-card" data-user-card data-id="' + esc(user.id) + '" role="button" tabindex="0" aria-label="Открыть клиента ' + esc(user.name || user.phone) + '">' +
+        '<div class="client-main">' +
+          '<div class="product-topline">' + clientStatusPill(user.status) + '<span class="pill">' + esc(clientTypeLabel(user.client_type)) + '</span><span class="pill">' + esc(user.role === 'admin' ? 'Админ' : 'Клиент') + '</span></div>' +
+          '<div class="prod-name">' + esc(user.name || 'Без имени') + '</div>' +
+          (user.company ? '<div class="product-meta">' + esc(user.company) + '</div>' : '') +
+          '<div class="product-desc">' + esc(contact || 'Контакты не заполнены') + '</div>' +
+          '<div class="client-comm-row">' + renderClientCommBadges(user) + '</div>' +
+        '</div>' +
+        '<div class="client-side">' +
+          '<div><div class="price">' + money(user.total_spent) + '</div><div class="photo-count">оборот</div></div>' +
+          '<div><b>' + esc(user.order_count || 0) + '</b><div class="photo-count">заказов</div></div>' +
+          '<div><b>' + money(user.bonus_balance) + '</b><div class="photo-count">бонусы</div></div>' +
+          '<button class="btn primary small" type="button" data-action="user-detail" data-id="' + esc(user.id) + '">Открыть</button>' +
+        '</div>' +
+      '</article>';
+    }).join('') + '</div>';
+  }
+
+  function clientTypeLabel(value){
+    return {retail:'Розница', company:'Юрлицо', partner:'Партнер', vip:'VIP'}[value || 'retail'] || 'Розница';
+  }
+
+  function clientStatusPill(value){
+    var v = value || 'active';
+    var label = {active:'Активен', on_hold:'На паузе', blocked:'Заблокирован'}[v] || 'Активен';
+    return '<span class="status ' + esc(v) + '">' + label + '</span>';
+  }
+
+  function renderClientCommBadges(user){
+    var items = [];
+    if(Number(user.email_subscribed) !== 0) items.push('Email');
+    if(Number(user.telegram_subscribed) !== 0) items.push('Telegram');
+    if(Number(user.sms_subscribed) === 1) items.push('SMS');
+    if(!items.length) return '<span class="muted">Рассылки отключены</span>';
+    return items.map(function(item){ return '<span class="pill">' + item + '</span>'; }).join('');
   }
 
   async function saveRole(select){
@@ -601,16 +643,201 @@
     try {
       var data = await api('user_detail' + qs({user_id:id}));
       var user = data.user || {};
-      modalEl().innerHTML =
-        '<div class="modal-card">' +
-          '<div class="panel-head"><div><div class="panel-title">' + esc(user.name || 'Клиент') + '</div><div class="panel-note">' + esc(user.phone || '') + '</div></div><button class="btn ghost small" type="button" data-action="modal-close">Закрыть</button></div>' +
-          '<div class="grid two">' +
-            '<div><div class="panel-title">Заказы</div>' + renderOrdersMini(data.orders || []) + '</div>' +
-            '<div><div class="panel-title">Бонусы: ' + money(data.bonus_balance || 0) + '</div>' + renderBonusLog(data.bonus_log || []) + '</div>' +
-          '</div>' +
-        '</div>';
-      modalEl().classList.add('show');
+      state.clientDetail = data;
+      closeModal();
+      drawerEl().innerHTML =
+        '<div class="drawer-backdrop" data-action="drawer-close"></div>' +
+        '<aside class="drawer-panel client-drawer-panel">' +
+          '<div class="drawer-head"><div><div class="drawer-title">' + esc(user.name || 'Клиент') + '</div><div class="panel-note">' + esc(user.phone || '') + (user.email ? ' · ' + esc(user.email) : '') + '</div></div><button class="btn ghost small" type="button" data-action="drawer-close">Закрыть</button></div>' +
+          '<form id="client-editor-form">' +
+            '<input type="hidden" name="user_id" value="' + esc(user.id) + '">' +
+            '<div class="drawer-body">' +
+              renderClientSummary(data) +
+              renderClientEditorFields(user) +
+              '<div class="client-detail-grid">' +
+                '<section class="client-section"><div class="section-title">Заказы</div>' + renderClientOrders(data.orders || []) + '</section>' +
+                '<section class="client-section"><div class="section-title">Бонусы: ' + money(data.bonus_balance || 0) + '</div>' + renderBonusLog(data.bonus_log || []) + renderBonusAdjust(user.id) + '</section>' +
+              '</div>' +
+            '</div>' +
+            '<div class="drawer-foot">' +
+              '<div class="panel-note">Изменения сохраняются в карточку клиента</div>' +
+              '<div class="filters"><button class="btn ghost" type="button" data-action="drawer-close">Отмена</button><button class="btn primary" type="submit">Сохранить</button></div>' +
+            '</div>' +
+          '</form>' +
+        '</aside>';
+      drawerEl().classList.add('show');
+      document.body.classList.add('drawer-open');
     } catch(e) { toast(e.message, true); }
+  }
+
+  function renderClientSummary(data){
+    var user = data.user || {};
+    return '<section class="client-summary">' +
+      '<div><div class="photo-count">Тип</div><b>' + esc(clientTypeLabel(user.client_type)) + '</b></div>' +
+      '<div><div class="photo-count">Статус</div>' + clientStatusPill(user.status) + '</div>' +
+      '<div><div class="photo-count">Заказы</div><b>' + esc(user.order_count || 0) + '</b></div>' +
+      '<div><div class="photo-count">Оборот</div><b>' + money(user.total_spent || 0) + '</b></div>' +
+      '<div><div class="photo-count">Бонусы</div><b>' + money(data.bonus_balance || 0) + '</b></div>' +
+    '</section>';
+  }
+
+  function renderClientEditorFields(user){
+    return '<div class="form-grid client-form-grid">' +
+      '<div class="client-section wide"><div class="section-title">Основное</div><div class="form-grid">' +
+        '<label class="field"><span>Имя</span><input class="input" name="name" value="' + esc(user.name) + '" required></label>' +
+        '<label class="field"><span>Телефон</span><input class="input" name="phone" value="' + esc(user.phone) + '" required></label>' +
+        '<label class="field"><span>Email</span><input class="input" name="email" type="email" value="' + esc(user.email) + '" placeholder="client@example.ru"></label>' +
+        '<label class="field"><span>Telegram</span><input class="input" name="telegram" value="' + esc(user.telegram) + '" placeholder="@username"></label>' +
+        '<label class="field"><span>Роль</span><select class="select" name="role">' + clientRoleOptions(user.role) + '</select></label>' +
+        '<label class="field"><span>Статус</span><select class="select" name="status">' + clientStatusOptions(user.status) + '</select></label>' +
+        '<label class="field"><span>Тип клиента</span><select class="select" name="client_type">' + clientTypeOptions(user.client_type) + '</select></label>' +
+        '<label class="field"><span>Канал связи</span><select class="select" name="preferred_channel">' + preferredChannelOptions(user.preferred_channel) + '</select></label>' +
+      '</div></div>' +
+      '<div class="client-section wide"><div class="section-title">Компания и юридические данные</div><div class="form-grid">' +
+        '<label class="field"><span>Компания</span><input class="input" name="company" value="' + esc(user.company) + '"></label>' +
+        '<label class="field"><span>Контактное лицо</span><input class="input" name="contact_person" value="' + esc(user.contact_person) + '"></label>' +
+        '<label class="field"><span>Должность</span><input class="input" name="position" value="' + esc(user.position) + '"></label>' +
+        '<label class="field"><span>Юр. название</span><input class="input" name="legal_name" value="' + esc(user.legal_name) + '"></label>' +
+        '<label class="field"><span>ИНН</span><input class="input" name="inn" value="' + esc(user.inn) + '"></label>' +
+        '<label class="field"><span>КПП</span><input class="input" name="kpp" value="' + esc(user.kpp) + '"></label>' +
+        '<label class="field"><span>ОГРН/ОГРНИП</span><input class="input" name="ogrn" value="' + esc(user.ogrn) + '"></label>' +
+        '<label class="field"><span>Условия оплаты</span><input class="input" name="payment_terms" value="' + esc(user.payment_terms) + '" placeholder="Предоплата, отсрочка, договор"></label>' +
+        '<label class="field wide"><span>Юридический адрес</span><input class="input" name="legal_address" value="' + esc(user.legal_address) + '"></label>' +
+        '<label class="field wide"><span>Адрес доставки</span><input class="input" name="delivery_address" value="' + esc(user.delivery_address) + '"></label>' +
+      '</div></div>' +
+      '<div class="client-section wide"><div class="section-title">Коммуникации и магазин</div><div class="form-grid">' +
+        '<label class="field"><span>Telegram chat ID</span><input class="input" name="telegram_chat_id" value="' + esc(user.telegram_chat_id) + '"></label>' +
+        '<label class="field"><span>Telegram token клиента</span><input class="input" name="telegram_token" value="' + esc(user.telegram_token) + '" autocomplete="off"></label>' +
+        '<label class="field"><span>Скидка, %</span><input class="input" name="discount_percent" type="number" min="0" max="100" step="0.1" value="' + esc(user.discount_percent || 0) + '"></label>' +
+        '<label class="field"><span>Теги</span><input class="input" name="tags" value="' + esc(user.tags) + '" placeholder="опт, постоянный, Симферополь"></label>' +
+        '<div class="field wide"><span>Рассылки</span><div class="check-grid">' +
+          '<label class="check-field"><input type="checkbox" name="email_subscribed"' + checkedFlag(user.email_subscribed, true) + '> Email-рассылка</label>' +
+          '<label class="check-field"><input type="checkbox" name="telegram_subscribed"' + checkedFlag(user.telegram_subscribed, true) + '> Telegram-уведомления</label>' +
+          '<label class="check-field"><input type="checkbox" name="sms_subscribed"' + checkedFlag(user.sms_subscribed, false) + '> SMS/телефон</label>' +
+        '</div></div>' +
+        '<label class="field wide"><span>Заметка менеджера</span><textarea class="textarea" name="manager_note">' + esc(user.manager_note) + '</textarea></label>' +
+      '</div></div>' +
+    '</div>';
+  }
+
+  function clientRoleOptions(current){
+    return '<option value="client"' + (current === 'client' ? ' selected' : '') + '>Клиент</option>' +
+      '<option value="admin"' + (current === 'admin' ? ' selected' : '') + '>Админ</option>';
+  }
+
+  function clientStatusOptions(current){
+    var v = current || 'active';
+    return '<option value="active"' + (v === 'active' ? ' selected' : '') + '>Активен</option>' +
+      '<option value="on_hold"' + (v === 'on_hold' ? ' selected' : '') + '>На паузе</option>' +
+      '<option value="blocked"' + (v === 'blocked' ? ' selected' : '') + '>Заблокирован</option>';
+  }
+
+  function clientTypeOptions(current){
+    var v = current || 'retail';
+    return '<option value="retail"' + (v === 'retail' ? ' selected' : '') + '>Розница</option>' +
+      '<option value="company"' + (v === 'company' ? ' selected' : '') + '>Юрлицо</option>' +
+      '<option value="partner"' + (v === 'partner' ? ' selected' : '') + '>Партнер</option>' +
+      '<option value="vip"' + (v === 'vip' ? ' selected' : '') + '>VIP</option>';
+  }
+
+  function preferredChannelOptions(current){
+    var v = current || 'phone';
+    return '<option value="phone"' + (v === 'phone' ? ' selected' : '') + '>Телефон</option>' +
+      '<option value="telegram"' + (v === 'telegram' ? ' selected' : '') + '>Telegram</option>' +
+      '<option value="email"' + (v === 'email' ? ' selected' : '') + '>Email</option>' +
+      '<option value="none"' + (v === 'none' ? ' selected' : '') + '>Не беспокоить</option>';
+  }
+
+  function checkedFlag(value, defaultOn){
+    var on = value == null || value === '' ? defaultOn : !(value === 0 || value === '0' || value === false);
+    return on ? ' checked' : '';
+  }
+
+  function renderClientOrders(orders){
+    if(!orders.length) return '<div class="empty">Заказов пока нет</div>';
+    return '<div class="client-order-list">' + orders.map(function(order){
+      return '<div class="client-order-row">' +
+        '<div><div class="mono">SH-' + String(order.id).padStart(5,'0') + '</div><div class="muted">' + dateShort(order.created_at) + '</div></div>' +
+        '<div>' + renderItems(order.items || []) + '</div>' +
+        '<div class="price nowrap">' + money(order.total) + '</div>' +
+        '<div>' + statusPill(order.status) + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderBonusAdjust(userId){
+    return '<div class="bonus-adjust" data-bonus-adjust data-id="' + esc(userId) + '">' +
+      '<input class="input" name="bonus_amount" type="number" step="1" placeholder="+500 или -200">' +
+      '<input class="input" name="bonus_description" placeholder="Комментарий к бонусам">' +
+      '<button class="btn ghost" type="button" data-action="client-bonus-adjust" data-id="' + esc(userId) + '">Изменить бонусы</button>' +
+    '</div>';
+  }
+
+  async function saveClientEditor(form){
+    var submit = form.querySelector('button[type="submit"]');
+    if(submit) submit.disabled = true;
+    var id = Number(form.user_id.value || 0);
+    try {
+      await api('client_save', {method:'POST', body:{
+        user_id:id,
+        name:form.name.value.trim(),
+        phone:form.phone.value.trim(),
+        email:form.email.value.trim(),
+        telegram:form.telegram.value.trim(),
+        role:form.role.value,
+        status:form.status.value,
+        client_type:form.client_type.value,
+        preferred_channel:form.preferred_channel.value,
+        company:form.company.value.trim(),
+        contact_person:form.contact_person.value.trim(),
+        position:form.position.value.trim(),
+        legal_name:form.legal_name.value.trim(),
+        inn:form.inn.value.trim(),
+        kpp:form.kpp.value.trim(),
+        ogrn:form.ogrn.value.trim(),
+        payment_terms:form.payment_terms.value.trim(),
+        legal_address:form.legal_address.value.trim(),
+        delivery_address:form.delivery_address.value.trim(),
+        telegram_chat_id:form.telegram_chat_id.value.trim(),
+        telegram_token:form.telegram_token.value.trim(),
+        discount_percent:form.discount_percent.value,
+        tags:form.tags.value.trim(),
+        manager_note:form.manager_note.value.trim(),
+        email_subscribed:form.email_subscribed.checked ? 1 : 0,
+        telegram_subscribed:form.telegram_subscribed.checked ? 1 : 0,
+        sms_subscribed:form.sms_subscribed.checked ? 1 : 0
+      }});
+      toast('Карточка клиента сохранена');
+      if(state.view === 'clients') await renderClients();
+      return showUserDetail(id);
+    } catch(e) {
+      if(submit) submit.disabled = false;
+      toast(e.message, true);
+    }
+  }
+
+  async function adjustClientBonus(button){
+    var box = button.closest('[data-bonus-adjust]');
+    if(!box) return;
+    var id = Number(box.getAttribute('data-id') || 0);
+    var amountInput = box.querySelector('[name="bonus_amount"]');
+    var descInput = box.querySelector('[name="bonus_description"]');
+    var amount = Number(amountInput ? amountInput.value : 0);
+    if(!amount) return toast('Укажите сумму бонусов со знаком', true);
+    button.disabled = true;
+    try {
+      await api('bonus_adjust', {method:'POST', body:{
+        user_id:id,
+        amount:amount,
+        description:descInput && descInput.value.trim() ? descInput.value.trim() : 'Ручная корректировка из карточки клиента'
+      }});
+      toast('Бонусы обновлены');
+      if(state.view === 'clients') await renderClients();
+      return showUserDetail(id);
+    } catch(e) {
+      button.disabled = false;
+      toast(e.message, true);
+    }
   }
 
   function renderBonusLog(rows){
@@ -1209,6 +1436,7 @@
     if(drawer) { drawer.classList.remove('show'); drawer.innerHTML = ''; }
     document.body.classList.remove('drawer-open');
     state.editor = null;
+    state.clientDetail = null;
   }
 
   async function deleteCustomProduct(sku){
