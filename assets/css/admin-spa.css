@@ -169,8 +169,9 @@ a{color:inherit}
 .photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .photo-card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:7px}
 .photo-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;border:1px solid #eee6da;background:#f3eee6}
-.photo-actions{display:flex;gap:5px;margin-top:7px}
-.photo-actions .btn{flex:1;min-height:28px;padding:5px;font-size:12px}
+.photo-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:7px}
+.photo-actions .btn{width:100%;min-width:0;min-height:28px;padding:5px;font-size:12px}
+.photo-actions .btn:last-child{grid-column:1/-1}
 .main-badge{display:inline-flex;margin-top:6px;font-size:11px;font-weight:800;color:var(--accent-strong)}
 .modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px}
 .modal.show{display:flex}
