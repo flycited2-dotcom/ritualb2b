@@ -966,6 +966,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* ── PRODUCT BADGES ── */
 .pcard-badge{position:absolute;top:8px;left:8px;border-radius:20px;padding:3px 9px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;z-index:2;white-space:nowrap}
 .pb-new{background:rgba(22,163,74,.9);color:#fff}
+.pb-regular{background:rgba(55,65,81,.95);color:#fff}
 .pb-sale{background:rgba(245,158,11,.95);color:#fff}
 .pb-clearance{background:rgba(239,68,68,.9);color:#fff}
 .pcard-admin-desc{font-size:.72rem;color:#4b5563;margin-top:6px;line-height:1.4;font-style:italic}
@@ -1256,6 +1257,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 <script>
 // Product overrides (badges + descriptions from admin)
 var PRODUCT_OVERRIDES = {};
+var catalogReadyForLink = false;
 fetch("api/admin.php?action=products_overrides_public")
   .then(function(r){return r.json();})
   .then(function(d){
@@ -1272,7 +1274,11 @@ fetch("api/admin.php?action=products_overrides_public")
     if (typeof syncFab === 'function') syncFab();
     if (typeof renderAll === 'function') renderAll(); // Re-render catalog with overrides + custom products applied
   })
-  .catch(function(){});
+  .catch(function(){})
+  .finally(function(){
+    catalogReadyForLink = true;
+    if (typeof openLinkedProduct === 'function') openLinkedProduct();
+  });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js" defer></script>
@@ -1433,6 +1439,7 @@ function chQty(id, d) {
 function getStockHtml(p) {
   if(p.stock === 'in_stock') return '<div class="stock-badge sb-in">&#10003; В наличии</div>';
   if(p.stock === 'out')      return '<div class="stock-badge sb-out">Нет в наличии</div>';
+  if(p.stock === 'on_request') return '<div class="stock-badge sb-12">Под заказ</div>';
   if(p.stock === 'days_1_2') return '<div class="stock-badge sb-12">Под заказ &middot; 1&ndash;2 дня</div>';
   if(p.stock === 'days_3_5') return '<div class="stock-badge sb-35">Под заказ &middot; 3&ndash;5 дней</div>';
   if(p.stock === 'order_7')  return '<div class="stock-badge sb-7">Под заказ &middot; 7 дней</div>';
@@ -1443,6 +1450,7 @@ function getStockInline(p) {
   var cls, lbl;
   if(p.stock === 'in_stock')      { cls='si-in';  lbl='В наличии'; }
   else if(p.stock === 'out')      { cls='si-out'; lbl='Нет в наличии'; }
+  else if(p.stock === 'on_request') { cls='si-12'; lbl='Под заказ'; }
   else if(p.stock === 'days_1_2') { cls='si-12';  lbl='Под заказ &middot; 1&ndash;2 дня'; }
   else if(p.stock === 'days_3_5') { cls='si-35';  lbl='Под заказ &middot; 3&ndash;5 дней'; }
   else if(p.stock === 'order_7')  { cls='si-7';   lbl='Под заказ &middot; 7 дней'; }
@@ -1491,7 +1499,7 @@ function cardHtml(p, delay) {
       ? '<button class="addbtn" style="background:#9CA3AF;cursor:not-allowed" disabled>Нет в наличии</button>'
       : '<button class="addbtn" onclick="addItem(\''+p.id+'\');event.stopPropagation()">+ В заявку</button>');
   var _bdg = _ov.badge || '';
-  var _bdgLbl = _ov.badge_label || ({new:'Новинка',sale:'Акция',clearance:'Распродажа'}[_bdg]||'');
+  var _bdgLbl = _ov.badge_label || ({new:'Новинка',regular:'Регулярный ассортимент',sale:'Акция',clearance:'Распродажа'}[_bdg]||'');
   var _badgeHtml = _bdg ? '<div class="pcard-badge pb-'+_bdg+'">'+_bdgLbl+'</div>' : '';
   var _descExtra = _ov.description ? '<div class="pcard-admin-desc">'+_ov.description+'</div>' : '';
   var sizeTag = [_size && _size !== '-' ? 'Размер '+_size : '', _dimensions].filter(Boolean).join(' · ');
@@ -1502,6 +1510,7 @@ function cardHtml(p, delay) {
     + '<div class="pcard-body">'
     + '<div class="pcard-name">'+_model+'</div>'
     + '<div class="pcard-desc">'+descLine+'</div>'
+    + (_stock === 'on_request' ? getStockHtml({stock:_stock}) : '')
     + _descExtra
     + '<div class="pcard-bottom">'
     +   '<div class="pcard-price">'+_price.toLocaleString('ru-RU')+'&thinsp;₽</div>'
@@ -2538,12 +2547,18 @@ observe();
 syncFab();
 
 // Открыть товар по прямой ссылке ?p=<id>
-(function(){
+var linkedProductOpened = false;
+function openLinkedProduct() {
+  if (!catalogReadyForLink || linkedProductOpened) return;
   try {
     var pid = new URLSearchParams(location.search).get('p');
-    if(pid && PRODUCTS.some(function(x){ return x.id === pid && isProductVisible(x); })) openDetail(pid);
+    if(pid && PRODUCTS.some(function(x){ return x.id === pid && isProductVisible(x); })) {
+      linkedProductOpened = true;
+      openDetail(pid);
+    }
   } catch(e){}
-})();
+}
+openLinkedProduct();
 </script>
 
 <!-- UNAVAILABLE ITEMS MODAL -->

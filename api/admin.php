@@ -4,6 +4,7 @@
  */
 
 require __DIR__ . '/../db/init.php';
+require_once __DIR__ . '/../lib/catalog.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
@@ -560,14 +561,7 @@ switch ($action) {
 
     // ── List products + overrides ──
     case 'products_list':
-        $jsFile = __DIR__ . '/../products.js';
-        $products = [];
-        if (file_exists($jsFile)) {
-            $js = file_get_contents($jsFile);
-            if (preg_match('/var\s+PRODUCTS\s*=\s*(\[[\s\S]*?\])\s*;/', $js, $m)) {
-                $products = json_decode($m[1], true) ?: [];
-            }
-        }
+        $products = readBaseCatalog(__DIR__ . '/../products.js');
         $ovRows = $db->query("SELECT sku, description, badge, badge_label, active, price_override, stock_override, size_override, desc_short, model_override, brand_override, dimensions, desc_long_override, benefits_override, photos_override FROM product_overrides")->fetchAll();
         $ovMap = [];
         foreach ($ovRows as $r) { $ovMap[$r['sku']] = $r; }
@@ -607,7 +601,7 @@ switch ($action) {
         $blabel          = trim($raw['badge_label'] ?? '');
         $active          = array_key_exists('active', $raw) ? (intval($raw['active']) ? 1 : 0) : null;
         $priceOv         = isset($raw['price_override']) && $raw['price_override'] !== '' ? (int)$raw['price_override'] : null;
-        $stockOv         = in_array($raw['stock_override'] ?? '', ['in_stock', 'out_of_stock', '']) ? (($raw['stock_override'] ?? '') ?: null) : null;
+        $stockOv         = in_array($raw['stock_override'] ?? '', ['in_stock', 'out_of_stock', 'on_request', '']) ? (($raw['stock_override'] ?? '') ?: null) : null;
         $sizeOv          = trim($raw['size_override'] ?? '') ?: null;
         $descShort       = trim($raw['desc_short'] ?? '') ?: null;
         $modelOv         = trim($raw['model_override'] ?? '') ?: null;
@@ -681,13 +675,8 @@ switch ($action) {
         $sku = trim($raw['sku'] ?? '');
         if (!$sku) jsonResponse(['ok' => false, 'error' => 'sku required'], 422);
         $active = array_key_exists('active', $raw) ? (intval($raw['active']) ? 1 : 0) : 1;
-        // Generate ID if new
-        $existing = $db->prepare("SELECT id FROM custom_products WHERE sku = ?")->execute([$sku]);
-        $existRow = $db->prepare("SELECT id FROM custom_products WHERE sku = ?");
-        $existRow->execute([$sku]);
-        $existData = $existRow->fetch();
-        $id = $existData ? $existData['id'] : ('cp_' . substr(md5(uniqid()), 0, 8));
         $photos = normalizePhotoList($raw['photos'] ?? ($raw['photo'] ?? ''));
+        $stock = $raw['stock'] ?? 'in_stock';
         $data = [
             'model'      => $raw['model'] ?? '',
             'brand'      => $raw['brand'] ?? 'Ручная работа',
@@ -697,8 +686,8 @@ switch ($action) {
             'size'       => $raw['size'] ?? '-',
             'dimensions' => $raw['dimensions'] ?? '',
             'price'      => intval($raw['price'] ?? 0),
-            'stock'      => $raw['stock'] ?? 'in_stock',
-            'stockLabel' => $raw['stock'] === 'out_of_stock' ? 'Нет в наличии' : 'В наличии',
+            'stock'      => $stock,
+            'stockLabel' => catalogStockLabel($stock),
             'descShort'  => $raw['descShort'] ?? '',
             'cardBenef'  => $raw['cardBenef'] ?? '',
             'benefits'   => array_values(array_filter(explode("\n", $raw['benefits_text'] ?? ''))),
@@ -710,13 +699,7 @@ switch ($action) {
         ];
         $db->beginTransaction();
         try {
-            $db->prepare("INSERT INTO custom_products (id, sku, data_json, active, updated_at)
-                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-                ON CONFLICT(sku) DO UPDATE SET data_json=excluded.data_json, active=excluded.active, updated_at=excluded.updated_at")
-                ->execute([$id, $sku, json_encode($data, JSON_UNESCAPED_UNICODE), $active]);
-            $db->prepare("INSERT INTO product_overrides (sku, active, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
-                ON CONFLICT(sku) DO UPDATE SET active=excluded.active, updated_at=excluded.updated_at")
-                ->execute([$sku, $active]);
+            $id = saveCustomCatalogProduct($db, $sku, $data, $active);
             $db->commit();
         } catch (Throwable $e) {
             if ($db->inTransaction()) $db->rollBack();

@@ -1,0 +1,34 @@
+{
+  "SchemaVersion": "1.0",
+  "TemplateName": "Венки RitualB2B 70 × 120 мм",
+  "Page": {"WidthMm": 70, "HeightMm": 120, "GapMm": 3, "Dpi": 203, "PrintOffsetXmm": 0},
+  "Variables": [
+    {"Key": "name", "Value": "Венок"},
+    {"Key": "dimensions", "Value": "120 × 65 см"},
+    {"Key": "article", "Value": "ВН-42"},
+    {"Key": "barcode", "Value": "VN-42"}
+  ],
+  "Elements": [
+    {
+      "Id": "name", "Type": "RasterText", "Name": "Название", "Visible": true,
+      "Xmm": 6, "Ymm": 10, "WidthMm": 58, "HeightMm": 41,
+      "Text": "{name}", "FontFamily": "Arial", "FontSizePt": 33, "Bold": true, "Wrap": true, "Align": "Center"
+    },
+    {
+      "Id": "dimensions", "Type": "RasterText", "Name": "Размер", "Visible": true,
+      "Xmm": 6, "Ymm": 54, "WidthMm": 58, "HeightMm": 11,
+      "Text": "{dimensions}", "FontFamily": "Arial", "FontSizePt": 27, "Align": "Center"
+    },
+    {
+      "Id": "article", "Type": "RasterText", "Name": "Артикул", "Visible": true,
+      "Xmm": 6, "Ymm": 67, "WidthMm": 58, "HeightMm": 15,
+      "Text": "Арт. {article}", "FontFamily": "Arial", "FontSizePt": 22, "Wrap": true, "Align": "Center"
+    },
+    {
+      "Id": "barcode", "Type": "Barcode128", "Name": "Штрихкод 1С", "Visible": true,
+      "Xmm": 6, "Ymm": 86, "WidthMm": 58, "HeightMm": 19,
+      "Text": "{barcode}", "BarcodeType": "128", "BarcodeHeightMm": 19, "BarcodeHumanReadable": true,
+      "BarcodeNarrowDots": 2, "BarcodeWideDots": 2
+    }
+  ]
+}

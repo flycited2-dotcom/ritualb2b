@@ -26,7 +26,8 @@
     completed:'Выполнен',
     cancelled:'Отменен',
     in_stock:'В наличии',
-    out_of_stock:'Нет в наличии'
+    out_of_stock:'Нет в наличии',
+    on_request:'Под заказ'
   };
 
   var state = {
@@ -1214,7 +1215,10 @@
               '<label class="field"><span>Название</span><input class="input" name="model" value="' + esc(e.model) + '" required></label>' +
               '<label class="field"><span>Бренд</span><input class="input" name="brand" value="' + esc(e.brand || 'Ручная работа') + '"></label>' +
               '<label class="field"><span>Цена</span><input class="input" name="price" type="number" min="0" value="' + esc(e.price) + '"></label>' +
-              '<label class="field"><span>Наличие</span><select class="select" name="stock"><option value="in_stock"' + (e.stock === 'in_stock' ? ' selected' : '') + '>В наличии</option><option value="out_of_stock"' + (e.stock === 'out_of_stock' ? ' selected' : '') + '>Нет в наличии</option></select></label>' +
+              '<label class="field"><span>Наличие</span><select class="select" name="stock">' +
+                ['in_stock', 'out_of_stock', 'on_request'].map(function(value){
+                  return '<option value="' + value + '"' + (e.stock === value ? ' selected' : '') + '>' + statusLabels[value] + '</option>';
+                }).join('') + '</select></label>' +
               '<div class="field"><span>Размер</span><input class="input" name="size" value="' + esc(e.size) + '">' + renderSizePicker(e.size) + '</div>' +
               '<label class="field"><span>Габариты</span><input class="input" name="dimensions" value="' + esc(e.dimensions) + '" placeholder="50 см / 120 см"></label>' +
               (ed.isCustom ? customProductFields(product) : overrideProductFields(e)) +
