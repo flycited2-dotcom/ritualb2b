@@ -17,6 +17,9 @@ function migrateProductReleases(PDO $db): void {
         onec_id TEXT PRIMARY KEY,
         site_sku TEXT NOT NULL UNIQUE
     )");
+    $db->exec("CREATE TABLE IF NOT EXISTS release_price_wait (
+        release_id TEXT PRIMARY KEY, onec_id TEXT NOT NULL
+    )");
 }
 
 function releaseUuid(mixed $value, string $field): string {
@@ -87,7 +90,7 @@ function enqueueProductRelease(PDO $db, array $body): array {
         'height_cm' => releaseInt($body['height_cm'] ?? null, 'height_cm', 1, 500),
         'width_cm' => releaseInt($body['width_cm'] ?? null, 'width_cm', 1, 500),
         'shape' => $shape,
-        'price_rub' => releaseInt($body['price_rub'] ?? null, 'price_rub', 1, 10000000),
+        'price_rub' => isset($body['price_rub']) ? releaseInt($body['price_rub'], 'price_rub', 1, 10000000) : null,
         'label_copies' => releaseInt($body['label_copies'] ?? 1, 'label_copies', 1, 1000),
         'label' => $label,
         'photo_format' => $format,
@@ -103,9 +106,32 @@ function enqueueProductRelease(PDO $db, array $body): array {
     return productReleaseStatus($row);
 }
 
-function nextProductRelease(PDO $db): ?array {
-    $draft = $db->query('SELECT draft FROM product_releases WHERE result IS NULL ORDER BY created_at, rowid LIMIT 1')->fetchColumn();
+function nextProductRelease(PDO $db, ?string $afterId = null): ?array {
+    $query = $db->prepare('SELECT draft FROM product_releases WHERE result IS NULL
+        AND rowid > COALESCE((SELECT rowid FROM product_releases WHERE id = ?), 0) ORDER BY rowid LIMIT 1');
+    $query->execute([$afterId]);
+    $draft = $query->fetchColumn();
     return $draft === false ? null : json_decode($draft, true, 512, JSON_THROW_ON_ERROR);
+}
+
+function releaseWaitingPrice(PDO $db, array $body): array {
+    $id = releaseUuid($body['release_id'] ?? null, 'release_id');
+    $onec = releaseUuid($body['onec_id'] ?? null, 'onec_id');
+    $row = readProductRelease($db, $id);
+    if ($row['result'] !== null) return productReleaseStatus($row);
+    $draft = json_decode($row['draft'], true, 512, JSON_THROW_ON_ERROR);
+    if (($draft['onec_id'] ?? $id) !== $onec) throw new ProductReleaseError('Другая номенклатура в заявке', 409);
+    $db->prepare('INSERT OR IGNORE INTO release_price_wait (release_id, onec_id) VALUES (?, ?)')->execute([$id, $onec]);
+    return releaseCurrentStatus($db, $id);
+}
+
+function releaseCurrentStatus(PDO $db, string $id): array {
+    $row = readProductRelease($db, $id);
+    if ($row['result'] !== null) return productReleaseStatus($row);
+    $query = $db->prepare('SELECT onec_id FROM release_price_wait WHERE release_id = ?');
+    $query->execute([$id]);
+    $onec = $query->fetchColumn();
+    return $onec === false ? productReleaseStatus($row) : ['release_id' => $id, 'state' => 'waiting_price', 'onec_id' => $onec];
 }
 
 function readReleaseConfirmation(array $body): array {
@@ -190,6 +216,9 @@ function writeProductionPhoto(string $directory, array $draft): string {
 function confirmProductRelease(PDO $db, string $catalogFile, string $photoDir, array $body): array {
     $id = releaseUuid($body['release_id'] ?? null, 'release_id');
     $confirmation = readReleaseConfirmation($body);
+    if (isset($body['wholesale_price_rub'])) {
+        $confirmation['wholesale_price_rub'] = releaseInt($body['wholesale_price_rub'], 'wholesale_price_rub', 1, 10000000);
+    }
     $confirmationJson = encodeRelease($confirmation);
     $db->beginTransaction();
     try {
@@ -204,8 +233,16 @@ function confirmProductRelease(PDO $db, string $catalogFile, string $photoDir, a
             return productReleaseStatus($row);
         }
         $draft = json_decode($row['draft'], true, 512, JSON_THROW_ON_ERROR);
+        $price = $confirmation['wholesale_price_rub'] ?? null;
+        if ($price === null) throw new ProductReleaseError('Для публикации нужна действующая цена «Опт» из УТ', 422);
         if ($draft['onec_id'] !== null && $draft['onec_id'] !== $confirmation['onec_id']) {
             throw new ProductReleaseError('Ответ 1С не совпадает с выбранной номенклатурой', 409);
+        }
+        $waiting = $db->prepare('SELECT onec_id FROM release_price_wait WHERE release_id = ?');
+        $waiting->execute([$id]);
+        $expected = $waiting->fetchColumn();
+        if ($expected !== false && $expected !== $confirmation['onec_id']) {
+            throw new ProductReleaseError('Оптовая цена относится к другой номенклатуре', 409);
         }
         [$sku, $productId, $existing] = productionCatalogTarget($db, $catalogFile, $draft, $confirmation['onec_id']);
         $db->prepare('INSERT INTO product_release_links (onec_id, site_sku) VALUES (?, ?) ON CONFLICT(onec_id) DO NOTHING')
@@ -219,7 +256,7 @@ function confirmProductRelease(PDO $db, string $catalogFile, string $photoDir, a
                 'size' => '-', 'btu' => '-', 'area' => 0, 'descShort' => '', 'descLong' => '', 'benefits' => [],
                 'stock' => 'on_request', 'stockLabel' => catalogStockLabel('on_request'),
             ], $existing, [
-                'model' => $draft['name'], 'dimensions' => $dimensions, 'price' => $draft['price_rub'],
+                'model' => $draft['name'], 'dimensions' => $dimensions, 'price' => $price,
                 'photo' => $photo, 'photos' => [$photo],
             ]);
             $productId = saveCustomCatalogProduct($db, $sku, $data, 1);
@@ -231,13 +268,14 @@ function confirmProductRelease(PDO $db, string $catalogFile, string $photoDir, a
                 photos_override=excluded.photos_override, updated_at=CURRENT_TIMESTAMP")
             ->execute([
                 $sku, $draft['label'], $isBaseProduct ? $draft['name'] : null, $isBaseProduct ? $dimensions : null,
-                $isBaseProduct ? $draft['price_rub'] : null,
+                $isBaseProduct ? $price : null,
                 $isBaseProduct ? encodeRelease([$photo]) : null,
             ]);
         $result = [
             'release_id' => $id, 'state' => 'published', 'product_id' => $productId, 'site_sku' => $sku,
             'catalog_path' => '/?p=' . rawurlencode($productId),
             'onec_id' => $confirmation['onec_id'],
+            'wholesale_price_rub' => $price,
             'label' => [
                 'release_id' => $id, 'name' => $draft['name'], 'dimensions' => $dimensions,
                 'article' => $confirmation['article'], 'barcode' => $confirmation['barcode'],

@@ -91,6 +91,7 @@ def confirmation(release):
     return {
         "release_id": release["release_id"], "onec_id": release.get("onec_id") or str(uuid4()),
         "article": "ВН-42", "barcode": "5901234123457", "barcode_type": "ean13",
+        "wholesale_price_rub": release.get("price_rub", 3200),
     }
 
 
@@ -162,3 +163,25 @@ def test_te200_label_export_from_published_result(local_site, tmp_path):
     assert raw.count(b"BITMAP ") == 3
     assert b'"EAN13",152,1,0,3,3,"590123412345"\r\n' in raw
     assert raw.endswith(b"PRINT 2,1\r\n")
+
+
+def test_ordered_queue_and_manual_wholesale_price(local_site):
+    first = draft(price_rub=1500)
+    second = draft()
+    second.pop("price_rub")
+    for item in (first, second):
+        assert local_site("enqueue", item)[0] == 200
+    receipt = confirmation(first)
+    receipt["onec_id"] = first["release_id"]
+    receipt.pop("wholesale_price_rub")
+    assert local_site("confirm", receipt, "1c")[0] == 422
+    assert local_site("wait_price", receipt, "producer")[0] == 401
+    assert local_site("wait_price", receipt, "1c")[1]["state"] == "waiting_price"
+    assert local_site("status", {"release_id": first["release_id"]})[1]["state"] == "waiting_price"
+    assert local_site("next", {"after_id": first["release_id"]}, "1c")[1]["job"]["release_id"] == second["release_id"]
+    assert local_site("catalog")[1]["custom_products"] == []
+    receipt["wholesale_price_rub"] = 2600
+    published = local_site("confirm", receipt, "1c")[1]
+    assert published["wholesale_price_rub"] == 2600
+    assert local_site("confirm", receipt, "1c")[1] == published
+    assert local_site("catalog")[1]["custom_products"][0]["price"] == 2600

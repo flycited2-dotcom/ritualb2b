@@ -12,11 +12,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 $action = $_GET['action'] ?? '';
 $keyName = match ($action) {
     'enqueue', 'status' => 'RITUAL_RELEASE_PRODUCER_KEY',
-    'next', 'confirm' => 'RITUAL_RELEASE_1C_KEY',
+    'next', 'confirm', 'wait_price' => 'RITUAL_RELEASE_1C_KEY',
     default => null,
 };
 if ($keyName === null) jsonResponse(['ok' => false, 'error' => 'Unknown action'], 404);
 $key = getenv($keyName);
+if ($key === false) {
+    $keyFile = dirname(__DIR__, 2) . '/private/product-release-keys.json';
+    if (is_readable($keyFile)) {
+        $keys = json_decode(file_get_contents($keyFile), true);
+        $key = is_array($keys) ? ($keys[$keyName] ?? null) : null;
+    }
+}
 if (!is_string($key) || strlen($key) < 32
     || !hash_equals('Bearer ' . $key, $_SERVER['HTTP_AUTHORIZATION'] ?? '')) {
     jsonResponse(['ok' => false, 'error' => 'Unauthorized'], 401);
@@ -39,9 +46,10 @@ try {
     migrateProductReleases($db);
     $result = match ($action) {
         'enqueue' => enqueueProductRelease($db, $body),
-        'next' => ['job' => nextProductRelease($db)],
+        'next' => ['job' => nextProductRelease($db, isset($body['after_id']) ? releaseUuid($body['after_id'], 'after_id') : null)],
+        'wait_price' => releaseWaitingPrice($db, $body),
         'confirm' => confirmProductRelease($db, __DIR__ . '/../products.js', __DIR__ . '/../assets/img/products', $body),
-        'status' => productReleaseStatus(readProductRelease($db, releaseUuid($body['release_id'] ?? null, 'release_id'))),
+        'status' => releaseCurrentStatus($db, releaseUuid($body['release_id'] ?? null, 'release_id')),
     };
     jsonResponse(['ok' => true] + $result);
 } catch (ProductReleaseError $error) {

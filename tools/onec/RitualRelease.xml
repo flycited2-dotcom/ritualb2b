@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" version="2.20">
+  <ExternalDataProcessor uuid="8ddd63e9-ea65-4cdd-ba2d-60c17ce08ff7">
+    <InternalInfo>
+      <xr:ContainedObject><xr:ClassId>c3831ec8-d8d5-4f93-8a22-f9bfae07327f</xr:ClassId><xr:ObjectId>294d5291-fd4b-4e38-b6cb-6e1e0650ca38</xr:ObjectId></xr:ContainedObject>
+      <xr:GeneratedType name="ExternalDataProcessorObject.RitualRelease" category="Object">
+        <xr:TypeId>f34073bb-fc7c-4494-b0e3-42d8147a50d3</xr:TypeId><xr:ValueId>94f3af8f-5654-4524-bb37-983be5be946f</xr:ValueId>
+      </xr:GeneratedType>
+    </InternalInfo>
+    <Properties><Name>RitualRelease</Name><Synonym><v8:item><v8:lang>ru</v8:lang><v8:content>Выпуск венка RitualB2B</v8:content></v8:item></Synonym><Comment/><DefaultForm/><AuxiliaryForm/></Properties>
+    <ChildObjects/>
+  </ExternalDataProcessor>
+</MetaDataObject>
